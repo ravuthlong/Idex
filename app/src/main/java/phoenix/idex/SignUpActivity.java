@@ -19,7 +19,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     ServerRequests serverRequests;
     User signedUpUser;
     Button bSignUp;
-    EditText etFirstName, etLastName, etEmail, etUsername, etPassword;
+    EditText etFirstName, etLastName, etEmail, etUsername, etPassword, etConfirmPass;
     private  UserLocalStore userLocalStore;
 
     @Override
@@ -39,6 +39,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         etEmail = (EditText) findViewById(R.id.etEmail);
         etUsername = (EditText) findViewById(R.id.etUsername);
         etPassword = (EditText) findViewById(R.id.etPassword);
+        etConfirmPass = (EditText) findViewById(R.id.etConfirmPass);
+
         bSignUp = (Button) findViewById(R.id.bSignUp);
 
         bSignUp.setOnClickListener(this);
@@ -56,27 +58,35 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bSignUp:
-                signedUpUser = new User(etFirstName.getText().toString(), etLastName.getText().toString(),
-                        etEmail.getText().toString(), etUsername.getText().toString(), etPassword.getText().toString());
+                if(etConfirmPass.toString().equals(etPassword.toString())){
+                    signedUpUser = new User(etFirstName.getText().toString(), etLastName.getText().toString(),
+                            etEmail.getText().toString(), etUsername.getText().toString(), etPassword.getText().toString());
 
 
-                serverRequests = new ServerRequests(this);
-                serverRequests.storeUserDataInBackground(signedUpUser, new GetUserCallBack() {
-                    @Override
-                    public void done(User returnedUser) {
-                        // Username has been taken and user info will not be stored
-                        if (returnedUser == null) {
-                            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SignUpActivity.this);
-                            dialogBuilder.setMessage("User has been taken");
-                            dialogBuilder.setPositiveButton("Ok", null);
-                            dialogBuilder.show();
-                        } else {
-                            userLocalStore.storeUserData(returnedUser);
-                            userLocalStore.setUserLoggedIn(true);
-                            startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                    serverRequests = new ServerRequests(this);
+                    serverRequests.storeUserDataInBackground(signedUpUser, new GetUserCallBack() {
+                        @Override
+                        public void done(User returnedUser) {
+                            // Username has been taken and user info will not be stored
+                            if (returnedUser == null) {
+                                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SignUpActivity.this);
+                                dialogBuilder.setMessage("User has been taken");
+                                dialogBuilder.setPositiveButton("Ok", null);
+                                dialogBuilder.show();
+                            } else {
+                                userLocalStore.storeUserData(returnedUser);
+                                userLocalStore.setUserLoggedIn(true);
+                                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                            }
                         }
-                    }
-                });
+                    });
+                }
+                else{
+                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SignUpActivity.this);
+                    dialogBuilder.setMessage("Confirm password does not match. Please enter again.");
+                    dialogBuilder.setPositiveButton("Ok", null);
+                    dialogBuilder.show();
+                }
                 break;
         }
 

@@ -25,7 +25,7 @@
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.FloatingActionButton
-        app:layout_behavior="phoenix.idex.RecyclerViewFeed.listener.ScrollListener"
+        app:layout_behavior="phoenix.idex.RecyclerViewFeed.MainRecyclerView.listener.ScrollListener"
         android:id="@+id/postWidget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
