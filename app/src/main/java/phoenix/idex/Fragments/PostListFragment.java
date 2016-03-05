@@ -46,6 +46,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     private SwipeRefreshLayout refreshLayout;
 
     @Override
+    /*OKAY*/
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_mainpost,container, false);
         postWidget = (FloatingActionButton) v.findViewById(R.id.postWidget);
