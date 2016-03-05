@@ -5,7 +5,7 @@ package phoenix.idex;
  */
 public class User {
     private String firstname, lastname, email, username, password;
-
+    // SUmthing
     // User for signing up
     public User(String firstname, String lastname, String email, String username, String password) {
         this.firstname = firstname;
