@@ -169,21 +169,17 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                 JSONObject feedObj = (JSONObject) feedArray.get(i);
 
                 FeedItem item = new FeedItem();
+
+
                 item.setId(feedObj.getInt("id"));
                 item.setName(feedObj.getString("name"));
-
-                // Image might be null sometimes
-                String image = feedObj.isNull("image") ? null : feedObj
-                        .getString("image");
-                item.setImge(image);
+                item.setUsername(feedObj.getString("username"));
                 item.setStatus(feedObj.getString("status"));
                 item.setProfilePic(feedObj.getString("profilePic"));
                 item.setTimeStamp(feedObj.getString("timeStamp"));
-
-                // url might be null sometimes
-                String feedUrl = feedObj.isNull("url") ? null : feedObj
-                        .getString("url");
-                item.setUrl(feedUrl);
+                item.setFill(feedObj.getInt("fill"));
+                item.setKill(feedObj.getInt("kill"));
+                 item.setValue();
 
                 feedItems.add(item);
             }

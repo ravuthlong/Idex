@@ -69,7 +69,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         // user profile pic
         holder.profilePic.setImageUrl(currentPos.getProfilePic(), imageLoader);
 
-
+        holder.numKill.setText(Integer.toString(currentPos.getKill()));
+        holder.numFill.setText(Integer.toString(currentPos.getFill()));
     }
 
     @Override
@@ -83,6 +84,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         TextView name;
         TextView timestamp;
         TextView txtStatusMsg;
+        TextView numFill;
+        TextView numKill;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -90,6 +93,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             name = (TextView) itemView.findViewById(R.id.name);
             timestamp = (TextView) itemView.findViewById(R.id.timestamp);
             txtStatusMsg = (TextView) itemView.findViewById(R.id.txtStatusMsg);
+            numFill = (TextView) itemView.findViewById(R.id.tvFillNum);
+            numKill = (TextView) itemView.findViewById(R.id.tvKillNum);
         }
     }
 }

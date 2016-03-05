@@ -63,21 +63,15 @@
             android:paddingRight="@dimen/feed_item_status_pad_left_right"
             android:paddingTop="@dimen/feed_item_status_pad_top" />
 
-        <TextView
-            android:id="@+id/txtUrl"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:linksClickable="true"
-            android:paddingBottom="10dp"
-            android:paddingLeft="@dimen/feed_item_status_pad_left_right"
-            android:paddingRight="@dimen/feed_item_status_pad_left_right"
-            android:textColorLink="@color/link" />
         <LinearLayout
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-
+            <TextView
+                android:id="@+id/tvFillNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
             <Button
                 android:id="@+id/bFill"
                 android:text="Fill"
@@ -93,6 +87,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#30595b" />
+            <TextView
+                android:id="@+id/tvKillNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
     </LinearLayout>
