@@ -67,7 +67,7 @@ public class TabFragment extends Fragment implements ViewPager.OnPageChangeListe
     private void initViewPager() {
         List<Fragment> listFrag = new ArrayList<>();
         listFrag.add(new UserstatFragment());
-        listFrag.add(new PostListFragment());
+        listFrag.add(new GraphFragment());
 
         this.viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), listFrag);
         this.viewPager = (ViewPager) v.findViewById(R.id.viewPager);

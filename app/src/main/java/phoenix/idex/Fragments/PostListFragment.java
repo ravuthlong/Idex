@@ -42,7 +42,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     private List<FeedItem> feedItems;
     private FeedListAdapter feedListAdapter;
     private FloatingActionButton postWidget;
-    private String URL_FEED = "http://paulphoenix.netai.net/feed.json";
+    private String URL_FEED = "http://paulphoenix.netai.net/feed_temporary.json";
     private SwipeRefreshLayout refreshLayout;
 
     @Override

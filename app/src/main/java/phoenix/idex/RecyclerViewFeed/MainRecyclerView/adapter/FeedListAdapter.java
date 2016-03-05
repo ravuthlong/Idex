@@ -7,6 +7,7 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -43,12 +44,12 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
 
         if (imageLoader == null)
             imageLoader = AppController.getInstance().getImageLoader();
 
-        FeedItem currentPos = feedItems.get(position);
+        final FeedItem currentPos = feedItems.get(position);
         holder.name.setText(currentPos.getName());
 
         // Converting timestamp into x ago format
@@ -71,12 +72,31 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
         holder.numKill.setText(Integer.toString(currentPos.getKill()));
         holder.numFill.setText(Integer.toString(currentPos.getFill()));
+
+        holder.bFill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPos.hitFill();
+                holder.bFill.setText("Fill (" + currentPos.getFill() + ")");
+            }
+        });
+        holder.bKill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPos.hitKill();
+                holder.bKill.setText("Kill (" + currentPos.getKill() + ")");
+            }
+        });
+
     }
 
     @Override
     public int getItemCount() {
         return feedItems.size();
     }
+
+
+
     // Holder knows and references where the fields are
     class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -86,6 +106,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         TextView txtStatusMsg;
         TextView numFill;
         TextView numKill;
+        Button bFill;
+        Button bKill;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -95,6 +117,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             txtStatusMsg = (TextView) itemView.findViewById(R.id.txtStatusMsg);
             numFill = (TextView) itemView.findViewById(R.id.tvFillNum);
             numKill = (TextView) itemView.findViewById(R.id.tvKillNum);
+            bFill = (Button) itemView.findViewById(R.id.bFill);
+            bKill = (Button) itemView.findViewById(R.id.bKill);
         }
     }
 }
