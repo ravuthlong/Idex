@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Idex</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="userInfo_edit">Edit Info</string>
+    <string name="facebook_app_id">990811460986304</string>
+    <string name="frag1">Frag 1</string>
+    <string name="info">Everyone has an idea...\n \nMarket Before You Make It!</string>
+    <string name="frag3">Frag 3</string>
+    <string name="menu1">Item 1</string>
+    <string name="menu2">Item 2</string>
+    <string name="menu3">Item 3</string>
+    <string name="drawerOpened">Opened</string>
+    <string name="drawerClosed">Closed</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+</resources>

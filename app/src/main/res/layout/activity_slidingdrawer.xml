@@ -1,0 +1,32 @@
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start"
+    android:id="@+id/drawerLayoutMain">
+
+    <include
+        layout="@layout/frag_toolbar_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <RelativeLayout
+        android:paddingTop="?attr/actionBarSize"
+        android:id="@+id/rLayoutMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+    </RelativeLayout>
+
+    <ListView
+        android:layout_width="190dp"
+        android:layout_height="match_parent"
+        android:background="#383838"
+        android:choiceMode="singleChoice"
+        android:id="@+id/listViewMain"
+        android:layout_gravity='start'/>
+</android.support.v4.widget.DrawerLayout>
+
+
