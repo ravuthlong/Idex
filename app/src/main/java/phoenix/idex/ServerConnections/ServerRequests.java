@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 
-import phoenix.idex.MainActivity;
 import phoenix.idex.User;
+import phoenix.idex.UserLocalStore;
 
 /**
  * Created by Ravinder on 3/2/16.
@@ -20,7 +20,6 @@ import phoenix.idex.User;
 public class ServerRequests {
     private ProgressDialog progressDialog;
     public static final int CONNECTION_TIMEOUT = 1000 * 15;
-    public static final String SERVER_ADDRESS = "http://www.idex.site88.net/";
 
     public ServerRequests(Context context) {
         progressDialog = new ProgressDialog(context);
@@ -36,7 +35,7 @@ public class ServerRequests {
 
     public void logUserInDataInBackground(User user, GetUserCallBack userCallBack) {
         progressDialog.show();
-        new StoreUserDataAsyncTask(user, userCallBack).execute();
+        new FetchUserDataAsyncTask(user, userCallBack).execute();
     }
 
 
@@ -67,6 +66,14 @@ public class ServerRequests {
                 HttpRequest req = new HttpRequest("http://idex.site88.net/register.php");
                 jObject = req.preparePost().withData(userInfo).sendAndReadJSON();
 
+                if(jObject.getString("username").equals("")) {
+                    // No user returned
+                    returnedUser = null;
+                } else {
+                    UserLocalStore.isUserLoggedIn = true;
+                    returnedUser = new User(user.getFirstname(), user.getLastname(), user.getEmail(),
+                            user.getUsername());
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }catch (MalformedURLException e) {
@@ -76,14 +83,7 @@ public class ServerRequests {
 
             }
 
-            if(jObject == null) {
-                // No user returned
-                returnedUser = null;
-            } else {
-                MainActivity.isUserLoggedIn = true;
-                returnedUser = new User(user.getFirstname(), user.getLastname(), user.getEmail(),
-                        user.getUsername());
-            }
+
 
             return returnedUser;
         }
@@ -123,11 +123,12 @@ public class ServerRequests {
                 HttpRequest req = new HttpRequest("http://idex.site88.net/login.php");
                 jObject = req.preparePost().withData(userInfo).sendAndReadJSON();
 
-                if(jObject.length() == 0){
+                if(jObject.getString("username").equals("")){
                     // No user returned
                     returnedUser = null;
 
                 }else{
+                   UserLocalStore.isUserLoggedIn = true;
                     // Get the user details
                     String firstname = jObject.getString("firstname");
                     String lastname = jObject.getString("lastname");

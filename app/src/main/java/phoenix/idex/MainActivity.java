@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout layout;
     private FragmentManager fragmentManager;
     public static boolean isMainShown = false;
-    public static boolean isUserLoggedIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayoutMain);
         layout = (RelativeLayout) findViewById(R.id.rLayoutMain);
 
-        if (isUserLoggedIn == false) {
+        if (!UserLocalStore.isUserLoggedIn) {
             setUpDrawerList();
             setUpFragments();
             screenStartUpState();
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             setUpLoggedInDrawerList();
             setUpLoggedInFragments();
             screenStartUpState();
-            drawerListViewListener();
+            drawerListViewLoggedInUserListener();
             toggleListener();
         }
     }
@@ -131,20 +131,66 @@ public class MainActivity extends AppCompatActivity {
         fragmentList = new ArrayList<>();
 
         fragmentList.add(new PostListFragment());
-        fragmentList.add(new LoginActivityFragment());
         fragmentList.add(new TabFragment());
+        fragmentList.add(new PostListFragment());
         fragmentList.add(new Fragment2());
     }
 
     // Start up state
     //Title Idex, with closed navigation drawer and default fragment 1
     private void screenStartUpState() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         isMainShown = true;
         setTitle("Idex");
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.rLayoutMain, fragmentList.get(0)).commit();
         listView.setItemChecked(0, true);
         drawerLayout.closeDrawer(listView);
+    }
+
+    // Fragments to be displayed based on user selection from navigation drawer
+    private void drawerListViewLoggedInUserListener() {
+        // Handle click
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                currentPos = position;
+
+                if (position == 2) {
+                    currentPos = 0;
+                    Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
+                    UserLocalStore.isUserLoggedIn = false;
+                    setUpDrawerList();
+                    setUpFragments();
+                    screenStartUpState();
+                    drawerListViewListener();
+                    //toggleListener();
+
+                } else {
+                    if (position == 0) {
+                        isMainShown = true;
+                        setTitle("Idex");
+                    } else {
+                        isMainShown = false;
+                        setTitle(itemList.get(position).getTitle());
+                    }
+                    drawerLayout.closeDrawer(listView);
+                    // Set item to selected
+                    listView.setItemChecked(position, true);
+
+                }
+                // Delay to avoid lag between navigation drawer items
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        FragmentManager fragmentManager = getSupportFragmentManager();
+                        fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
+                                fragmentList.get(currentPos)).commit();
+                    }
+                }, 270);
+            }
+        });
     }
 
     // Fragments to be displayed based on user selection from navigation drawer

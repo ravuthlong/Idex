@@ -29,11 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import phoenix.idex.DashActivity;
-import phoenix.idex.MainActivity;
 import phoenix.idex.R;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.adapter.FeedListAdapter;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.data.FeedItem;
+import phoenix.idex.UserLocalStore;
 
 public class PostListFragment extends Fragment implements  View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = PostListFragment.class.getSimpleName();
@@ -52,7 +52,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         postWidget = (FloatingActionButton) v.findViewById(R.id.postWidget);
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refreshLayout);
 
-
         recyclerView = (RecyclerView) v.findViewById(R.id.postRecyclerView1);
         feedItems = new ArrayList<>();
 
@@ -63,35 +62,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         refreshLayout.setOnRefreshListener(this);
         postWidget.setOnClickListener(this);
 
-        if (!MainActivity.isUserLoggedIn) {
-            postWidget.hide();
-        }
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                if(!MainActivity.isUserLoggedIn && dy > 0) {
-                    postWidget.hide();
-                    System.out.println("Scrolled Downwards");
-                } else if(!MainActivity.isUserLoggedIn && dy < 0) {
-                    postWidget.hide();
-                    System.out.println("Scrolled Upwards");
-                }
-            }
-        });
-/*
-        if (!MainActivity.isUserLoggedIn) {
-            CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) postWidget.getLayoutParams();
-            p.setAnchorId(View.NO_ID);
-            postWidget.setVisibility(View.GONE);
-            //postWidget.hide();
-        } else {
-            postWidget.setOnClickListener(this);
-        }
-        */
+        hideWidget();
         getJson();
         return v;
 
@@ -106,7 +77,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                 break;
         }
     }
-
 
     @Override
     public void onRefresh() {
@@ -170,7 +140,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
 
                 FeedItem item = new FeedItem();
 
-
                 item.setId(feedObj.getInt("id"));
                 item.setName(feedObj.getString("name"));
                 item.setUsername(feedObj.getString("username"));
@@ -189,5 +158,26 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    // If user is not logged in, hide the widget. Otherwise, show the widget.
+    private void hideWidget() {
+        if (!UserLocalStore.isUserLoggedIn) {
+            postWidget.hide();
+        }
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if(!UserLocalStore.isUserLoggedIn && dy > 0) {
+                    postWidget.hide();
+                } else if(!UserLocalStore.isUserLoggedIn && dy < 0) {
+                    postWidget.hide();
+                }
+            }
+        });
     }
 }
