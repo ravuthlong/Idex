@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         FragmentManager fragmentManager = getSupportFragmentManager();
                         fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
-                                fragmentList.get(currentPos)).commit();
+                                fragmentList.get(currentPos)).addToBackStack(null).commit();
                     }
                 }, 270);
             }
@@ -256,10 +256,11 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (isMainShown) {
             finish();
-        } else  {
-            listView.setItemChecked(currentPos, true);
-            setTitle(itemList.get(currentPos).getTitle());
+        } else {
+            listView.setItemChecked(0, true);
+            setTitle(itemList.get(0).getTitle());
             fragmentManager.beginTransaction().replace(R.id.rLayoutMain, fragmentList.get(0)).commit();
+            isMainShown = true;
         }
     }
 }

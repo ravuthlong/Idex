@@ -8,6 +8,26 @@
     android:weightSum="5"
     tools:context="phoenix.idex.UserStatsActivity">
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="You are logged in as:"
+            android:id="@+id/textView"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/etloggedInUser" />
+    </LinearLayout>
+
     <TextView
         android:text="Total posts: 26\nTotal fills: 22\nTotal Kills: 10"
         android:textSize="20dp"

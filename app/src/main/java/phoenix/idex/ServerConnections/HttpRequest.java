@@ -101,15 +101,17 @@ public class HttpRequest {
      * @return HttpRequest this instance -> for chaining method @see line 22
      * @throws IOException - should be checked by caller
      * */
-    public HttpRequest withData(HashMap<String,String> params) throws IOException{
+
+    public HttpRequest withData(HashMap<String,Object> params) throws IOException{
         String result="",and = "";
-        for(Map.Entry<String, String> entry : params.entrySet()){
+        for(Map.Entry<String, Object> entry : params.entrySet()){
             result+=and+entry.getKey()+"="+entry.getValue();//concats: key=value (for first param) OR &key=value(second and more)
             if(and.isEmpty())and="&";//& between params, except first so added after first concatenation
         }
         withData(result);
         return this;
     }
+
     //When caller only need to send, and don't need String response from server
     public boolean send() throws IOException{
         boolean status=con.getResponseCode()==HttpURLConnection.HTTP_OK;//Http OK == 200

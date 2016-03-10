@@ -9,20 +9,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import phoenix.idex.ServerConnections.ServerRequests;
 
 
 /**
  * Created by Ravinder on 2/23/16.
  */
 
-public class DashActivity extends AppCompatActivity implements TextWatcher {
+public class DashActivity extends AppCompatActivity implements TextWatcher, View.OnClickListener {
 
-    EditText editText;
-    Toolbar toolbardash;
-    TextView wordCounter;
+    private  EditText editText;
+    private Toolbar toolbardash;
+    private TextView wordCounter;
+    private Button bPostIdea;
+    private UserLocalStore userLocalStore;
+    private ServerRequests serverRequests;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +41,14 @@ public class DashActivity extends AppCompatActivity implements TextWatcher {
         toolbardash = (Toolbar) findViewById(R.id.toolbardash);
         editText = (EditText) findViewById(R.id.editTextDash);
         wordCounter = (TextView) findViewById(R.id.wordCounter);
+        bPostIdea = (Button) findViewById(R.id.bPostIdea);
 
         setSupportActionBar(toolbardash);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setTitle("Post");
 
+        userLocalStore = new UserLocalStore(this);
+        serverRequests = new ServerRequests(this);
         toolbardash.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,6 +56,18 @@ public class DashActivity extends AppCompatActivity implements TextWatcher {
             }
         });
         editText.addTextChangedListener(this);
+        bPostIdea.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.bPostIdea:
+                User user = userLocalStore.getLoggedInUser();
+                serverRequests.storeAPostInBackground(editText.getText().toString(),
+                        user.getUserID());
+                break;
+        }
     }
 
     @Override

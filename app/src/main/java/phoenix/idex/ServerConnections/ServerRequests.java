@@ -3,6 +3,7 @@ package phoenix.idex.ServerConnections;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,8 +21,10 @@ import phoenix.idex.UserLocalStore;
 public class ServerRequests {
     private ProgressDialog progressDialog;
     public static final int CONNECTION_TIMEOUT = 1000 * 15;
+    Context context;
 
     public ServerRequests(Context context) {
+        this.context = context;
         progressDialog = new ProgressDialog(context);
         progressDialog.setCancelable(false);
         progressDialog.setTitle("Processing");
@@ -38,6 +41,53 @@ public class ServerRequests {
         new FetchUserDataAsyncTask(user, userCallBack).execute();
     }
 
+    public void storeAPostInBackground(String post, int userID) {
+        progressDialog.show();
+        new StoreAPostAsyncTask(post, userID).execute();
+    }
+
+    public class StoreAPostAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private String post;
+        private int userID;
+
+        public StoreAPostAsyncTask(String post, int userID) {
+            this.post = post;
+            this.userID = userID;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            HashMap<String, Object> userPost = new HashMap<>();
+            userPost.put("post", post);
+            userPost.put("userID", userID);
+
+
+            JSONObject jObject = new JSONObject();
+
+            try {
+                HttpRequest req = new HttpRequest("http://idex.site88.net/insertnewpost.php");
+                jObject = req.preparePost().withData(userPost).sendAndReadJSON();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+            Toast.makeText(context, "Post sent to the database..", Toast.LENGTH_SHORT).show();
+
+        }
+    }
 
     public class StoreUserDataAsyncTask extends AsyncTask<Void, Void, User> {
 
@@ -53,7 +103,7 @@ public class ServerRequests {
         protected User doInBackground(Void... params) {
             User returnedUser = null;
 
-            HashMap<String, String> userInfo = new HashMap<>();
+            HashMap<String, Object> userInfo = new HashMap<>();
             userInfo.put("firstname", user.getFirstname());
             userInfo.put("lastname", user.getLastname());
             userInfo.put("email", user.getEmail());
@@ -66,13 +116,17 @@ public class ServerRequests {
                 HttpRequest req = new HttpRequest("http://idex.site88.net/register.php");
                 jObject = req.preparePost().withData(userInfo).sendAndReadJSON();
 
-                if(jObject.getString("username").equals("")) {
+                if(jObject.getString("user").equals("")) {
                     // No user returned
                     returnedUser = null;
                 } else {
+
+                    int userID = jObject.getInt("id");
                     UserLocalStore.isUserLoggedIn = true;
-                    returnedUser = new User(user.getFirstname(), user.getLastname(), user.getEmail(),
+                    returnedUser = new User(userID, user.getFirstname(), user.getLastname(), user.getEmail(),
                             user.getUsername());
+
+                    System.out.println("!!!!!!!!!!!!!!!!!!USER WAS INSERTED AT LOCATION " + userID);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -82,12 +136,8 @@ public class ServerRequests {
                 e.printStackTrace();
 
             }
-
-
-
             return returnedUser;
         }
-
         @Override
         protected void onPostExecute(User returnedUser) {
             super.onPostExecute(returnedUser);
@@ -112,7 +162,7 @@ public class ServerRequests {
 
             User returnedUser = null;
 
-            HashMap<String, String> userInfo = new HashMap<>();
+            HashMap<String, Object> userInfo = new HashMap<>();
             userInfo.put("username", user.getUsername());
             userInfo.put("password", user.getPassword());
 
@@ -130,12 +180,13 @@ public class ServerRequests {
                 }else{
                    UserLocalStore.isUserLoggedIn = true;
                     // Get the user details
+                    int userID = jObject.getInt("userID");
                     String firstname = jObject.getString("firstname");
                     String lastname = jObject.getString("lastname");
                     String email = jObject.getString("email");
                     String username = jObject.getString("username");
 
-                    returnedUser = new User(firstname, lastname, email, username);
+                    returnedUser = new User(userID, firstname, lastname, email, username);
                 }
             }catch(Exception e){
                 e.printStackTrace();

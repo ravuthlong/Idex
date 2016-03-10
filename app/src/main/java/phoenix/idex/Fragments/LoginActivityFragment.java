@@ -167,7 +167,9 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
                 if(returnedUser == null){
                     showErrorMessage();
                 }else{
-                    logUserIn(returnedUser);
+                    userLocalStore.storeUserData(returnedUser);
+                    userLocalStore.setUserLoggedIn(true);
+                    logUserIn();
                 }
             }
         });
@@ -182,10 +184,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     }
 
     // If the log in info is correct, store user in local store and show MainActivity
-    private void logUserIn(User returnedUser){
-        userLocalStore.storeUserData(returnedUser);
-        userLocalStore.setUserLoggedIn(true);
-
+    private void logUserIn(){
         startActivity(new Intent(getActivity(), MainActivity.class));
 
     }

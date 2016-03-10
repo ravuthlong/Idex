@@ -1,6 +1,10 @@
 package phoenix.idex.Fragments;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Cache;
@@ -37,13 +42,14 @@ import phoenix.idex.UserLocalStore;
 
 public class PostListFragment extends Fragment implements  View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = PostListFragment.class.getSimpleName();
-
+    private ProgressDialog progressDialog;
     private RecyclerView recyclerView;
     private List<FeedItem> feedItems;
     private FeedListAdapter feedListAdapter;
     private FloatingActionButton postWidget;
     private String URL_FEED = "http://paulphoenix.netai.net/feed_temporary.json";
     private SwipeRefreshLayout refreshLayout;
+    private ProgressBar spinner;
 
     @Override
     /*OKAY*/
@@ -51,6 +57,8 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         View v = inflater.inflate(R.layout.activity_mainpost,container, false);
         postWidget = (FloatingActionButton) v.findViewById(R.id.postWidget);
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refreshLayout);
+        spinner = (ProgressBar) v.findViewById(R.id.progress_bar);
+        spinner.setVisibility(View.VISIBLE);
 
         recyclerView = (RecyclerView) v.findViewById(R.id.postRecyclerView1);
         feedItems = new ArrayList<>();
@@ -62,10 +70,14 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         refreshLayout.setOnRefreshListener(this);
         postWidget.setOnClickListener(this);
 
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Processing");
+        progressDialog.setMessage("Please Wait...");
+
         hideWidget();
         getJson();
         return v;
-
     }
 
     @Override
@@ -90,11 +102,15 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     }
 
     private void getJson(){
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
         // We first check for cached request
         Cache cache = AppController.getInstance().getRequestQueue().getCache();
         Cache.Entry entry = cache.get(URL_FEED);
-        if (entry != null) {
-            // fetch the data from cache
+        if ((entry != null) && (networkInfo == null) || (UserLocalStore.visitCounter > 0)) {
+            // fetch the data from cache if the user is offline
             try {
                 String data = new String(entry.data, "UTF-8");
                 try {
@@ -105,8 +121,10 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-
         } else {
+            UserLocalStore.visitCounter++;
+
+            //progressDialog.show();
             // making fresh volley request and getting json
             JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
                     URL_FEED, null, new Response.Listener<JSONObject>() {
@@ -118,6 +136,8 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                         parseJsonFeed(response);
                     }
                 }
+
+
             }, new Response.ErrorListener() {
 
                 @Override
@@ -155,6 +175,9 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
 
             // notify data changes to list adapater
             feedListAdapter.notifyDataSetChanged();
+            //progressDialog.hide();
+            spinner.setVisibility(View.GONE);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
