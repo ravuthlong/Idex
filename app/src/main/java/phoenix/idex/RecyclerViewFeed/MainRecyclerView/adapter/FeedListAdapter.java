@@ -9,27 +9,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.daimajia.swipe.SwipeLayout;
+import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 
 import java.util.List;
 
 import phoenix.idex.R;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.data.FeedItem;
-
 /**
  * Created by Ravinder on 2/25/16.
  */
-public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHolder> {
+public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHolder> {
 
+    private Context mContext;
     private LayoutInflater inflater;
     private List<FeedItem> feedItems;
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
     public FeedListAdapter(Context context, List<FeedItem> feedItems) {
         inflater = LayoutInflater.from(context);
+        this.mContext = context;
         this.feedItems = feedItems;
     }
 
@@ -88,6 +92,82 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             }
         });
 
+
+        holder.swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
+        // Drag From Left
+        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Left, holder.swipeLayout.findViewById(R.id.bottom_wrapper1));
+
+        // Drag From Right
+        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, holder.swipeLayout.findViewById(R.id.bottom_wrapper));
+
+        // Handling different events when swiping
+        holder.swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
+            @Override
+            public void onClose(SwipeLayout layout) {
+                //when the SurfaceView totally cover the BottomView.
+            }
+
+            @Override
+            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+                //you are swiping.
+            }
+
+            @Override
+            public void onStartOpen(SwipeLayout layout) {
+
+            }
+
+            @Override
+            public void onOpen(SwipeLayout layout) {
+                //when the BottomView totally show.
+            }
+
+            @Override
+            public void onStartClose(SwipeLayout layout) {
+
+            }
+
+            @Override
+            public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
+                //when user's hand released.
+            }
+        });
+
+        // Close the swipeLayout when user click on the post
+        holder.swipeLayout.getSurfaceView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.swipeLayout.close();
+            }
+        });
+
+        holder.tvLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Toast.makeText(v.getContext(), "Clicked on Report ", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        holder.tvFill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Toast.makeText(view.getContext(), "Clicked on Fill ", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        holder.tvKill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Toast.makeText(view.getContext(), "Clicked on Kill  ", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // mItemManger is member in RecyclerSwipeAdapter Class
+        mItemManger.bindView(holder.itemView, position);
     }
 
     @Override
@@ -95,11 +175,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         return feedItems.size();
     }
 
-
-
     // Holder knows and references where the fields are
     class ViewHolder extends RecyclerView.ViewHolder {
 
+        SwipeLayout swipeLayout;
         NetworkImageView profilePic;
         TextView name;
         TextView timestamp;
@@ -109,8 +188,17 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         Button bFill;
         Button bKill;
 
+        TextView tvFill;
+        TextView tvKill;
+        TextView tvLocation;
+
         public ViewHolder(View itemView) {
             super(itemView);
+            swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
+            tvFill = (TextView) itemView.findViewById(R.id.tvFill);
+            tvKill = (TextView) itemView.findViewById(R.id.tvKill);
+            tvLocation = (TextView) itemView.findViewById(R.id.tvLocation);
+
             profilePic = (NetworkImageView) itemView.findViewById(R.id.profilePic);
             name = (TextView) itemView.findViewById(R.id.name);
             timestamp = (TextView) itemView.findViewById(R.id.timestamp);
@@ -120,5 +208,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             bFill = (Button) itemView.findViewById(R.id.bFill);
             bKill = (Button) itemView.findViewById(R.id.bKill);
         }
+    }
+
+    @Override
+    public int getSwipeLayoutResourceId(int position) {
+        return R.id.swipe;
     }
 }

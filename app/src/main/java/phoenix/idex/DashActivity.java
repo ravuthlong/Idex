@@ -63,9 +63,10 @@ public class DashActivity extends AppCompatActivity implements TextWatcher, View
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bPostIdea:
+                String unixTime = Long.toString(System.currentTimeMillis());
                 User user = userLocalStore.getLoggedInUser();
                 serverRequests.storeAPostInBackground(editText.getText().toString(),
-                        user.getUserID());
+                        user.getUserID(), unixTime);
                 break;
         }
     }

@@ -41,19 +41,21 @@ public class ServerRequests {
         new FetchUserDataAsyncTask(user, userCallBack).execute();
     }
 
-    public void storeAPostInBackground(String post, int userID) {
+    public void storeAPostInBackground(String post, int userID, String timeStamp) {
         progressDialog.show();
-        new StoreAPostAsyncTask(post, userID).execute();
+        new StoreAPostAsyncTask(post, userID, timeStamp).execute();
     }
 
     public class StoreAPostAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private String post;
         private int userID;
+        private String timeStamp;
 
-        public StoreAPostAsyncTask(String post, int userID) {
+        public StoreAPostAsyncTask(String post, int userID, String timeStamp) {
             this.post = post;
             this.userID = userID;
+            this.timeStamp = timeStamp;
         }
 
         @Override
@@ -62,6 +64,7 @@ public class ServerRequests {
             HashMap<String, Object> userPost = new HashMap<>();
             userPost.put("post", post);
             userPost.put("userID", userID);
+            userPost.put("timeStamp", timeStamp);
 
 
             JSONObject jObject = new JSONObject();

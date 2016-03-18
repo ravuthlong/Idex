@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -29,7 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +46,11 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     private FeedListAdapter feedListAdapter;
     private FloatingActionButton postWidget;
     private String URL_FEED = "http://paulphoenix.netai.net/feed_temporary.json";
+    private String URL_TEST = "http://idex.site88.net/fetchUserPosts.php";
     private SwipeRefreshLayout refreshLayout;
     private ProgressBar spinner;
 
     @Override
-    /*OKAY*/
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_mainpost,container, false);
         postWidget = (FloatingActionButton) v.findViewById(R.id.postWidget);
@@ -64,6 +62,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         feedItems = new ArrayList<>();
 
         feedListAdapter = new FeedListAdapter(getActivity(), feedItems);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(feedListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -96,6 +95,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                getJson();
                 refreshLayout.setRefreshing(false);
             }
         }, 2000);
@@ -104,30 +104,22 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     private void getJson(){
 
         ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo networkInfo  = connectivityManager.getActiveNetworkInfo();
 
         // We first check for cached request
-        Cache cache = AppController.getInstance().getRequestQueue().getCache();
-        Cache.Entry entry = cache.get(URL_FEED);
-        if ((entry != null) && (networkInfo == null) || (UserLocalStore.visitCounter > 0)) {
+        //Cache cache = AppController.getInstance().getRequestQueue().getCache();
+        //Cache.Entry entry = cache.get(URL_FEED);
+        //if ((entry != null) && (networkInfo == null) || (UserLocalStore.visitCounter > 0)) {
+        if ((networkInfo == null)) {
             // fetch the data from cache if the user is offline
-            try {
-                String data = new String(entry.data, "UTF-8");
-                try {
-                    parseJsonFeed(new JSONObject(data));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+
         } else {
             UserLocalStore.visitCounter++;
 
             //progressDialog.show();
             // making fresh volley request and getting json
             JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
-                    URL_FEED, null, new Response.Listener<JSONObject>() {
+                    URL_TEST, null, new Response.Listener<JSONObject>() {
 
                 @Override
                 public void onResponse(JSONObject response) {
@@ -136,8 +128,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                         parseJsonFeed(response);
                     }
                 }
-
-
             }, new Response.ErrorListener() {
 
                 @Override
@@ -159,16 +149,19 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                 JSONObject feedObj = (JSONObject) feedArray.get(i);
 
                 FeedItem item = new FeedItem();
+                String name;
 
-                item.setId(feedObj.getInt("id"));
-                item.setName(feedObj.getString("name"));
+                name = feedObj.getString("firstname") + feedObj.getString("lastname");
+
+                //item.setId(feedObj.getInt("id"));
+                item.setName(name);
                 item.setUsername(feedObj.getString("username"));
-                item.setStatus(feedObj.getString("status"));
-                item.setProfilePic(feedObj.getString("profilePic"));
+                item.setStatus(feedObj.getString("post"));
+                //item.setProfilePic(feedObj.getString("profilePic"));
                 item.setTimeStamp(feedObj.getString("timeStamp"));
-                item.setFill(feedObj.getInt("fill"));
-                item.setKill(feedObj.getInt("kill"));
-                 item.setValue();
+                //item.setFill(feedObj.getInt("fill"));
+                //item.setKill(feedObj.getInt("kill"));
+                //item.setValue();
 
                 feedItems.add(item);
             }
@@ -188,19 +181,5 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         if (!UserLocalStore.isUserLoggedIn) {
             postWidget.hide();
         }
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                if(!UserLocalStore.isUserLoggedIn && dy > 0) {
-                    postWidget.hide();
-                } else if(!UserLocalStore.isUserLoggedIn && dy < 0) {
-                    postWidget.hide();
-                }
-            }
-        });
     }
 }

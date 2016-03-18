@@ -35,4 +35,5 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.github.dmytrodanylyk.android-process-button:library:1.0.4'
     compile 'com.wrapp.floatlabelededittext:library:0.0.6'
+    compile 'com.daimajia.swipelayout:library:1.2.0@aar'//Swipe for recycler view
 }

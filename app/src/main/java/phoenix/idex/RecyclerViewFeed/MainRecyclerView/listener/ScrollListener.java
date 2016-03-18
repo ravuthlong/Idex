@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ListView;
 
+import phoenix.idex.UserLocalStore;
+
 /**
  * Created by Ravinder on 2/21/16.
  */
@@ -36,7 +38,11 @@ public class ScrollListener extends FloatingActionButton.Behavior {
         if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
             child.hide();
         } else if (dyConsumed < 0 && child.getVisibility() != View.VISIBLE) {
-            child.show();
+            if (UserLocalStore.isUserLoggedIn) {
+                child.show();
+            } else {
+                child.hide();
+            }
         }
     }
     @Override
