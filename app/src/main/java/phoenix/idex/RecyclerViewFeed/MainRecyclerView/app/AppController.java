@@ -20,14 +20,19 @@ public class AppController extends Application {
 
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
-    LruBitmapCache mLruBitmapCache;
-
+    LruBitmapCache mLruBitmapCache ;
     private static AppController mInstance;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+    }
+
+    public void setImageLoaderNull() {
+        mRequestQueue = null;
+        mImageLoader = null;
+        mLruBitmapCache = null;
     }
 
     public static synchronized AppController getInstance() {
@@ -38,23 +43,23 @@ public class AppController extends Application {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(getApplicationContext());
         }
-
         return mRequestQueue;
     }
 
     public ImageLoader getImageLoader() {
+
         getRequestQueue();
         if (mImageLoader == null) {
             getLruBitmapCache();
             mImageLoader = new ImageLoader(this.mRequestQueue, mLruBitmapCache);
         }
-
         return this.mImageLoader;
     }
 
     public LruBitmapCache getLruBitmapCache() {
-        if (mLruBitmapCache == null)
+        if (mLruBitmapCache == null) {
             mLruBitmapCache = new LruBitmapCache();
+        }
         return this.mLruBitmapCache;
     }
 

@@ -38,9 +38,10 @@
         android:gravity="center_horizontal" />
 
     <Button
+        android:id="@+id/bViewProfile"
         android:layout_margin="5dp"
         android:padding="5dp"
-        android:text="View Own Posts"
+        android:text="View Profile"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 

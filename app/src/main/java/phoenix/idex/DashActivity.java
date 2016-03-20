@@ -1,5 +1,6 @@
 package phoenix.idex;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -67,6 +68,8 @@ public class DashActivity extends AppCompatActivity implements TextWatcher, View
                 User user = userLocalStore.getLoggedInUser();
                 serverRequests.storeAPostInBackground(editText.getText().toString(),
                         user.getUserID(), unixTime);
+                UserLocalStore.allowRefresh = true;
+                startActivity(new Intent(this, MainActivity.class));
                 break;
         }
     }

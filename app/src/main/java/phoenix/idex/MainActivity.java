@@ -13,13 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import phoenix.idex.Fragments.Fragment2;
+import phoenix.idex.Fragments.AboutFragment;
 import phoenix.idex.Fragments.LoginActivityFragment;
 import phoenix.idex.Fragments.PostListFragment;
 import phoenix.idex.Fragments.TabFragment;
@@ -31,19 +30,20 @@ public class MainActivity extends AppCompatActivity {
     private List<ItemSlideMenu> itemList;
     private List<Fragment> fragmentList;
     private SlidingMenuAdapter adapter;
-    private ListView listView;
+    public static ListView listView;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private int currentPos;
     private Toolbar toolbar;
-    private RelativeLayout layout;
     private FragmentManager fragmentManager;
     public static boolean isMainShown = false;
+    private UserLocalStore userLocalStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slidingdrawer);
+        userLocalStore = new UserLocalStore(this);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.listViewMain);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayoutMain);
-        layout = (RelativeLayout) findViewById(R.id.rLayoutMain);
 
         if (!UserLocalStore.isUserLoggedIn) {
             setUpDrawerList();
@@ -94,9 +93,8 @@ public class MainActivity extends AppCompatActivity {
     private void setUpDrawerList() {
         itemList = new ArrayList<>();
 
-        itemList.add(new ItemSlideMenu("Roll"));
         itemList.add(new ItemSlideMenu("Log In"));
-        itemList.add(new ItemSlideMenu("Profile"));
+        itemList.add(new ItemSlideMenu("Roll"));
         itemList.add(new ItemSlideMenu("About"));
 
         adapter = new SlidingMenuAdapter(this, itemList);
@@ -107,10 +105,9 @@ public class MainActivity extends AppCompatActivity {
     private void setUpFragments() {
         fragmentList = new ArrayList<>();
 
-        fragmentList.add(new PostListFragment());
         fragmentList.add(new LoginActivityFragment());
-        fragmentList.add(new TabFragment());
-        fragmentList.add(new Fragment2());
+        fragmentList.add(new PostListFragment());
+        fragmentList.add(new AboutFragment());
     }
 
     // Add items to the drawer list for navigation drawer
@@ -133,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentList.add(new PostListFragment());
         fragmentList.add(new TabFragment());
         fragmentList.add(new PostListFragment());
-        fragmentList.add(new Fragment2());
+        fragmentList.add(new AboutFragment());
     }
 
     // Start up state
@@ -142,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         isMainShown = true;
-        setTitle("Idex");
+        setTitle("");
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.rLayoutMain, fragmentList.get(0)).commit();
         listView.setItemChecked(0, true);
@@ -157,20 +154,21 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 currentPos = position;
 
+                // Sign out option
                 if (position == 2) {
                     currentPos = 0;
                     Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
+                    // Erase local history of logged in user
+                    userLocalStore.clearUserData();
                     UserLocalStore.isUserLoggedIn = false;
                     setUpDrawerList();
                     setUpFragments();
                     screenStartUpState();
                     drawerListViewListener();
-                    //toggleListener();
-
                 } else {
                     if (position == 0) {
                         isMainShown = true;
-                        setTitle("Idex");
+                        setTitle("");
                     } else {
                         isMainShown = false;
                         setTitle(itemList.get(position).getTitle());
@@ -178,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
                     drawerLayout.closeDrawer(listView);
                     // Set item to selected
                     listView.setItemChecked(position, true);
-
                 }
                 // Delay to avoid lag between navigation drawer items
                 new Handler().postDelayed(new Runnable() {
@@ -202,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                 currentPos = position;
                 if (position == 0 ) {
                     isMainShown = true;
-                    setTitle("Idex");
+                    setTitle("");
                 } else {
                     isMainShown = false;
                     setTitle(itemList.get(position).getTitle());

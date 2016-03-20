@@ -11,12 +11,13 @@
     android:background="@drawable/dark"
     android:layout_gravity="center_vertical"
     android:gravity="center|left"
+    android:id="@+id/fragmentLogin"
     tools:context=".LoginActivityFragment"
     android:weightSum="1">
 
 
     <TextView
-        android:id="@+id/idexTitle"
+        android:id="@+id/tvIdexTitle"
         android:textColor="#FDD017"
         android:text="i d e x"
         android:textStyle="bold|italic"
@@ -110,5 +111,16 @@
 
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="5dp"
+        android:layout_marginBottom="20dp"
         />
+
+    <Button
+        android:id="@+id/bBrowseIdea"
+        android:textColor="#FFFF00"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Browse Idea"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </LinearLayout>

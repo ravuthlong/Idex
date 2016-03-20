@@ -1,6 +1,13 @@
 package phoenix.idex.RecyclerViewFeed.MainRecyclerView.adapter;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -18,9 +25,14 @@ import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 
 import java.util.List;
 
+import phoenix.idex.EditProfileActivity;
+import phoenix.idex.Graphing.GraphActivity;
 import phoenix.idex.R;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.data.FeedItem;
+import phoenix.idex.ServerConnections.ServerRequests;
+import phoenix.idex.UserLocalStore;
+
 /**
  * Created by Ravinder on 2/25/16.
  */
@@ -29,7 +41,9 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
     private Context mContext;
     private LayoutInflater inflater;
     private List<FeedItem> feedItems;
-    ImageLoader imageLoader = AppController.getInstance().getImageLoader();
+    ImageLoader imageLoader = AppController.getInstance().getImageLoader();;
+    ServerRequests serverRequests;
+    private UserLocalStore userLocalStore;
 
     public FeedListAdapter(Context context, List<FeedItem> feedItems) {
         inflater = LayoutInflater.from(context);
@@ -43,18 +57,28 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         View view = inflater.inflate(R.layout.item_mainfeed, parent, false);
         // Hold a structure of a view. See class viewholder, which holds the structure
         ViewHolder holder = new ViewHolder(view);
-
+        userLocalStore = new UserLocalStore(mContext);
         return holder;
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 
-        if (imageLoader == null)
-            imageLoader = AppController.getInstance().getImageLoader();
+        // Initialize fonts
+        Typeface killFillFont = Typeface.createFromAsset(mContext.getAssets(), "Menufont.ttf");
+        holder.tvKill.setTypeface(killFillFont);
+        holder.tvFill.setTypeface(killFillFont);
+        holder.name.setTypeface(killFillFont);
 
         final FeedItem currentPos = feedItems.get(position);
         holder.name.setText(currentPos.getName());
+
+        // Logged in user's post will get delete option instead of report option
+        if (currentPos.getUsername().equals(userLocalStore.getLoggedInUser().getUsername())) {
+            holder.tvManagePost.setText("Delete");
+        } else {
+            holder.tvManagePost.setText("Report");
+        }
 
         // Converting timestamp into x ago format
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
@@ -62,7 +86,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                 System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
         holder.timestamp.setText(timeAgo);
 
-        // Chcek for empty status message
+        // Check for empty status message
         if (!TextUtils.isEmpty(currentPos.getStatus())) {
             holder.txtStatusMsg.setText(currentPos.getStatus());
             holder.txtStatusMsg.setVisibility(View.VISIBLE);
@@ -71,12 +95,25 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             holder.txtStatusMsg.setVisibility(View.GONE);
         }
 
+        // If the user uploaded a new photo through the editing page, load current JSON and not Cache
+        // This is achieved through setImageLoaderNull()
+        if (EditProfileActivity.isNewPhotoUploaded()) {
+            EditProfileActivity.setIsNewPhotoUploaded(false);
+            AppController.getInstance().setImageLoaderNull();
+        }
+        imageLoader = AppController.getInstance().getImageLoader();
+
         // user profile pic
-        holder.profilePic.setImageUrl(currentPos.getProfilePic(), imageLoader);
+        if (!currentPos.getProfilePic().equals("")) {
+            holder.profilePic.setImageUrl(currentPos.getProfilePic(), imageLoader);
+        } else { // default
+            holder.profilePic.setImageUrl("http://oi67.tinypic.com/24npqbk.jpg", imageLoader);
+        }
 
-        holder.numKill.setText(Integer.toString(currentPos.getKill()));
-        holder.numFill.setText(Integer.toString(currentPos.getFill()));
+        holder.bFill.setText("Fill (" + currentPos.getFill() + ")");
+        holder.bKill.setText("Kill (" + currentPos.getKill() + ")");
 
+        /*
         holder.bFill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,8 +127,28 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                 currentPos.hitKill();
                 holder.bKill.setText("Kill (" + currentPos.getKill() + ")");
             }
-        });
+        });*/
 
+        // ******* READ FROM THE DATABASE HERE ********
+        final Number[] numFill = new Number[15];
+        final Number[] numKill = new Number[15];
+        // BOTH
+
+        holder.bView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, GraphActivity.class);
+                intent.putExtra("kill", currentPos.getKill());
+                intent.putExtra("fill", currentPos.getFill());
+                /* waiting for database
+                for (int i = 0; i < 15; i++) {
+                    intent.putExtra("kill" + String.valueOf(i), numKill[i]);
+                    intent.putExtra("fill" + String.valueOf(i), numFill[i]);
+                }*/
+
+                mContext.startActivity(intent);
+            }
+        });
 
         holder.swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
         // Drag From Left
@@ -141,28 +198,40 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             }
         });
 
-        holder.tvLocation.setOnClickListener(new View.OnClickListener() {
+        holder.tvManagePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(v.getContext(), "Clicked on Report ", Toast.LENGTH_SHORT).show();
+                if (holder.tvManagePost.getText().toString().equals("Delete")) {
+                    new MyDialog(currentPos.getId());
+                    //System.out.println("OLD SCHOOL POST ID: " + currentPos.getId());
+                    //serverRequests.deleteAPostInBackground(currentPos.getId());
+                } else {
+                    Toast.makeText(v.getContext(), "Clicked on Report ", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-
+        serverRequests = new ServerRequests(mContext);
         holder.tvFill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Toast.makeText(view.getContext(), "Clicked on Fill ", Toast.LENGTH_SHORT).show();
+                // Update Fill number in the database. Increment by 1 through SQL command in .php
+                serverRequests.updateFillInBackground(currentPos.getId());
+                currentPos.hitFill();
+                holder.bFill.setText("Fill (" + currentPos.getFill() + ")");
+                holder.swipeLayout.close();
             }
         });
 
         holder.tvKill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Toast.makeText(view.getContext(), "Clicked on Kill  ", Toast.LENGTH_SHORT).show();
+                // Update Kill number in the database. Decrement by 1 through SQL command in .php
+                serverRequests.updateKillInBackground(currentPos.getId());
+                currentPos.hitKill();
+                holder.bKill.setText("Kill (" + currentPos.getKill() + ")");
+                holder.swipeLayout.close();
             }
         });
 
@@ -180,25 +249,15 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
         SwipeLayout swipeLayout;
         NetworkImageView profilePic;
-        TextView name;
-        TextView timestamp;
-        TextView txtStatusMsg;
-        TextView numFill;
-        TextView numKill;
-        Button bFill;
-        Button bKill;
-
-        TextView tvFill;
-        TextView tvKill;
-        TextView tvLocation;
+        Button bFill, bKill, bView;
+        TextView tvFill, tvKill, numFill, numKill, txtStatusMsg, timestamp, name, tvManagePost;
 
         public ViewHolder(View itemView) {
             super(itemView);
             swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
             tvFill = (TextView) itemView.findViewById(R.id.tvFill);
             tvKill = (TextView) itemView.findViewById(R.id.tvKill);
-            tvLocation = (TextView) itemView.findViewById(R.id.tvLocation);
-
+            tvManagePost = (TextView) itemView.findViewById(R.id.tvManagePost);
             profilePic = (NetworkImageView) itemView.findViewById(R.id.profilePic);
             name = (TextView) itemView.findViewById(R.id.name);
             timestamp = (TextView) itemView.findViewById(R.id.timestamp);
@@ -207,6 +266,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             numKill = (TextView) itemView.findViewById(R.id.tvKillNum);
             bFill = (Button) itemView.findViewById(R.id.bFill);
             bKill = (Button) itemView.findViewById(R.id.bKill);
+            bView = (Button) itemView.findViewById(R.id.bView);
         }
     }
 
@@ -214,4 +274,37 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
     public int getSwipeLayoutResourceId(int position) {
         return R.id.swipe;
     }
+
+    public static class MyDialog extends DialogFragment {
+        private int postID;
+        private ServerRequests serverRequests;
+
+        public MyDialog() {
+            super();
+            
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            int title = getArguments().getInt("title");
+
+            return new AlertDialog.Builder(getActivity())
+                    .setTitle(title)
+                    .setPositiveButton("YES",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    serverRequests.deleteAPostInBackground(postID);
+                                }
+                            }
+                    )
+                    .setNegativeButton("NO",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                }
+                            }
+                    )
+                    .create();
+        }
+        }
 }

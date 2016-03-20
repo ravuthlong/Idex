@@ -10,16 +10,16 @@ import phoenix.idex.R;
 /**
  * Created by Ravinder on 2/19/16.
  */
-public class Fragment2 extends android.support.v4.app.Fragment {
+public class AboutFragment extends android.support.v4.app.Fragment {
 
-    public Fragment2() {
+    public AboutFragment() {
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.frag_2, container, false);
+        View rootView = inflater.inflate(R.layout.frag_about, container, false);
         return rootView;
     }
 }

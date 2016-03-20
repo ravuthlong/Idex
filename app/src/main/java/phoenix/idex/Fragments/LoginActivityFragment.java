@@ -1,12 +1,16 @@
 package phoenix.idex.Fragments;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -40,13 +44,12 @@ import phoenix.idex.UserLocalStore;
 public class LoginActivityFragment extends Fragment implements View.OnClickListener {
     private TextView mTextDetails;
     private CallbackManager mCallbackManager;
-    private Button bRegister;
+    private Button bRegister, bLogin, bBrowseIdea;
     private AccessTokenTracker mTokenTracker;
     private ProfileTracker mProfileTracker;
     private View v;
-    private Button bLogin;
     private UserLocalStore userLocalStore;
-    private TextView etUsername, etPassword;
+    private TextView etUsername, etPassword, tvIdexTitle;;
 
     private android.support.v7.widget.Toolbar toolbar;
 
@@ -114,11 +117,15 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
         v = inflater.inflate(R.layout.frag_login, container, false);
         bRegister = (Button) v.findViewById(R.id.bRegister);
         bLogin = (Button) v.findViewById(R.id.bLogin);
+        bBrowseIdea = (Button) v.findViewById(R.id.bBrowseIdea);
+        tvIdexTitle = (TextView) v.findViewById(R.id.tvIdexTitle);
         etUsername = (TextView) v.findViewById(R.id.etUsername);
         etPassword = (TextView) v.findViewById(R.id.etPassword);
 
+        tvIdexTitle.setOnClickListener(this);
         bLogin.setOnClickListener(this);
         bRegister.setOnClickListener(this);
+        bBrowseIdea.setOnClickListener(this);
 
         userLocalStore = new UserLocalStore(getActivity());
 
@@ -154,6 +161,17 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
                 Intent signUpIntent = new Intent(getActivity(), SignUpActivity.class);
                 startActivity(signUpIntent);
                 break;
+            case R.id.bBrowseIdea:
+                startActivity(new Intent(getActivity(), MainActivity.class));
+                break;
+            case R.id.tvIdexTitle:
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
+                        new AboutFragment()).commit();
+                MainActivity.listView.setItemChecked(2, true);
+                //android.support.v4.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                //transaction.replace(R.id.fragmentLogin, new AboutFragment()).commit();
+                break;
         }
     }
 
@@ -164,11 +182,16 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
             @Override
             public void done(User returnedUser) {
                 // Wrong username and password
-                if(returnedUser == null){
-                    showErrorMessage();
+                ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo  = connectivityManager.getActiveNetworkInfo();
+
+                if (networkInfo == null) {
+                    showNoInternetError();
+                } else if(returnedUser == null){
+                    showNoUserErrorMessage();
                 }else{
                     userLocalStore.storeUserData(returnedUser);
-                    userLocalStore.setUserLoggedIn(true);
+                    UserLocalStore.isUserLoggedIn = true;
                     logUserIn();
                 }
             }
@@ -176,12 +199,21 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     }
 
     // Error if the user info is incorrect
-    private void showErrorMessage(){
+    private void showNoUserErrorMessage(){
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         dialogBuilder.setMessage("Incorrect user details");
         dialogBuilder.setPositiveButton("Ok", null);
         dialogBuilder.show();
     }
+
+    // Error if the user info is incorrect
+    private void showNoInternetError(){
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        dialogBuilder.setMessage("You are not connected to the internet");
+        dialogBuilder.setPositiveButton("Ok", null);
+        dialogBuilder.show();
+    }
+
 
     // If the log in info is correct, store user in local store and show MainActivity
     private void logUserIn(){
@@ -199,7 +231,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
 
         // Change title font
         Typeface myTypeface = Typeface.createFromAsset(getActivity().getAssets(), "Starjhol.ttf" );
-        TextView idexTitle = (TextView) view.findViewById(R.id.idexTitle);
+        TextView idexTitle = (TextView) view.findViewById(R.id.tvIdexTitle);
         idexTitle.setTypeface(myTypeface);
 
     }

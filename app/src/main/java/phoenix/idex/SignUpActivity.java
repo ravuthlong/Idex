@@ -22,7 +22,6 @@ import phoenix.idex.ServerConnections.ServerRequests;
  */
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
     ServerRequests serverRequests;
-    User signedUpUser;
     Button bSignUp;
     EditText etFirstName, etLastName, etEmail, etUsername, etPassword, etConfirmPass;
     private  UserLocalStore userLocalStore;
@@ -37,7 +36,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setTitle("Sign Up");
         userLocalStore = new UserLocalStore(this);
-
 
         etFirstName = (EditText) findViewById(R.id.etFirstName);
         etLastName = (EditText) findViewById(R.id.etLastName);
@@ -64,7 +62,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 inputValidation();
                 break;
         }
-
     }
 
     @Override
@@ -133,7 +130,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     dialogBuilder.show();
                 } else {
                     userLocalStore.storeUserData(returnedUser);
-                    userLocalStore.setUserLoggedIn(true);
+                    UserLocalStore.isUserLoggedIn = true;
                     startActivity(new Intent(SignUpActivity.this, MainActivity.class));
                 }
             }

@@ -20,7 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#0076a5"
+            android:background="#13571A"
             android:gravity="center"
             android:text="Fill"
             android:textColor="#fff" />
@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#003c54"
+            android:background="#722112"
             android:gravity="center"
             android:text="Kill"
             android:textColor="#fff" />
@@ -45,14 +45,15 @@
         android:weightSum="1">
 
         <TextView
-            android:id="@+id/tvLocation"
+            android:id="@+id/tvManagePost"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/red_error"
+            android:background="#B05140"
             android:gravity="center"
             android:text="Report"
-            android:textColor="#fff" />
+            android:textColor="#fff"
+            android:visibility="visible" />
     </LinearLayout>
 
 
@@ -141,6 +142,14 @@
                 android:id="@+id/tvKillNum"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/bView"
+                android:text="View"
+                android:layout_marginLeft="5dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#30595b" />
         </LinearLayout>
 
     </LinearLayout>

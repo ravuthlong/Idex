@@ -12,6 +12,7 @@ public class UserLocalStore {
     private static User storedUser;
     public static boolean isUserLoggedIn = false;
     public static int visitCounter = 0;
+    public static boolean allowRefresh = false;
 
     public UserLocalStore(Context context) {
         userLocalDataStore = context.getSharedPreferences(SP_NAME, 0);
@@ -42,7 +43,6 @@ public class UserLocalStore {
         spEditor.putBoolean("loggedIn", loggedIn);
         spEditor.commit();
     }
-
     public void clearUserData() {
         SharedPreferences.Editor spEditor = userLocalDataStore.edit();
         spEditor.clear();

@@ -9,14 +9,20 @@
     android:weightSum="5"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbarSignUp"
+        android:id="@+id/toolbarEditProfile"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/transparent"
         local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         local:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         />
+    <ImageView
+        android:id="@+id/ivProfilePic"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="150dp"
+        android:layout_height="150dp" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -25,6 +31,7 @@
         android:paddingLeft="70dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
 
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
             android:layout_width="match_parent"
@@ -35,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:ems="10"
-                android:id="@+id/etFirstName"
+                android:id="@+id/etChangeFirstName"
                 android:hint="First Name"
                 android:layout_marginTop="30dp"
                 android:paddingBottom="10dp" />
@@ -50,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:ems="10"
-                android:id="@+id/etLastName"
+                android:id="@+id/etChangeLastName"
                 android:hint="Last Name"
                 android:paddingBottom="10dp" />
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
@@ -60,11 +67,12 @@
             android:layout_height="wrap_content"
             float:fletPadding="10dp">
             <EditText
+                android:editable="false"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:ems="10"
-                android:id="@+id/etEmail"
+                android:id="@+id/etEdit_Email"
                 android:hint="Email Address"
                 android:paddingBottom="10dp" />
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
@@ -74,52 +82,38 @@
             android:layout_height="wrap_content"
             float:fletPadding="10dp">
             <EditText
+                android:editable="false"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:id="@+id/etUsername"
+                android:id="@+id/etEdit_Username"
                 android:hint="Username"
                 android:paddingBottom="10dp" />
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
-
-        <com.wrapp.floatlabelededittext.FloatLabeledEditText
-            android:layout_width="match_parent"
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Button
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            float:fletPadding="10dp">
-            <EditText
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:ems="10"
-                android:id="@+id/etPassword"
-                android:hint="Password"
-                android:paddingBottom="10dp" />
-        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
-
-        <com.wrapp.floatlabelededittext.FloatLabeledEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            float:fletPadding="10dp">
-            <EditText
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:ems="10"
-                android:id="@+id/etConfirmPass"
-                android:hint="Confirm Password"
-                android:paddingBottom="10dp" />
-        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
-
+            android:text="Edit Profile"
+            android:id="@+id/bEditProfile"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:layout_marginRight="5dp"/>
+        <Button
+            android:id="@+id/bChangePassword"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Change Password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sign Up"
-        android:id="@+id/bSignUp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp" />
 
 </LinearLayout>
-
 

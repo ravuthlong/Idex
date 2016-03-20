@@ -14,13 +14,11 @@ public class FeedItem {
     public FeedItem() {
     }
 
-    public FeedItem(int id, String username, String name, String status,
-                    String profilePic, String timeStamp, int fill, int kill, double value) {
+    public FeedItem(int id, String username, String name, String status, String timeStamp, int fill, int kill, double value) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.status = status;
-        this.profilePic = profilePic;
         this.timeStamp = timeStamp;
         this.fill = fill;
         this.kill = kill;
