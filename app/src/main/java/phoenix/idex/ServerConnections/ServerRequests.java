@@ -43,17 +43,23 @@ public class ServerRequests {
         new FetchUserDataAsyncTask(user, userCallBack).execute();
     }
 
-    public void storeAPostInBackground(String post, int userID, String timeStamp) {
+    public void storeAPostInBackground(String post, int userID, String timeStamp, int currentColumn) {
         progressDialog.show();
-        new StoreAPostAsyncTask(post, userID, timeStamp).execute();
+        new StoreAPostAsyncTask(post, userID, timeStamp, currentColumn).execute();
     }
 
-    public void updateFillInBackground(int postID) {
-        new UpdateFill(postID).execute();
+    public void updateFillInBackground(int postID, int currentColumn) {
+        new UpdateFill(postID, currentColumn).execute();
     }
 
-    public void updateKillInBackground(int postID) {
-        new UpdateKill(postID).execute();
+    public void updateFillAndCurrentColumnInBackground(int postID, int currentColumn) {
+        new UpdateFillAndCurrentColumn(postID, currentColumn).execute();
+    }
+    public void updateKillInBackground(int postID, int currentColumn) {
+        new UpdateKill(postID, currentColumn).execute();
+    }
+    public void updateKillAndCurrentColumnInBackground(int postID, int currentColumn) {
+        new UpdateKillAndCurrentColumn(postID, currentColumn).execute();
     }
     public void fetchOneUserPostsInBackground(int userID, UserPostsCallBack userPostsCallBack) {
         progressDialog.show();
@@ -64,6 +70,7 @@ public class ServerRequests {
         progressDialog.show();
         new DeleteAPostAsyncTask(postID).execute();
     }
+
 
     // Fetch all the posts from a unique logged in user. JSON string of data will be returned.
     public class FetchOneUserPosts extends AsyncTask<Void, Void, String> {
@@ -109,9 +116,11 @@ public class ServerRequests {
     public class UpdateKill extends AsyncTask<Void, Void, Void> {
 
         private int postID;
+        private int currentColumn;
 
-        public UpdateKill(int postID) {
+        public UpdateKill(int postID, int currentColumn) {
             this.postID = postID;
+            this.currentColumn = currentColumn;
         }
 
         @Override
@@ -119,6 +128,7 @@ public class ServerRequests {
 
             HashMap<String, Object> userPost = new HashMap<>();
             userPost.put("postID", postID);
+            userPost.put("currentColumn", currentColumn);
 
             JSONObject jObject = new JSONObject();
 
@@ -141,13 +151,15 @@ public class ServerRequests {
         }
     }
 
-    // Update fill of a unique post. Increment by 1 in the database.
-    public class UpdateFill extends AsyncTask<Void, Void, Void> {
+    // Update kill AND current column to insert. Increment by 1 in the database.
+    public class UpdateKillAndCurrentColumn extends AsyncTask<Void, Void, Void> {
 
         private int postID;
+        private int currentColumn;
 
-        public UpdateFill(int postID) {
+        public UpdateKillAndCurrentColumn(int postID, int currentColumn) {
             this.postID = postID;
+            this.currentColumn = currentColumn;
         }
 
         @Override
@@ -155,11 +167,86 @@ public class ServerRequests {
 
             HashMap<String, Object> userPost = new HashMap<>();
             userPost.put("postID", postID);
+            userPost.put("currentColumn", currentColumn);
+
+            try {
+                HttpRequest req = new HttpRequest("http://idex.site88.net/updateKillAndCurrentColumn.php");
+                req.preparePost().withData(userPost).send();
+
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+        }
+    }
+
+    // Update fill of a unique post. Increment by 1 in the database.
+    public class UpdateFill extends AsyncTask<Void, Void, Void> {
+
+        private int postID;
+        private int currentColumn;
+
+        public UpdateFill(int postID, int currentColumn) {
+            this.postID = postID;
+            this.currentColumn = currentColumn;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            HashMap<String, Object> userPost = new HashMap<>();
+            userPost.put("postID", postID);
+            userPost.put("currentColumn", currentColumn);
 
             JSONObject jObject = new JSONObject();
 
             try {
                 HttpRequest req = new HttpRequest("http://idex.site88.net/updateFill.php");
+                req.preparePost().withData(userPost).send();
+
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+        }
+    }
+
+    // Update fill AND current column to insert. Increment by 1 in the database.
+    public class UpdateFillAndCurrentColumn extends AsyncTask<Void, Void, Void> {
+
+        private int postID;
+        private int currentColumn;
+
+        public UpdateFillAndCurrentColumn(int postID, int currentColumn) {
+            this.postID = postID;
+            this.currentColumn = currentColumn;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            HashMap<String, Object> userPost = new HashMap<>();
+            userPost.put("postID", postID);
+            userPost.put("currentColumn", currentColumn);
+
+            try {
+                HttpRequest req = new HttpRequest("http://idex.site88.net/updateFillAndCurrentColumn.php");
                 req.preparePost().withData(userPost).send();
 
             }catch (MalformedURLException e) {
@@ -217,11 +304,13 @@ public class ServerRequests {
         private String post;
         private int userID;
         private String timeStamp;
+        private int currentColumn;
 
-        public StoreAPostAsyncTask(String post, int userID, String timeStamp) {
+        public StoreAPostAsyncTask(String post, int userID, String timeStamp, int currentColumn) {
             this.post = post;
             this.userID = userID;
             this.timeStamp = timeStamp;
+            this.currentColumn = currentColumn;
         }
 
         @Override
@@ -231,6 +320,7 @@ public class ServerRequests {
             userPost.put("post", post);
             userPost.put("userID", userID);
             userPost.put("timeStamp", timeStamp);
+            userPost.put("currentColumn", currentColumn);
 
             try {
                 HttpRequest req = new HttpRequest("http://idex.site88.net/insertnewpost.php");

@@ -50,7 +50,6 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     private View v;
     private UserLocalStore userLocalStore;
     private TextView etUsername, etPassword, tvIdexTitle;;
-
     private android.support.v7.widget.Toolbar toolbar;
 
 
@@ -78,6 +77,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
         mCallbackManager = CallbackManager.Factory.create();
 
@@ -128,6 +128,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
         bBrowseIdea.setOnClickListener(this);
 
         userLocalStore = new UserLocalStore(getActivity());
+        userLocalStore.clearUserData(); // Clear the last logged in user before storing the new one
 
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         actionBar.setBackgroundDrawable(new ColorDrawable((Color.TRANSPARENT)));

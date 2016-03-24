@@ -1,5 +1,7 @@
 package phoenix.idex.RecyclerViewFeed.MainRecyclerView.data;
 
+import java.util.ArrayList;
+
 /**
  * Created by Linh on 2/19/2016.
  */
@@ -7,22 +9,99 @@ package phoenix.idex.RecyclerViewFeed.MainRecyclerView.data;
 public class FeedItem {
     private int id;
     private String username, name, status, profilePic, timeStamp;
-    // new variable here
-    private int fill, kill;
+    private ArrayList<Integer> fillArray = new ArrayList<>();
+    private ArrayList<Integer> killArray = new ArrayList<>();
+    private int totalFill;
+    private int totalKill;
+    private int currentColumn; // if 10, reset to 0 and update all fill/kill columns to 0
     private double value;
 
     public FeedItem() {
     }
 
-    public FeedItem(int id, String username, String name, String status, String timeStamp, int fill, int kill, double value) {
+    public FeedItem(int id, String username, String name, String status, String timeStamp, double value) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.status = status;
         this.timeStamp = timeStamp;
-        this.fill = fill;
-        this.kill = kill;
         this.value = value;
+    }
+
+    public void setCurrentColumn(int currentColumn) {
+        this.currentColumn = currentColumn;
+    }
+
+    public int getCurrentColumn() {
+        return currentColumn;
+    }
+
+    public void setOneFill(int numFill) {
+        fillArray.add(0, numFill);
+    }
+    public void setTwoFill(int numFill) {
+        fillArray.add(1, numFill);
+    }public void setThreeFill(int numFill) {
+        fillArray.add(numFill);
+    }public void setFourFill(int numFill) {
+        fillArray.add(numFill);
+    }public void setFiveFill(int numFill) {
+        fillArray.add(numFill);
+    }public void setSixFill(int numFill) {
+        fillArray.add(numFill);
+    }public void setSevenFill(int numFill) {
+        fillArray.add(numFill);
+    }public void setEightFill(int numFill) {
+        fillArray.add(numFill);
+    }public void setNineFill(int numFill) {
+        fillArray.add(numFill);
+    }public void setTenFill(int numFill) {
+        fillArray.add(numFill);
+    }
+
+    public void setOneKill(int numFill) {
+        killArray.add(0, numFill);
+    }
+    public void setTwoKill(int numFill) {
+        killArray.add(numFill);
+    }public void setThreeKill(int numFill) {
+        killArray.add(numFill);
+    }public void setFourKill(int numFill) {
+        killArray.add(numFill);
+    }public void setFiveKill(int numFill) {
+        killArray.add(numFill);
+    }public void setSixKill(int numFill) {
+        killArray.add(numFill);
+    }public void setSevenKill(int numFill) {
+        killArray.add(numFill);
+    }public void setEightKill(int numFill) {
+        killArray.add(numFill);
+    }public void setNineKill(int numFill) {
+        killArray.add(numFill);
+    }public void setTenKill(int numFill) {
+        killArray.add(numFill);
+    }
+
+    public void setTotalFill(int totalFill) {
+        this.totalFill = totalFill;
+    }
+
+    public void setTotalKill(int totalKill) {
+        this.totalKill = totalKill;
+    }
+
+    public int getTotalFill() {
+        return totalFill;
+    }
+    public int getTotalKill() {
+        return totalKill;
+    }
+
+    public ArrayList<Integer> getFillArray() {
+        return fillArray;
+    }
+    public ArrayList<Integer> getKillArray() {
+        return killArray;
     }
 
     public int getId() {
@@ -74,6 +153,22 @@ public class FeedItem {
         this.username = username;
     }
 
+    public void insertFill(int column) {
+
+    }
+
+    public void insertKill() {
+
+    }
+
+    public void hitKill(){
+        totalKill++;
+    }
+    public void hitFill(){
+       totalFill++;
+    }
+
+/*
     public void setFill(int fill){
         this.fill = fill;
     }
@@ -104,6 +199,6 @@ public class FeedItem {
     }
     public double getValue(){
         return this.value;
-    }
+    }*/
 
 }

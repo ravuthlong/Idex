@@ -67,7 +67,7 @@ public class DashActivity extends AppCompatActivity implements TextWatcher, View
                 String unixTime = Long.toString(System.currentTimeMillis());
                 User user = userLocalStore.getLoggedInUser();
                 serverRequests.storeAPostInBackground(editText.getText().toString(),
-                        user.getUserID(), unixTime);
+                        user.getUserID(), unixTime, DateColumn.getRowNumber());
                 UserLocalStore.allowRefresh = true;
                 startActivity(new Intent(this, MainActivity.class));
                 break;

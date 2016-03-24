@@ -137,8 +137,8 @@ public class AUserPostListFragment extends Fragment implements  View.OnClickList
                         item.setStatus(feedObj.getString("post"));
                         item.setProfilePic(picLinkJSON);
                         item.setTimeStamp(feedObj.getString("timeStamp"));
-                        item.setFill(feedObj.getInt("fill"));
-                        item.setKill(feedObj.getInt("kill"));
+                        //item.setFill(feedObj.getInt("fill"));
+                        //item.setKill(feedObj.getInt("kill"));
                         //item.setValue();
 
                         feedItems.add(item);

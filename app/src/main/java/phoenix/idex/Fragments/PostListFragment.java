@@ -183,8 +183,35 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                 item.setStatus(feedObj.getString("post"));
                 item.setProfilePic(feedObj.getString("userpic"));
                 item.setTimeStamp(feedObj.getString("timeStamp"));
-                item.setFill(feedObj.getInt("fill"));
-                item.setKill(feedObj.getInt("kill"));
+
+                item.setCurrentColumn(feedObj.getInt("currentColumn"));
+
+                item.setOneFill(feedObj.getInt("oneFill"));
+                item.setTwoFill(feedObj.getInt("twoFill"));
+                item.setThreeFill(feedObj.getInt("threeFill"));
+                item.setFourFill(feedObj.getInt("fourFill"));
+                item.setFiveFill(feedObj.getInt("fiveFill"));
+                item.setSixFill(feedObj.getInt("sixFill"));
+                item.setSevenFill(feedObj.getInt("sevenFill"));
+                item.setEightFill(feedObj.getInt("eightFill"));
+                item.setNineFill(feedObj.getInt("nineFill"));
+                item.setTenFill(feedObj.getInt("tenFill"));
+
+                item.setOneKill(feedObj.getInt("oneKill"));
+                item.setTwoKill(feedObj.getInt("twoKill"));
+                item.setThreeKill(feedObj.getInt("threeKill"));
+                item.setFourKill(feedObj.getInt("fourKill"));
+                item.setFiveKill(feedObj.getInt("fiveKill"));
+                item.setSixKill(feedObj.getInt("sixKill"));
+                item.setSevenKill(feedObj.getInt("sevenKill"));
+                item.setEightKill(feedObj.getInt("eightKill"));
+                item.setNineKill(feedObj.getInt("nineKill"));
+                item.setTenKill(feedObj.getInt("tenKill"));
+
+                item.setTotalFill(feedObj.getInt("totalFill"));
+                item.setTotalKill(feedObj.getInt("totalKill"));
+                //item.setFill(feedObj.getInt("fill"));
+                //item.setKill(feedObj.getInt("kill"));
                 //item.setValue();
 
                 feedItems.add(item);

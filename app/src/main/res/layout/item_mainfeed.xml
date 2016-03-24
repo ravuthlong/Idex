@@ -11,28 +11,18 @@
 
     <LinearLayout
         android:id="@+id/bottom_wrapper"
-        android:layout_width="240dp"
+        android:layout_width="100dp"
         android:layout_height="match_parent"
-        android:weightSum="2">
+        android:weightSum="1">
 
         <TextView
-            android:id="@+id/tvFill"
+            android:id="@+id/tvGraph"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#13571A"
+            android:background="#246961"
             android:gravity="center"
-            android:text="Fill"
-            android:textColor="#fff" />
-
-        <TextView
-            android:id="@+id/tvKill"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#722112"
-            android:gravity="center"
-            android:text="Kill"
+            android:text="Graph"
             android:textColor="#fff" />
     </LinearLayout>
 
@@ -70,7 +60,7 @@
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/feed_item_padding_left_right"
             android:paddingRight="@dimen/feed_item_padding_left_right" >
@@ -83,73 +73,83 @@
             </com.android.volley.toolbox.NetworkImageView>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="210dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingLeft="@dimen/feed_item_profile_info_padd" >
-
                 <TextView
                     android:id="@+id/name"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/feed_item_profile_name"
                     android:textStyle="bold" />
-
                 <TextView
                     android:id="@+id/timestamp"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/timestamp"
                     android:textSize="@dimen/feed_item_timestamp" />
-            </LinearLayout>
-        </LinearLayout>
 
-        <TextView
-            android:id="@+id/txtStatusMsg"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#3090C7"
-            android:paddingBottom="5dp"
-            android:paddingLeft="@dimen/feed_item_status_pad_left_right"
-            android:paddingRight="@dimen/feed_item_status_pad_left_right"
-            android:paddingTop="@dimen/feed_item_status_pad_top" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent">
+
+                <ImageButton
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/imgbFill"
+                    android:background="@drawable/fill" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:id="@+id/tvFillNum"
+                        android:textSize="10sp"
+                        android:text="lol." />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_gravity="center_horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
             <TextView
-                android:id="@+id/tvFillNum"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <Button
-                android:id="@+id/bFill"
-                android:text="Fill"
-                android:layout_gravity="center_horizontal"
+                android:id="@+id/txtStatusMsg"
+                android:layout_width="275dp"
+                android:layout_height="wrap_content"
+                android:textColor="#3090C7"
+                android:paddingBottom="5dp"
+                android:paddingLeft="@dimen/feed_item_status_pad_left_right"
+                android:paddingRight="@dimen/feed_item_status_pad_left_right"
+                android:paddingTop="@dimen/feed_item_status_pad_top" />
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/imgbKill"
+                android:background="@drawable/kill"
+                android:layout_gravity="right" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#30595d"
-                android:layout_marginRight="5dp" />
-            <Button
-                android:id="@+id/bKill"
-                android:text="Kill"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#30595b" />
-            <TextView
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/tvKillNum"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <Button
-                android:id="@+id/bView"
-                android:text="View"
-                android:layout_marginLeft="5dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#30595b" />
+                android:textSize="10sp" />
+
         </LinearLayout>
 
     </LinearLayout>
