@@ -10,8 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +27,7 @@ public class DashActivity extends AppCompatActivity implements TextWatcher, View
     private  EditText editText;
     private Toolbar toolbardash;
     private TextView wordCounter;
-    private Button bPostIdea;
+    private ImageButton imgbPostIdea;
     private UserLocalStore userLocalStore;
     private ServerRequests serverRequests;
 
@@ -42,28 +42,34 @@ public class DashActivity extends AppCompatActivity implements TextWatcher, View
         toolbardash = (Toolbar) findViewById(R.id.toolbardash);
         editText = (EditText) findViewById(R.id.editTextDash);
         wordCounter = (TextView) findViewById(R.id.wordCounter);
-        bPostIdea = (Button) findViewById(R.id.bPostIdea);
+        imgbPostIdea = (ImageButton) findViewById(R.id.imgbPostIdea);
+
 
         setSupportActionBar(toolbardash);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setTitle("Post");
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+
+        if (toolbardash != null) {
+            toolbardash.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            });
+        }
 
         userLocalStore = new UserLocalStore(this);
         serverRequests = new ServerRequests(this);
-        toolbardash.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
         editText.addTextChangedListener(this);
-        bPostIdea.setOnClickListener(this);
+        imgbPostIdea.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.bPostIdea:
+            case R.id.imgbPostIdea:
                 String unixTime = Long.toString(System.currentTimeMillis());
                 User user = userLocalStore.getLoggedInUser();
                 serverRequests.storeAPostInBackground(editText.getText().toString(),

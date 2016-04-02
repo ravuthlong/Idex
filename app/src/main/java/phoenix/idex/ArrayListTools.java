@@ -14,10 +14,6 @@ public class ArrayListTools {
     public ArrayListTools(ArrayList<Integer> fillArrayList, ArrayList<Integer> killArrayList) {
         this.fillArrayList = fillArrayList;
         this.killArrayList = killArrayList;
-
-        for (int i = 0; i < fillArrayList.size(); i++) {
-            System.out.println("ARRAY is: " + fillArrayList.get(i));
-        }
     }
 
     public void sortFillArrayList() {
@@ -36,10 +32,6 @@ public class ArrayListTools {
             }
         } else {
             sortedFillArray = fillArrayList;
-        }
-
-        for (int i = 0; i < sortedFillArray.size(); i++) {
-            System.out.println("Sorted fill is: " + sortedFillArray.get(i));
         }
     }
 
@@ -60,9 +52,6 @@ public class ArrayListTools {
         } else {
             sortedKillArray = killArrayList;
         }
-        for (int i = 0; i < sortedKillArray.size(); i++) {
-            System.out.println("Sorted kill is: " + sortedKillArray.get(i));
-        }
     }
 
     public void sumSortedFillArray() {
@@ -82,7 +71,7 @@ public class ArrayListTools {
     public ArrayList<Integer> getGraphList() {
         ArrayList<Integer> trendList = new ArrayList<>();
         for (int i = 0; i < sortedFillArray.size(); i++) {
-            trendList.add((sortedFillArray.get(i) * 4) - sortedKillArray.get(i));
+            trendList.add((sortedFillArray.get(i) * 2) - sortedKillArray.get(i));
         }
         return trendList;
     }

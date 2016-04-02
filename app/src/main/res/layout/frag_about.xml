@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:background="@drawable/logo" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbardash"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        local:popupTheme="@style/AppTheme.PopupOverlay"
+        android:transitionGroup="false" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/info"
-        android:textSize="40sp"
+        android:textSize="17sp"
         android:layout_gravity="center_vertical"
         android:layout_marginTop="70dp"
         android:typeface="monospace"
-        android:gravity="center" />
+        android:gravity="center"
+        android:id="@+id/tvInfo"
+        android:singleLine="false"
+        android:textAlignment="gravity" />
 
 </LinearLayout>

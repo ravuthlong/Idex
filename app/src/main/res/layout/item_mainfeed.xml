@@ -30,9 +30,19 @@
 
     <LinearLayout
         android:id="@+id/bottom_wrapper1"
-        android:layout_width="80dp"
+        android:layout_width="170dp"
         android:layout_height="match_parent"
-        android:weightSum="1">
+        android:weightSum="2">
+        <TextView
+            android:id="@+id/tvEditPost"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#C27861"
+            android:gravity="center"
+            android:text="Edit"
+            android:textColor="#fff"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvManagePost"
@@ -59,11 +69,10 @@
         android:paddingTop="@dimen/feed_item_padding_top_bottom" >
 
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="70dp"
             android:orientation="horizontal"
-            android:paddingLeft="@dimen/feed_item_padding_left_right"
-            android:paddingRight="@dimen/feed_item_padding_left_right" >
+            android:paddingLeft="@dimen/feed_item_padding_left_right">
 
             <com.android.volley.toolbox.NetworkImageView
                 android:id="@+id/profilePic"
@@ -92,32 +101,21 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent">
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/imgbFill"
+                android:background="@drawable/fill" />
 
-                <ImageButton
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:id="@+id/imgbFill"
-                    android:background="@drawable/fill" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:id="@+id/tvFillNum"
+                android:textSize="10sp"
+                android:visibility="visible"
+                android:layout_marginTop="15dp" />
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:id="@+id/tvFillNum"
-                        android:textSize="10sp"
-                        android:text="lol." />
-                </LinearLayout>
-
-            </LinearLayout>
 
         </LinearLayout>
 
@@ -148,7 +146,9 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/tvKillNum"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:visibility="visible"
+                android:text="1" />
 
         </LinearLayout>
 

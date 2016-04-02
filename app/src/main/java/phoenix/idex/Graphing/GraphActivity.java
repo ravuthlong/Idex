@@ -36,7 +36,6 @@ public class GraphActivity extends AppCompatActivity {
         setContentView(R.layout.frag_graph);
 
         Bundle extras = getIntent().getExtras();
-
         ArrayList<Integer> fillArray = extras.getIntegerArrayList("fillArray");
         ArrayList<Integer> killArray = extras.getIntegerArrayList("killArray");
 

@@ -1,6 +1,7 @@
 package phoenix.idex.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import phoenix.idex.EditProfileActivity;
 import phoenix.idex.R;
 import phoenix.idex.TabAdapter.ViewPagerAdapter;
 
@@ -27,7 +30,6 @@ public class TabFragment extends Fragment implements ViewPager.OnPageChangeListe
     private TabHost tabHost;
     private View v;
     private ViewPagerAdapter viewPagerAdapter;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,6 +46,18 @@ public class TabFragment extends Fragment implements ViewPager.OnPageChangeListe
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.useraccount_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.editAccount_setting:
+                startActivity(new Intent(getActivity(), EditProfileActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public class TabContent implements TabHost.TabContentFactory {

@@ -65,12 +65,14 @@
 
 
             </LinearLayout>
-            <Button
-                android:layout_marginTop="15dp"
-                android:text="POST IDEA"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/bPostIdea" />
+
+            <ImageButton
+                android:layout_width="130dp"
+                android:layout_height="60dp"
+                android:id="@+id/imgbPostIdea"
+                android:background="@drawable/post"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal" />
 
         </LinearLayout>
     </ScrollView>

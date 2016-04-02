@@ -3,20 +3,18 @@ package phoenix.idex.Fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
@@ -32,8 +30,8 @@ import com.facebook.login.widget.LoginButton;
 
 import phoenix.idex.MainActivity;
 import phoenix.idex.R;
-import phoenix.idex.ServerConnections.GetUserCallBack;
 import phoenix.idex.ServerConnections.ServerRequests;
+import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
 import phoenix.idex.SignUpActivity;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
@@ -44,13 +42,17 @@ import phoenix.idex.UserLocalStore;
 public class LoginActivityFragment extends Fragment implements View.OnClickListener {
     private TextView mTextDetails;
     private CallbackManager mCallbackManager;
+    private ImageButton imgbRegister, imgbLogin;
     private Button bRegister, bLogin, bBrowseIdea;
     private AccessTokenTracker mTokenTracker;
     private ProfileTracker mProfileTracker;
     private View v;
+    private int sizeOfActionBar;
+    RelativeLayout rLayoutMain;
     private UserLocalStore userLocalStore;
-    private TextView etUsername, etPassword, tvIdexTitle;;
+    private TextView etUsername, etPassword, tvIdexTitle, tvContinue, tvUsername, tvPassword;
     private android.support.v7.widget.Toolbar toolbar;
+    private FragmentManager fragmentManager;
 
 
     private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
@@ -115,63 +117,59 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
                              Bundle savedInstanceState) {
 
         v = inflater.inflate(R.layout.frag_login, container, false);
-        bRegister = (Button) v.findViewById(R.id.bRegister);
-        bLogin = (Button) v.findViewById(R.id.bLogin);
+        imgbRegister = (ImageButton) v.findViewById(R.id.imgbRegister);
+        imgbLogin = (ImageButton) v.findViewById(R.id.imgbLogin);
         bBrowseIdea = (Button) v.findViewById(R.id.bBrowseIdea);
         tvIdexTitle = (TextView) v.findViewById(R.id.tvIdexTitle);
         etUsername = (TextView) v.findViewById(R.id.etUsername);
         etPassword = (TextView) v.findViewById(R.id.etPassword);
-
+        tvContinue = (TextView) v.findViewById(R.id.tvContinue);
         tvIdexTitle.setOnClickListener(this);
-        bLogin.setOnClickListener(this);
-        bRegister.setOnClickListener(this);
+        imgbLogin.setOnClickListener(this);
+        imgbRegister.setOnClickListener(this);
         bBrowseIdea.setOnClickListener(this);
+        tvContinue.setOnClickListener(this);
 
+        tvUsername = (TextView) v.findViewById(R.id.tvUsername);
+        tvPassword = (TextView) v.findViewById(R.id.tvPassword);
+
+        Typeface osFont = Typeface.createFromAsset(getActivity().getAssets(), "tt.otf");
+
+        tvContinue.setTypeface(osFont);
+        tvPassword.setTypeface(osFont);
+        tvUsername.setTypeface(osFont);
+
+        // Remove toolbar from login activity
+        MainActivity.rLayoutMain.setPadding(0, 0, 0, 0);
         userLocalStore = new UserLocalStore(getActivity());
         userLocalStore.clearUserData(); // Clear the last logged in user before storing the new one
-
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable((Color.TRANSPARENT)));
-
         return v;
     }
-
-
-/*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getActivity().onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-*/
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.bLogin:
+            case R.id.imgbLogin:
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
                 User user = new User(username, password);
                 authenticate(user);
                 break;
-            case R.id.bRegister:
+            case R.id.imgbRegister:
                 Intent signUpIntent = new Intent(getActivity(), SignUpActivity.class);
                 startActivity(signUpIntent);
                 break;
-            case R.id.bBrowseIdea:
-                startActivity(new Intent(getActivity(), MainActivity.class));
+            case R.id.tvContinue:
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
+                        new PostListFragment()).commit();
+                MainActivity.listView.setItemChecked(1, true);
                 break;
             case R.id.tvIdexTitle:
-                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
                         new AboutFragment()).commit();
                 MainActivity.listView.setItemChecked(2, true);
-                //android.support.v4.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                //transaction.replace(R.id.fragmentLogin, new AboutFragment()).commit();
                 break;
         }
     }
@@ -218,7 +216,9 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
 
     // If the log in info is correct, store user in local store and show MainActivity
     private void logUserIn(){
-        startActivity(new Intent(getActivity(), MainActivity.class));
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  //It is use to finish current activity
+        startActivity(intent);
 
     }
 

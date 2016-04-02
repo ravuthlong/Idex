@@ -14,8 +14,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
             local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            local:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            />
+            local:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
 </android.support.design.widget.CoordinatorLayout>
 

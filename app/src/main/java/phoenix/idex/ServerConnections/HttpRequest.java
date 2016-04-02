@@ -3,7 +3,6 @@ package phoenix.idex.ServerConnections;
 /**
  * Created by Ravinder on 3/3/16.
  */
-//needed imports:
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,25 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-/**
- * Since HttpClient,BasicNameValuePairs, etc...  are deprecated.
- * I've searched for a good alternative, and couldn't find any. Eventually ended up writing my own solution, so I decided to share to those who needs it.
- * Main goals: to make it intuitive, short, clean and reasonable.
- * NOTE methods: .prepare(), preparePost(), withData(map) & withData(string) are build to allow caller to chain in different variations, examples:
- *HttpRequest req=new HttpRequest("http://host:port/path");
- *
- *Example 1: //prepare Http Post request and send to "http://host:port/path" with data params name=Bubu and age=29, return true - if worked
- *req.preparePost().withData("name=Bubu&age=29").send();
- *
- *Example 2: //prepare http get request,  send to "http://host:port/path" and read server's response as String
- *req.prepare().sendAndReadString();
- *
- *Example 3: //prepare Http Post request and send to "http://host:port/path" with name=Bubu and age=29 and read server's response as JSONObject
- *HashMap<String, String>params=new HashMap<>();
- params.put("name", "Groot");
- params.put("age", "29");
- *req.preparePost().withData(params).sendAndReadJSON();
- */
+
 public class HttpRequest {
     private URL url;
     private HttpURLConnection con;
@@ -54,12 +35,8 @@ public class HttpRequest {
         con.disconnect();
         os.close();
     }
-    /**
-     * Sending connection and opening an output stream to server by pre-defined instance variable url
-     *
-     * @param isPost boolean - indicates whether this request should be sent in POST method
-     * @throws IOException - should be checked by caller
-     * */
+
+    //Sending connection and opening an output stream to server by pre-defined instance variable url
     private void prepareAll(boolean isPost)throws IOException{
         con = (HttpURLConnection) url.openConnection();
         if(isPost)con.setRequestMethod("POST");
@@ -79,29 +56,16 @@ public class HttpRequest {
         prepareAll(true);
         return this;
     }
-    /**
-     * Writes query to open stream to server
-     *
-     * @param query String params in format of key1=v1&key2=v2 to open stream to server
-     * @return HttpRequest this instance -> for chaining method @see line 22
-     * @throws IOException - should be checked by caller
-     * */
-    public HttpRequest withData(String query) throws IOException{
+
+    //Writes query to open stream to server
+    public HttpRequest withData(String query) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
         writer.write(query);
         writer.close();
         return this;
     }
-    /**
-     * Builds query on format of key1=v1&key2=v2 from given hashMap structure
-     * for map: {name=Bubu, age=29} -> builds "name=Bubu&age=29"
-     * for map: {Iam=Groot} -> builds "Iam=Groot"
-     *
-     * @param params HashMap consists of key-> value pairs to build query from
-     * @return HttpRequest this instance -> for chaining method @see line 22
-     * @throws IOException - should be checked by caller
-     * */
 
+     //Builds query on format of key1=v1&key2=v2 from given hashMap structure
     public HttpRequest withData(HashMap<String,Object> params) throws IOException{
         String result="",and = "";
         for(Map.Entry<String, Object> entry : params.entrySet()){
@@ -118,12 +82,8 @@ public class HttpRequest {
         done();
         return status; //boolean return to indicate whether it successfully sent
     }
-    /**
-     * Sending request to the server and pass to caller String as it received in response from server
-     *
-     * @return String printed from server's response
-     * @throws IOException - should be checked by caller
-     * */
+
+    //Sending request to the server and pass to caller String as it received in response from server
     public String sendAndReadString() throws IOException{
         BufferedReader br=new BufferedReader(new InputStreamReader(con.getInputStream()));
         String line,response="";

@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ListView;
 
+import phoenix.idex.MainActivity;
+import phoenix.idex.R;
 import phoenix.idex.UserLocalStore;
 
 /**
@@ -14,15 +16,17 @@ import phoenix.idex.UserLocalStore;
  */
 
 // Class called in post_recyclerview XML
-
 public class ScrollListener extends FloatingActionButton.Behavior {
 
+    int sizeOfActionBar;
     public ScrollListener(Context context, AttributeSet attrs) {
         super();
     }
 
     public boolean onStartNestedScroll(CoordinatorLayout parent, FloatingActionButton child,
                                        View directTargetChild, View target, int nestedScrollAxes) {
+        sizeOfActionBar = MainActivity.getThemeAttributeDimensionSize(parent.getContext(), R.attr.actionBarSize);
+
         return true;
     }
 

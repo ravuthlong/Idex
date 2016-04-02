@@ -9,7 +9,6 @@
     android:weightSum="5"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbarEditProfile"
         android:layout_width="match_parent"

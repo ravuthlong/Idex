@@ -28,22 +28,4 @@
             android:id="@+id/etloggedInUser" />
     </LinearLayout>
 
-    <TextView
-        android:text="Total posts: 26\nTotal fills: 22\nTotal Kills: 10"
-        android:textSize="20dp"
-        android:textColor="#E5E4E2"
-        android:layout_margin="20dp"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal" />
-
-    <Button
-        android:id="@+id/bViewProfile"
-        android:layout_margin="5dp"
-        android:padding="5dp"
-        android:text="View Profile"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-
-
 </LinearLayout>

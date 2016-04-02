@@ -6,23 +6,22 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import phoenix.idex.ServerConnections.GetUserCallBack;
 import phoenix.idex.ServerConnections.ServerRequests;
+import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
 
-/*
- *https://github.com/wrapp/floatlabelededittext
- */
-public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
+
+public class SignUpActivity extends AppCompatActivity {
     ServerRequests serverRequests;
-    Button bSignUp;
     EditText etFirstName, etLastName, etEmail, etUsername, etPassword, etConfirmPass;
     private  UserLocalStore userLocalStore;
 
@@ -33,8 +32,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarSignUp);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setTitle("Sign Up");
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }        setTitle("Sign Up");
         userLocalStore = new UserLocalStore(this);
 
         etFirstName = (EditText) findViewById(R.id.etFirstName);
@@ -44,9 +44,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         etPassword = (EditText) findViewById(R.id.etPassword);
         etConfirmPass = (EditText) findViewById(R.id.etConfirmPass);
 
-        bSignUp = (Button) findViewById(R.id.bSignUp);
-
-        bSignUp.setOnClickListener(this);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,11 +53,20 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.bSignUp:
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_signup, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.submitSignup:
                 inputValidation();
-                break;
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

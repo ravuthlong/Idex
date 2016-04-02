@@ -1,5 +1,7 @@
 package phoenix.idex;
 
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -13,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -35,9 +38,11 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private int currentPos;
     private Toolbar toolbar;
+    public static RelativeLayout rLayoutMain;
     private FragmentManager fragmentManager;
     public static boolean isMainShown = false;
     private UserLocalStore userLocalStore;
+    private int sizeOfToolBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +53,17 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        fragmentManager = getSupportFragmentManager();
+        getSupportActionBar().setHomeButtonEnabled(true);
 
+        fragmentManager = getSupportFragmentManager();
         listView = (ListView) findViewById(R.id.listViewMain);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayoutMain);
+        rLayoutMain = (RelativeLayout) findViewById(R.id.rLayoutMain);
+
+        sizeOfToolBar = getThemeAttributeDimensionSize(this, R.attr.actionBarSize);
 
         if (!UserLocalStore.isUserLoggedIn) {
+            System.out.println("SDFSDFS");
             setUpDrawerList();
             setUpFragments();
             screenStartUpState();
@@ -65,6 +75,19 @@ public class MainActivity extends AppCompatActivity {
             screenStartUpState();
             drawerListViewLoggedInUserListener();
             toggleListener();
+        }
+    }
+
+    public static int getThemeAttributeDimensionSize(Context context, int attr)
+    {
+        TypedArray a = null;
+        try{
+            a = context.getTheme().obtainStyledAttributes(new int[] { attr });
+            return a.getDimensionPixelSize(0, 0);
+        }finally{
+            if(a != null){
+                a.recycle();
+            }
         }
     }
 
@@ -86,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 invalidateOptionsMenu();
             }
         };
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
     }
 
     // Add items to the drawer list for navigation drawer
@@ -136,12 +159,12 @@ public class MainActivity extends AppCompatActivity {
     // Start up state
     //Title Idex, with closed navigation drawer and default fragment 1
     private void screenStartUpState() {
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+       // rLayoutMain.setPadding(0,0,0,0);
         isMainShown = true;
         setTitle("");
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.rLayoutMain, fragmentList.get(0)).commit();
+        fragmentManager.beginTransaction().replace(R.id.rLayoutMain, fragmentList.get(0)).addToBackStack(null).commit();
         listView.setItemChecked(0, true);
         drawerLayout.closeDrawer(listView);
     }
@@ -160,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
                     // Erase local history of logged in user
                     userLocalStore.clearUserData();
+                    UserLocalStore.visitCounter = 0;
                     UserLocalStore.isUserLoggedIn = false;
                     setUpDrawerList();
                     setUpFragments();
@@ -197,14 +221,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 currentPos = position;
-                if (position == 0 ) {
+                if (position == 0) {
                     isMainShown = true;
                     setTitle("");
                 } else {
                     isMainShown = false;
                     setTitle(itemList.get(position).getTitle());
                 }
-
                 drawerLayout.closeDrawer(listView);
                 // Set item to selected
                 listView.setItemChecked(position, true);
@@ -215,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         FragmentManager fragmentManager = getSupportFragmentManager();
                         fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
-                                fragmentList.get(currentPos)).addToBackStack(null).commit();
+                                fragmentList.get(currentPos)).commit();
                     }
                 }, 270);
             }

@@ -8,7 +8,7 @@
         androidPlot.graphWidget.marginLeft="20dp"
         androidPlot.graphWidget.marginBottom="15dp"
         android:id="@+id/xyplot"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         title="Post Chart" />
 </LinearLayout>

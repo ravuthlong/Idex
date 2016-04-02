@@ -10,9 +10,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,6 +47,20 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarEditProfile);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         bEditProfile = (Button) findViewById(R.id.bEditProfile);
         bChangePassword = (Button) findViewById(R.id.bChangePassword);
         ivProfilePic = (ImageView) findViewById(R.id.ivProfilePic);
@@ -73,28 +86,6 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
 
         ivProfilePic.setOnClickListener(this);
         bEditProfile.setOnClickListener(this);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_edit_profile, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     // Set the image from gallery onto ivProfilePic imageview
@@ -197,7 +188,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
         @Override
         protected Void doInBackground(Void... params) {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            image.compress(Bitmap.CompressFormat.JPEG, 15, byteArrayOutputStream);
             String encodedImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
 
             ArrayList<NameValuePair> dataToSend = new ArrayList<>();
@@ -227,5 +218,9 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
             Toast.makeText(EditProfileActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(EditProfileActivity.this, MainActivity.class));
         }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

@@ -16,16 +16,21 @@
     android:weightSum="1">
 
 
-    <TextView
-        android:id="@+id/tvIdexTitle"
-        android:textColor="#FDD017"
-        android:text="i d e x"
-        android:textStyle="bold|italic"
-        android:layout_gravity="center_horizontal"
-        android:textSize="75dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-70dp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvIdexTitle"
+            android:textColor="#FDD017"
+            android:text="q i x"
+            android:textStyle="bold|italic"
+            android:textSize="69sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
@@ -39,7 +44,8 @@
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            android:id="@+id/tvUsername" />
 
         <EditText
             android:id="@+id/etUsername"
@@ -52,7 +58,8 @@
             android:text="Password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            android:id="@+id/tvPassword" />
 
         <EditText
             android:id="@+id/etPassword"
@@ -81,6 +88,18 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal">
 
+        <ImageButton
+            android:layout_width="140dp"
+            android:layout_height="60dp"
+            android:id="@+id/imgbLogin"
+            android:background="@drawable/login" />
+
+        <ImageButton
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:id="@+id/imgbRegister"
+            android:background="@drawable/register" />
+
         <Button
             android:layout_weight="3"
             android:id="@+id/bLogin"
@@ -88,7 +107,8 @@
             android:paddingLeft="50dp"
             android:paddingRight="50dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/bRegister"
@@ -99,7 +119,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 
@@ -114,6 +136,19 @@
         android:layout_marginBottom="20dp"
         />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/continueNoLogIn"
+        android:id="@+id/tvContinue"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:clickable="true"
+        android:textSize="17sp"
+        android:typeface="sans"
+        android:textColor="#8ccfcccc" />
+
     <Button
         android:id="@+id/bBrowseIdea"
         android:textColor="#FFFF00"
@@ -122,5 +157,7 @@
         android:layout_gravity="center_horizontal"
         android:text="Browse Idea"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
 </LinearLayout>

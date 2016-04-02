@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,8 +40,8 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
     private Context mContext;
     private LayoutInflater inflater;
     private List<FeedItem> feedItems;
-    ImageLoader imageLoader = AppController.getInstance().getImageLoader();;
-    ServerRequests serverRequests;
+    private ImageLoader imageLoader = AppController.getInstance().getImageLoader();;
+    private ServerRequests serverRequests;
     private UserLocalStore userLocalStore;
 
     public FeedListAdapter(Context context, List<FeedItem> feedItems) {
@@ -70,10 +71,22 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         final FeedItem currentPos = feedItems.get(position);
         holder.name.setText(currentPos.getName());
 
+        holder.tvFillNum.setText("" + (currentPos.getTotalFill()));
+        holder.tvKillNum.setText("-" + (currentPos.getTotalKill()));
+
+        if (currentPos.getFillOrKill() == 0) {
+            holder.imgbKill.setBackgroundResource(R.drawable.killed);
+        } else if (currentPos.getFillOrKill() == 1) {
+            holder.imgbFill.setBackgroundResource(R.drawable.filled);
+        }
+
         // Logged in user's post will get delete option instead of report option
         if (currentPos.getUsername().equals(userLocalStore.getLoggedInUser().getUsername())) {
             holder.tvManagePost.setText("Delete");
+            holder.tvEditPost.setVisibility(View.VISIBLE);
+
         } else {
+            holder.bottomWrapper1.setWeightSum(1);
             holder.tvManagePost.setText("Report");
         }
 
@@ -107,40 +120,105 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             holder.profilePic.setImageUrl("http://oi67.tinypic.com/24npqbk.jpg", imageLoader);
         }
 
-        //holder.bFill.setText("Fill (" + currentPos.getTotalFill() + ")");
-        //holder.bKill.setText("Kill (" + currentPos.getTotalKill() + ")");
-
         holder.numFill.setText("" + currentPos.getTotalFill());
-        holder.numKill.setText("" + currentPos.getTotalKill());
+        holder.numKill.setText("-" + currentPos.getTotalKill());
 
         holder.imgbFill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if (currentPos.getCurrentColumn() == DateColumn.getRowNumber()) {
-                    // Update Fill number in the database. Increment by 1 through SQL command in .php
-                    serverRequests.updateFillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
+                if (currentPos.getFillOrKill() == 1) {
+                    // Case the post already has a fill so need to cancel fill.
+                    serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
+                    serverRequests.minusFillInBackground(currentPos.getCurrentColumn(), currentPos.getId());
+                    holder.imgbFill.setBackgroundResource(R.drawable.fill);
+                    currentPos.hitFillSecondTime();
+                    currentPos.setFillOrKill(-1);
+
+                    System.out.println("11111111111111111111111");
                 } else {
-                    // Update both fill number and current column because it's a new day
-                    serverRequests.updateFillAndCurrentColumnInBackground(currentPos.getId(), DateColumn.getRowNumber());
+                    if (currentPos.getFillOrKill() == 0 && (currentPos.getCurrentColumn() != DateColumn.getRowNumber())) {
+                        System.out.println("22222222222222222222222");
+
+                        // Case the post already has a kill and it's a new day. Need to cancel kill and update column
+                        // SERVER REQUEST TO REMOVE FROM USER KILL LIST & UPDATE COLUMN
+                        holder.imgbKill.setBackgroundResource(R.drawable.kill);
+                    } else if (currentPos.getFillOrKill() == 0) {
+                        System.out.println("3333333333333333333333");
+
+                        // Case the post already has a Kill. Replace the kill with fill.
+                        currentPos.hitKillSecondTime();
+                        holder.tvKillNum.setText("-" + currentPos.getTotalKill());
+                        serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
+                        serverRequests.updateFillAndCancelKillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
+                        holder.imgbKill.setBackgroundResource(R.drawable.kill);
+                    } else if (currentPos.getCurrentColumn() == DateColumn.getRowNumber()) {
+                        System.out.println("44444444444444444444444444");
+
+                        // Case the post has no fill nor kill and the day of insert is the current insert column. Correct column already.
+                        serverRequests.updateFillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
+                    } else {
+                        System.out.println("55555555555555555555555555555");
+
+                        // Case the post has no fill nor kill and it's a new day so update column and add a fill.
+                        serverRequests.updateFillAndCurrentColumnInBackground(currentPos.getId(), DateColumn.getRowNumber());
+                    }
+                    System.out.println("ADD  TO FILL");
+
+                    // Add to user list of Fill clicks database table
+                    serverRequests.addToFillListInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
+                    holder.imgbFill.setBackgroundResource(R.drawable.filled);
+                    currentPos.hitFill();
+                    currentPos.setFillOrKill(1);
+
                 }
-                currentPos.hitFill();
-                holder.numFill.setText("" + currentPos.getTotalFill());
+                holder.tvFillNum.setText("" + (currentPos.getTotalFill()));
                 holder.swipeLayout.close();
             }
         });
         holder.imgbKill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (currentPos.getCurrentColumn() == DateColumn.getRowNumber()) {
-                    // Update Kill number in the database. Decrement by 1 through SQL command in .php
-                    serverRequests.updateKillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
+
+                if (currentPos.getFillOrKill() == 0) {
+                    System.out.println("66666666666666666666666");
+                    // Case the post already has a kill so need to cancel kill
+                    serverRequests.minusKillInBackground(currentPos.getCurrentColumn(), currentPos.getId());
+                    serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
+                    holder.imgbKill.setBackgroundResource(R.drawable.kill);
+                    currentPos.hitKillSecondTime();
+                    currentPos.setFillOrKill(-1);
+
                 } else {
-                    // Update both fill number and current column because it's a new day
-                    serverRequests.updateKillAndCurrentColumnInBackground(currentPos.getId(), DateColumn.getRowNumber());
+                    if (currentPos.getFillOrKill() == 1 && (currentPos.getCurrentColumn() != DateColumn.getRowNumber())) {
+                        System.out.println("7777777777777777777777777");
+                        // Case the post already has a fill and it's a new day. Need to cancel fill and update column
+                        // SERVER REQUEST TO REMOVE FROM USER FILL LIST
+                        holder.imgbFill.setBackgroundResource(R.drawable.fill);
+                    } else if (currentPos.getFillOrKill() == 1) {
+                        System.out.println("8888888888888888888888888");
+                        // Case the post already has a fill. Replace fill with kill.
+                        currentPos.hitFillSecondTime();
+                        holder.tvFillNum.setText("" + currentPos.getTotalFill());
+                        serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
+                        serverRequests.updateKillAndCancelFillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
+                        holder.imgbFill.setBackgroundResource(R.drawable.fill);
+                    } else if (currentPos.getCurrentColumn() == DateColumn.getRowNumber()) {
+                        System.out.println("9999999999999999999999999");
+                        // Case the day of insert is the current insert column. Correct column already.
+                        serverRequests.updateKillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
+                    } else {
+                        System.out.println("LASTTTTTTTTTTTTTTTTT");
+                        // Case the post has no fill nor kill and it's a new day so update column and add a fill.
+                        serverRequests.updateKillAndCurrentColumnInBackground(currentPos.getId(), DateColumn.getRowNumber());
+                    }
+                    // Add to user list of kill clicks database table
+                    serverRequests.addToKillListInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
+                    holder.imgbKill.setBackgroundResource(R.drawable.killed);
+                    currentPos.hitKill();
+                    currentPos.setFillOrKill(0);
                 }
-                currentPos.hitKill();
-                holder.numKill.setText("" + currentPos.getTotalKill());
+                holder.tvKillNum.setText("-" + currentPos.getTotalKill());
                 holder.swipeLayout.close();
             }
         });
@@ -234,7 +312,9 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         NetworkImageView profilePic;
         Button bFill, bKill;
         ImageButton imgbFill, imgbKill;
-        TextView tvGraph, numFill, numKill, txtStatusMsg, timestamp, name, tvManagePost;
+        TextView tvGraph, numFill, numKill, txtStatusMsg, timestamp, name, tvManagePost, tvFillNum, tvKillNum,
+                tvEditPost;
+        LinearLayout bottomWrapper1;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -249,9 +329,10 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             numKill = (TextView) itemView.findViewById(R.id.tvKillNum);
             imgbFill = (ImageButton) itemView.findViewById(R.id.imgbFill);
             imgbKill = (ImageButton) itemView.findViewById(R.id.imgbKill);
-
-            //bFill = (Button) itemView.findViewById(R.id.bFill);
-            //bKill = (Button) itemView.findViewById(R.id.bKill);
+            tvFillNum = (TextView) itemView.findViewById(R.id.tvFillNum);
+            tvKillNum = (TextView) itemView.findViewById(R.id.tvKillNum);
+            tvEditPost = (TextView) itemView.findViewById(R.id.tvEditPost);
+            bottomWrapper1 = (LinearLayout) itemView.findViewById(R.id.bottom_wrapper1);
         }
     }
 
@@ -269,5 +350,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
         }
     }
+
+
 
 }

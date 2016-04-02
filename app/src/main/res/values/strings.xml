@@ -5,7 +5,10 @@
     <string name="userInfo_edit">Edit Info</string>
     <string name="facebook_app_id">990811460986304</string>
     <string name="frag1">Frag 1</string>
-    <string name="info">Everyone has an idea...\n \nMarket Before You Make It!</string>
+    <string name="info">We live in the age of start\-ups, yet the American Dream 9\-5 paradigm still exists.
+    People have ideas but don\'t have means, opportunity or risk appetite. Many start ups exhaust their cash
+    on manufacturing and customer acquisition before reaching the investor phase. QIX removes inherent
+    start\-up risk by focusing on real value in intangible ideas and create a social beta market.</string>
     <string name="frag3">Frag 3</string>
     <string name="menu1">Item 1</string>
     <string name="menu2">Item 2</string>
@@ -18,5 +21,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_upload_photo">UploadPhoto</string>
     <string name="title_activity_edit_profile">EditProfileActivity</string>
+    <string name="continueNoLogIn"><u>Continue without logging in</u></string>
+    <string name="MenuSignUp">SignUp</string>
 
 </resources>

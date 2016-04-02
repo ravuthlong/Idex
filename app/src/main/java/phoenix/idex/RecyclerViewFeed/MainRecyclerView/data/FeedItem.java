@@ -15,6 +15,7 @@ public class FeedItem {
     private int totalKill;
     private int currentColumn; // if 10, reset to 0 and update all fill/kill columns to 0
     private double value;
+    private int fillOrKill; // Fill has value 1 and kill has value 0
 
     public FeedItem() {
     }
@@ -36,6 +37,9 @@ public class FeedItem {
         return currentColumn;
     }
 
+    public void setFillOrKill(int fillOrKill) {
+        this.fillOrKill = fillOrKill;
+    }
     public void setOneFill(int numFill) {
         fillArray.add(0, numFill);
     }
@@ -96,6 +100,7 @@ public class FeedItem {
     public int getTotalKill() {
         return totalKill;
     }
+    public int getFillOrKill() { return fillOrKill; }
 
     public ArrayList<Integer> getFillArray() {
         return fillArray;
@@ -167,6 +172,9 @@ public class FeedItem {
     public void hitFill(){
        totalFill++;
     }
+
+    public void hitKillSecondTime() { totalKill--; }
+    public void hitFillSecondTime() { totalFill--; }
 
 /*
     public void setFill(int fill){
