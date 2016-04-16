@@ -1,4 +1,4 @@
-package phoenix.idex;
+package phoenix.idex.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -16,7 +17,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -31,16 +31,21 @@ import cz.msebera.android.httpclient.client.methods.HttpPost;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 import cz.msebera.android.httpclient.params.BasicHttpParams;
+import phoenix.idex.R;
+import phoenix.idex.User;
+import phoenix.idex.UserLocalStore;
+import phoenix.idex.VolleyServerConnections.VolleyConnections;
 
 public class EditProfileActivity extends AppCompatActivity implements View.OnClickListener {
     ImageView ivProfilePic;
-    EditText etChangeFirstName, etChangeLastName, etEmail, etUsername;
+    EditText etChangeFirstName, etChangeLastName, etChangeEmail, etChangeUsername;
     private UserLocalStore userLocalStore;
     Button bEditProfile, bChangePassword;
     private ProgressDialog progressDialog;
     private static final String SERVER_ADDRESS = "http://idex.site88.net/";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static boolean isNewPhotoUploaded = false;
+    private VolleyConnections volleyConnections;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,22 +71,23 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
         ivProfilePic = (ImageView) findViewById(R.id.ivProfilePic);
         etChangeFirstName = (EditText) findViewById(R.id.etChangeFirstName);
         etChangeLastName = (EditText) findViewById(R.id.etChangeLastName);
-        etUsername = (EditText) findViewById(R.id.etEdit_Username);
-        etEmail = (EditText) findViewById(R.id.etEdit_Email);
+        etChangeUsername = (EditText) findViewById(R.id.etChangeUsername);
+        etChangeEmail = (EditText) findViewById(R.id.etChangeEmail);
 
         userLocalStore = new UserLocalStore(this);
         progressDialog = new ProgressDialog(this);
 
         etChangeFirstName.setText(userLocalStore.getLoggedInUser().getFirstname());
         etChangeLastName.setText(userLocalStore.getLoggedInUser().getLastname());
-        etUsername.setText(userLocalStore.getLoggedInUser().getUsername());
-        etEmail.setText(userLocalStore.getLoggedInUser().getEmail());
+        etChangeUsername.setText(userLocalStore.getLoggedInUser().getUsername());
+        etChangeEmail.setText(userLocalStore.getLoggedInUser().getEmail());
 
         // Get current Profile Pic
         new DownloadImage(userLocalStore.getLoggedInUser().getUsername()).execute();
 
         userLocalStore = new UserLocalStore(this);
         progressDialog = new ProgressDialog(this);
+        volleyConnections = new VolleyConnections(this);
         progressDialog.setCancelable(false);
 
         ivProfilePic.setOnClickListener(this);
@@ -110,7 +116,11 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
                 isNewPhotoUploaded = true;
                 Bitmap image = ((BitmapDrawable) ivProfilePic.getDrawable()).getBitmap();
                 new UploadImage(image, userLocalStore.getLoggedInUser().getUsername()).execute();
+                User editUser = new User(userLocalStore.getLoggedInUser().getUserID(), etChangeFirstName.getText().toString(), etChangeLastName.getText().toString(),
+                        etChangeEmail.getText().toString(), etChangeUsername.getText().toString());
+                volleyConnections.updateUserInfo(editUser);
                 UserLocalStore.allowRefresh = true;
+
         }
     }
 
@@ -149,7 +159,6 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
             }catch(Exception e){
                 e.printStackTrace();
             }
-
             return null;
         }
 
@@ -161,7 +170,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
                 ivProfilePic.setImageBitmap(bitmap);
             }
             else{
-                ivProfilePic.setImageDrawable(getResources().getDrawable(R.drawable.default_profile_pic));
+                ivProfilePic.setImageDrawable(ContextCompat.getDrawable(EditProfileActivity.this, R.drawable.default_profile_pic));
             }
         }
     }
@@ -215,7 +224,6 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
             super.onPostExecute(aVoid);
             progressDialog.dismiss();
             isNewPhotoUploaded = true;
-            Toast.makeText(EditProfileActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(EditProfileActivity.this, MainActivity.class));
         }
     }

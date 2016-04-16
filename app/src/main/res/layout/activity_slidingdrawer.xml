@@ -23,7 +23,7 @@
     <ListView
         android:layout_width="190dp"
         android:layout_height="match_parent"
-        android:background="#383838"
+        android:background="#1b1616"
         android:choiceMode="singleChoice"
         android:id="@+id/listViewMain"
         android:layout_gravity='start'/>

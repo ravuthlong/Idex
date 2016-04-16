@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    android:id="@+id/corLayout">
 
     <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -18,7 +18,7 @@
     <android.support.v7.widget.RecyclerView
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:background="#25383C"
+        android:background="#000000"
         android:choiceMode="singleChoice"
         android:id="@+id/postRecyclerView1"
         android:layout_gravity='start'
@@ -34,16 +34,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <android.support.design.widget.FloatingActionButton
-        app:layout_behavior="phoenix.idex.RecyclerViewFeed.MainRecyclerView.listener.ScrollListener"
-        android:id="@+id/postWidget"
+
+    <Button
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:id="@+id/bMainRoll"
+        android:text="Roll" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:id="@+id/bMainDash"
+        android:text="Dash" />
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        android:layout_margin="16dp"
-        android:src="@android:drawable/ic_menu_edit"
-        android:clickable="true"
-        app:backgroundTint="@color/feed_item_border"
-        app:layout_anchorGravity="bottom|right|end" />
-
+        android:id="@+id/bMainInfo"
+        android:text="Info" />
 </android.support.design.widget.CoordinatorLayout>

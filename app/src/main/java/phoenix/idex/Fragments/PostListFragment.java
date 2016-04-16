@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +20,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -26,22 +28,19 @@ import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import phoenix.idex.DashActivity;
-import phoenix.idex.JSONParser;
-import phoenix.idex.MainActivity;
+import phoenix.idex.Activities.DashActivity;
+import phoenix.idex.Activities.MainActivity;
+import phoenix.idex.VolleyServerConnections.VolleyConnections;
 import phoenix.idex.R;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.adapter.FeedListAdapter;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
@@ -56,20 +55,33 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     private List<FeedItem> feedItems;
     private FeedListAdapter feedListAdapter;
     private FloatingActionButton postWidget;
-    private String URL_TEST = "http://idex.site88.net/fetchUserPosts.php";
     private SwipeRefreshLayout refreshLayout;
     private ProgressBar spinner;
     private Cache.Entry entry;
     private UserLocalStore userLocalStore;
     private String URL_LoggedInUser;
-    private JSONParser jsonParser;
+    private Button bMainDash, bMainRoll, bMainInfo;
+    private FragmentManager fragmentManager;
+    private VolleyConnections volleyConnections;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_mainpost,container, false);
-        postWidget = (FloatingActionButton) v.findViewById(R.id.postWidget);
+        //postWidget = (FloatingActionButton) v.findViewById(R.id.postWidget);
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refreshLayout);
         spinner = (ProgressBar) v.findViewById(R.id.progress_bar);
+
+
+       // String url = "http://idex.site88.net/fetchCurrentValue.php?postID=59";
+        //getJsonLive(url);
+
+        bMainRoll = (Button) v.findViewById(R.id.bMainRoll);
+        bMainDash = (Button) v.findViewById(R.id.bMainDash);
+        bMainInfo = (Button) v.findViewById(R.id.bMainInfo);
+
+        bMainRoll.setOnClickListener(this);
+        bMainDash.setOnClickListener(this);
+        bMainInfo.setOnClickListener(this);
 
         spinner.setVisibility(View.VISIBLE);
 
@@ -84,8 +96,28 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         recyclerView.setAdapter(feedListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                // Scroll down
+                if (dy > 0) {
+                    bMainDash.setVisibility(View.GONE);
+                    bMainRoll.setVisibility(View.GONE);
+                    bMainInfo.setVisibility(View.GONE);
+                } else {
+                    // Scroll up
+                    bMainRoll.setVisibility(View.VISIBLE);
+                    bMainDash.setVisibility(View.VISIBLE);
+                    bMainInfo.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         refreshLayout.setOnRefreshListener(this);
-        postWidget.setOnClickListener(this);
+        //postWidget.setOnClickListener(this);
         userLocalStore = new UserLocalStore(getActivity());
 
         progressDialog = new ProgressDialog(getActivity());
@@ -93,17 +125,15 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         progressDialog.setTitle("Processing");
         progressDialog.setMessage("Please Wait...");
 
-        jsonParser = new JSONParser(feedListAdapter, feedItems, spinner);
-
-        URL_LoggedInUser = "http://idex.site88.net/fetchLoggedInUserPosts.php?userID=" + userLocalStore.getLoggedInUser().getUserID();
+        volleyConnections = new VolleyConnections(getContext());
 
         // We first check for cached request
         Cache cache = AppController.getInstance().getRequestQueue().getCache();
 
         if (!UserLocalStore.isUserLoggedIn) {
-            entry = cache.get(URL_TEST);
+            entry = cache.get("http://idex.site88.net/fetchUserPosts.php");
         } else {
-            entry = cache.get(URL_LoggedInUser);
+            entry = cache.get("http://idex.site88.net/fetchLoggedInUserPosts.php?userID=" + userLocalStore.getLoggedInUser().getUserID());
         }
 
         if (UserLocalStore.allowRefresh) {
@@ -114,20 +144,23 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                     // If user refreshes the page, load current updated JSON
                     if (isConnected) {
                         if (UserLocalStore.isUserLoggedIn) {
-                            getJsonLiveLoggedIn();
+                            volleyConnections.getUserPostsLoggedIn(feedListAdapter, feedItems, spinner, userLocalStore.getLoggedInUser().getUserID());
+                            //jsonParserFeed.getJsonLiveLoggedIn(URL_LoggedInUser);
                         } else {
-                            getJsonLive();
+                            volleyConnections.getUserPostsNotLoggedIn(feedListAdapter, feedItems, spinner);
+                            //jsonParserFeed.getJsonLive(URL_TEST);
                         }
                     } else {
                         displayNoInternet(getContext());
-                        getJsonOffline();
+                        volleyConnections.getUserPostsCache(feedListAdapter, feedItems, spinner, entry);
+                        //jsonParserFeed.getJsonOffline(entry);
                     }
                 }
             }).execute();
             // If user is not connected to the internet or if the user already load the page once
             // User cache so the page doesn't need to reload
         } else if ((UserLocalStore.visitCounter > 0)) {
-            getJsonOffline();
+            volleyConnections.getUserPostsCache(feedListAdapter, feedItems, spinner, entry);
             // Else if the user is connected to the internet, simple load current updated JSON
             // Ex. when user opens app for the first time
         } else {
@@ -135,29 +168,70 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                 @Override
                 public void networkConnection(boolean isConnected) {
                     if (isConnected) {
-                        if (userLocalStore.getLoggedInUser() == null) {
-                            getJsonLive();
+                        if (!UserLocalStore.isUserLoggedIn) {
+                            volleyConnections.getUserPostsNotLoggedIn(feedListAdapter, feedItems, spinner);
+                            //jsonParserFeed.getJsonLive(URL_TEST);
                         } else {
-                            getJsonLiveLoggedIn();
+                            volleyConnections.getUserPostsLoggedIn(feedListAdapter, feedItems, spinner, userLocalStore.getLoggedInUser().getUserID());
+                            //jsonParserFeed.getJsonLiveLoggedIn(URL_LoggedInUser);
                         }
                     } else {
+                        volleyConnections.getUserPostsCache(feedListAdapter, feedItems, spinner, entry);
                         displayNoInternet(getContext());
-                        getJsonOffline();
+                        //jsonParserFeed.getJsonOffline(entry);
                     }
                 }
             }).execute();
         }
-        hideWidget();
+        //hideWidget();
         return v;
     }
+
+    // Pull JSON directly from the PHP JSON result
+    public void getJsonLive(String URL_TEST) {
+        // making fresh volley request and getting json
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
+                URL_TEST, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                if (response != null) {
+                    parseJsonFeed(response);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+        // Adding request to volley request queue
+        AppController.getInstance().addToRequestQueue(jsonReq);
+    }
+
+    // Populate FeedItem Array with JSONArray from PHP
+    public void parseJsonFeed(JSONObject response) {
+
+    }
+
 
     @Override
     public void onClick(View v) {
         switch(v.getId()) {
-            case R.id.postWidget:
-                Intent intent = new Intent(getActivity(), DashActivity.class);
-                startActivity(intent);
+            case R.id.bMainRoll:
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
+                        new PostListFragment()).commit();
+                MainActivity.listView.setItemChecked(0, true);
                 break;
+            case R.id.bMainDash:
+                getContext().startActivity(new Intent(getActivity(), DashActivity.class));
+                break;
+            case R.id.bMainInfo:
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
+                        new TabFragment()).commit();
+                MainActivity.listView.setItemChecked(1, true);
+                break;
+
         }
     }
 
@@ -231,143 +305,10 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         }
     }
 
-    // Pull JSON directly from the PHP JSON result
-    private void getJsonLive() {
-        UserLocalStore.visitCounter++;
-        // making fresh volley request and getting json
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
-                URL_TEST, null, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                VolleyLog.d(TAG, "Response: " + response.toString());
-                if (response != null) {
-                    jsonParser.parseJsonFeed(response);
-                    //parseJsonFeed(response);
-                }
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-            }
-        });
-
-        // Adding request to volley request queue
-        AppController.getInstance().addToRequestQueue(jsonReq);
-    }
-
-    // Pull JSON directly from the PHP JSON result
-    private void getJsonLiveLoggedIn() {
-
-        UserLocalStore.visitCounter++;
-        // making fresh volley request and getting json
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
-                URL_LoggedInUser, null, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                VolleyLog.d(TAG, "Response: " + response.toString());
-                if (response != null) {
-                    jsonParser.parseJsonFeed(response);
-                    //parseJsonFeed(response);
-                }
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-            }
-        });
-
-        // Adding request to volley request queue
-        AppController.getInstance().addToRequestQueue(jsonReq);
-    }
-
-
-    // Pull saved JSON in the cache.
-    private void getJsonOffline(){
-            // fetch the data from cache if the user is offline
-            try {
-                String data = new String(entry.data, "UTF-8");
-                try {
-                    jsonParser.parseJsonFeed(new JSONObject(data));
-                    //parseJsonFeed(new JSONObject(data));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-    }
-/*
-    // Populate FeedItem Array with JSONArray from PHP
-    private void parseJsonFeed(JSONObject response) {
-        try {
-            JSONArray feedArray = response.getJSONArray("feed");
-
-            for (int i = 0; i < feedArray.length(); i++) {
-                JSONObject feedObj = (JSONObject) feedArray.get(i);
-
-                FeedItem item = new FeedItem();
-                String name;
-                name = feedObj.getString("firstname") + " " + feedObj.getString("lastname");
-                item.setId(feedObj.getInt("postID"));
-                item.setName(name);
-                item.setUsername(feedObj.getString("username"));
-                item.setStatus(feedObj.getString("post"));
-                item.setProfilePic(feedObj.getString("userpic"));
-                item.setTimeStamp(feedObj.getString("timeStamp"));
-                item.setCurrentColumn(feedObj.getInt("currentColumn"));
-                item.setOneFill(feedObj.getInt("oneFill"));
-                item.setTwoFill(feedObj.getInt("twoFill"));
-                item.setThreeFill(feedObj.getInt("threeFill"));
-                item.setFourFill(feedObj.getInt("fourFill"));
-                item.setFiveFill(feedObj.getInt("fiveFill"));
-                item.setSixFill(feedObj.getInt("sixFill"));
-                item.setSevenFill(feedObj.getInt("sevenFill"));
-                item.setEightFill(feedObj.getInt("eightFill"));
-                item.setNineFill(feedObj.getInt("nineFill"));
-                item.setTenFill(feedObj.getInt("tenFill"));
-                item.setOneKill(feedObj.getInt("oneKill"));
-                item.setTwoKill(feedObj.getInt("twoKill"));
-                item.setThreeKill(feedObj.getInt("threeKill"));
-                item.setFourKill(feedObj.getInt("fourKill"));
-                item.setFiveKill(feedObj.getInt("fiveKill"));
-                item.setSixKill(feedObj.getInt("sixKill"));
-                item.setSevenKill(feedObj.getInt("sevenKill"));
-                item.setEightKill(feedObj.getInt("eightKill"));
-                item.setNineKill(feedObj.getInt("nineKill"));
-                item.setTenKill(feedObj.getInt("tenKill"));
-                item.setTotalFill(feedObj.getInt("totalFill"));
-                item.setTotalKill(feedObj.getInt("totalKill"));
-
-                try{
-                    item.setFillOrKill(feedObj.getInt("status"));
-                } catch (JSONException e) {
-                    item.setFillOrKill(-1); // Default value for posts user never clicked fill nor kill
-                }
-                //item.setFill(feedObj.getInt("fill"));
-                //item.setKill(feedObj.getInt("kill"));
-                //item.setValue();
-                feedItems.add(item);
-            }
-            // notify data changes to list adapater
-            feedListAdapter.notifyDataSetChanged();
-            //progressDialog.hide();
-            spinner.setVisibility(View.GONE);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-*/
     // If user is not logged in, hide the widget. Otherwise, show the widget.
     private void hideWidget() {
         if (!UserLocalStore.isUserLoggedIn) {
-            postWidget.hide();
+            //postWidget.hide();
         }
     }
 

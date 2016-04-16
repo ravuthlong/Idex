@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:swipe="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/swipe"
+    android:id="@+id/swipeCommentLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     swipe:leftEdgeSwipeOffset="0dp"
@@ -67,8 +67,8 @@
         android:orientation="vertical"
         android:paddingBottom="@dimen/feed_item_padding_top_bottom"
         android:paddingTop="@dimen/feed_item_padding_top_bottom"
-        android:id="@+id/postLayout"
-        >
+        android:id="@+id/commentLayout"
+        android:weightSum="1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -77,7 +77,7 @@
             android:paddingLeft="@dimen/feed_item_padding_left_right">
 
             <com.android.volley.toolbox.NetworkImageView
-                android:id="@+id/profilePic"
+                android:id="@+id/profilePicComment"
                 android:layout_width="@dimen/feed_item_profile_pic"
                 android:layout_height="@dimen/feed_item_profile_pic"
                 android:scaleType="fitCenter" >
@@ -89,13 +89,13 @@
                 android:orientation="vertical"
                 android:paddingLeft="@dimen/feed_item_profile_info_padd" >
                 <TextView
-                    android:id="@+id/name"
+                    android:id="@+id/nameComment"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/feed_item_profile_name"
                     android:textStyle="bold" />
                 <TextView
-                    android:id="@+id/timestamp"
+                    android:id="@+id/timestampComment"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/timestamp"
@@ -103,32 +103,16 @@
 
             </LinearLayout>
 
-            <ImageButton
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:id="@+id/imgbFill"
-                android:background="@drawable/fill"
-                android:clickable="false" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1"
-                android:id="@+id/tvFillNum"
-                android:textSize="10sp"
-                android:visibility="visible"
-                android:layout_marginTop="15dp" />
-
 
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/txtStatusMsg"
+                android:id="@+id/txtComment"
                 android:layout_width="275dp"
                 android:layout_height="wrap_content"
                 android:textColor="#3090C7"
@@ -137,23 +121,32 @@
                 android:paddingRight="@dimen/feed_item_status_pad_left_right"
                 android:paddingTop="@dimen/feed_item_status_pad_top" />
 
-            <ImageButton
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:id="@+id/imgbKill"
-                android:background="@drawable/kill"
-                android:layout_gravity="right" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.22">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:id="@+id/imageView"
+                android:background="@android:drawable/star_off"
+                android:layout_alignWithParentIfMissing="false"
+                android:layout_alignBottom="@+id/tvRecommend"
+                android:layout_toStartOf="@+id/tvRecommend"
+                android:layout_toLeftOf="@+id/tvRecommend"
+                android:backgroundTint="#fefefe" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/tvKillNum"
-                android:textSize="10sp"
-                android:visibility="visible"
-                android:text="1" />
-
-        </LinearLayout>
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Recommend"
+                android:id="@+id/tvRecommend"
+                android:layout_alignParentRight="true" />
+        </RelativeLayout>
 
     </LinearLayout>
 

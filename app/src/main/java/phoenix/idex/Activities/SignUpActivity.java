@@ -1,4 +1,4 @@
-package phoenix.idex;
+package phoenix.idex.Activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -16,14 +16,17 @@ import android.widget.Toast;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import phoenix.idex.R;
 import phoenix.idex.ServerConnections.ServerRequests;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
+import phoenix.idex.User;
+import phoenix.idex.UserLocalStore;
 
 
 public class SignUpActivity extends AppCompatActivity {
     ServerRequests serverRequests;
     EditText etFirstName, etLastName, etEmail, etUsername, etPassword, etConfirmPass;
-    private  UserLocalStore userLocalStore;
+    private UserLocalStore userLocalStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,7 @@ public class SignUpActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.submitSignup:
+                UserLocalStore.allowRefresh = true;
                 inputValidation();
                 return true;
             default:

@@ -2,12 +2,13 @@
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:float="http://schemas.android.com/tools"
     xmlns:local="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scrollView1"
     android:weightSum="5"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#0f0202">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbarSignUp"
@@ -31,6 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
             <EditText
+                android:singleLine="true"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
@@ -46,6 +48,7 @@
             android:layout_height="wrap_content"
             float:fletPadding="10dp">
             <EditText
+                android:singleLine="true"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
@@ -60,6 +63,7 @@
             android:layout_height="wrap_content"
             float:fletPadding="10dp">
             <EditText
+                android:singleLine="true"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
@@ -74,6 +78,7 @@
             android:layout_height="wrap_content"
             float:fletPadding="10dp">
             <EditText
+                android:singleLine="true"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -87,6 +92,7 @@
             android:layout_height="wrap_content"
             float:fletPadding="10dp">
             <EditText
+                android:singleLine="true"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
@@ -101,6 +107,7 @@
             android:layout_height="wrap_content"
             float:fletPadding="10dp">
             <EditText
+                android:singleLine="true"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"

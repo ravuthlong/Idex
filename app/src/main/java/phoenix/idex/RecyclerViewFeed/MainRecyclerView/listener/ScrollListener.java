@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ListView;
 
-import phoenix.idex.MainActivity;
+import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.R;
 import phoenix.idex.UserLocalStore;
 

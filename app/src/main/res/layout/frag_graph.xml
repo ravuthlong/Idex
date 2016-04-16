@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <com.androidplot.xy.XYPlot
-        androidPlot.graphWidget.marginRight="5dp"
-        androidPlot.graphWidget.marginLeft="20dp"
-        androidPlot.graphWidget.marginBottom="15dp"
-        android:id="@+id/xyplot"
+    android:layout_height="match_parent" >
+
+    <com.github.mikephil.charting.charts.CandleStickChart
+        android:id="@+id/chart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        title="Post Chart" />
-</LinearLayout>
+        android:layout_height="match_parent" />
+
+</RelativeLayout>

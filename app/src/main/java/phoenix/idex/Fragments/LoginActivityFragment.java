@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -28,11 +29,11 @@ import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import phoenix.idex.MainActivity;
+import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.R;
 import phoenix.idex.ServerConnections.ServerRequests;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
-import phoenix.idex.SignUpActivity;
+import phoenix.idex.Activities.SignUpActivity;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
 
@@ -119,7 +120,6 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
         v = inflater.inflate(R.layout.frag_login, container, false);
         imgbRegister = (ImageButton) v.findViewById(R.id.imgbRegister);
         imgbLogin = (ImageButton) v.findViewById(R.id.imgbLogin);
-        bBrowseIdea = (Button) v.findViewById(R.id.bBrowseIdea);
         tvIdexTitle = (TextView) v.findViewById(R.id.tvIdexTitle);
         etUsername = (TextView) v.findViewById(R.id.etUsername);
         etPassword = (TextView) v.findViewById(R.id.etPassword);
@@ -127,7 +127,6 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
         tvIdexTitle.setOnClickListener(this);
         imgbLogin.setOnClickListener(this);
         imgbRegister.setOnClickListener(this);
-        bBrowseIdea.setOnClickListener(this);
         tvContinue.setOnClickListener(this);
 
         tvUsername = (TextView) v.findViewById(R.id.tvUsername);
@@ -150,6 +149,8 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgbLogin:
+                String   myAndroidDeviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+                System.out.println("THE DEVICE ID IS : " + myAndroidDeviceId);
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
                 User user = new User(username, password);

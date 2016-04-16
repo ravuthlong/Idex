@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import phoenix.idex.MainActivity;
+import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.R;
 
 /**

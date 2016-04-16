@@ -1,4 +1,4 @@
-package phoenix.idex;
+package phoenix.idex.Activities;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -25,8 +25,10 @@ import phoenix.idex.Fragments.AboutFragment;
 import phoenix.idex.Fragments.LoginActivityFragment;
 import phoenix.idex.Fragments.PostListFragment;
 import phoenix.idex.Fragments.TabFragment;
+import phoenix.idex.R;
 import phoenix.idex.SlidingDrawer.ItemSlideMenu;
 import phoenix.idex.SlidingDrawer.SlidingMenuAdapter;
+import phoenix.idex.UserLocalStore;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         sizeOfToolBar = getThemeAttributeDimensionSize(this, R.attr.actionBarSize);
 
         if (!UserLocalStore.isUserLoggedIn) {
-            System.out.println("SDFSDFS");
             setUpDrawerList();
             setUpFragments();
             screenStartUpState();

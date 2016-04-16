@@ -3,7 +3,7 @@
     android:shape="rectangle" >
 
     <!-- view background color -->
-    <solid android:color="@color/feed_item_bg" >
+    <solid android:color="#000000" >
     </solid>
 
     <!-- view border color and width -->

@@ -18,7 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import phoenix.idex.EditProfileActivity;
+import phoenix.idex.Activities.EditProfileActivity;
 import phoenix.idex.R;
 import phoenix.idex.TabAdapter.ViewPagerAdapter;
 
@@ -27,7 +27,7 @@ import phoenix.idex.TabAdapter.ViewPagerAdapter;
  */
 public class TabFragment extends Fragment implements ViewPager.OnPageChangeListener, TabHost.OnTabChangeListener {
     private ViewPager viewPager;
-    private TabHost tabHost;
+    public static TabHost tabHost;
     private View v;
     private ViewPagerAdapter viewPagerAdapter;
 

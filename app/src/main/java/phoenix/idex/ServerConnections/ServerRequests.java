@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Pair;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,8 +13,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 
-import phoenix.idex.MainActivity;
+import phoenix.idex.Activities.MainActivity;
+import phoenix.idex.ServerRequestCallBacks.FetchColumnAndValueCallBack;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
+import phoenix.idex.ServerRequestCallBacks.PostExecutionCallBack;
 import phoenix.idex.ServerRequestCallBacks.UserPostsCallBack;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
@@ -40,9 +43,9 @@ public class ServerRequests {
         progressDialog.show();
         new FetchUserDataAsyncTask(user, userCallBack).execute();
     }
-    public void storeAPostInBackground(String post, int userID, String timeStamp, int currentColumn) {
+    public void storeAPostInBackground(String post, int userID, String timeStamp) {
         progressDialog.show();
-        new StoreAPostAsyncTask(post, userID, timeStamp, currentColumn).execute();
+        new StoreAPostAsyncTask(post, userID, timeStamp).execute();
     }
     public void updateFillInBackground(int postID, int currentColumn) {
         new UpdateFill(postID, currentColumn).execute();
@@ -50,8 +53,12 @@ public class ServerRequests {
     public void updateFillAndCancelKillInBackground(int postID, int currentColumn) {
         new UpdateFillAndCancelKill(postID, currentColumn).execute();
     }
-    public void updateFillAndCurrentColumnInBackground(int postID, int currentColumn) {
-        new UpdateFillAndCurrentColumn(postID, currentColumn).execute();
+    public void updateFillAndFillColumnInBackground(int postID, int columnToUpdate) {
+        new UpdateFillAndCurrentColumn(postID, columnToUpdate).execute();
+    }
+
+    public void updateFillAndResetColumnInBackground(int postID, int currentColumn) {
+        new UpdateFillAndResetColumn(postID, currentColumn).execute();
     }
     public void updateKillInBackground(int postID, int currentColumn) {
         new UpdateKill(postID, currentColumn).execute();
@@ -59,8 +66,14 @@ public class ServerRequests {
     public void updateKillAndCancelFillInBackground(int postID, int currentColumn) {
         new UpdateKillAndCancelFill(postID, currentColumn).execute();
     }
-    public void updateKillAndCurrentColumnInBackground(int postID, int currentColumn) {
+    public void updateKillAndKillColumnInBackground(int postID, int currentColumn) {
         new UpdateKillAndCurrentColumn(postID, currentColumn).execute();
+    }
+    public void updateKillAndFloorColumnInBackground(int postID, int columnToUpdate) {
+        new UpdateKillAndFloorColumn(postID, columnToUpdate).execute();
+    }
+    public void updateKillAndResetColumnInBackground(int postID, int currentColumn) {
+        new UpdateKillAndResetColumn(postID, currentColumn).execute();
     }
     public void fetchOneUserPostsInBackground(int userID, UserPostsCallBack userPostsCallBack) {
         new FetchOneUserPosts(userID, userPostsCallBack).execute();
@@ -78,12 +91,139 @@ public class ServerRequests {
     public void cancelClickInBackground(int userID, int postID) {
         new CancelClickAsyncTask(userID, postID).execute();
     }
-    public void minusFillInBackground(int currentColumn, int postID) {
-        new MinusFill(currentColumn, postID).execute();
+    public void minusFillInBackground(int postID) {
+        new MinusFill(postID).execute();
     }
-    public void minusKillInBackground(int currentColumn, int postID) {
-        new MinusKill(currentColumn, postID).execute();
+    public void minusKillInBackground(int postID) {
+        new MinusKill(postID).execute();
     }
+
+    public void fetchCurrentColumnInBackground(int postID, FetchColumnAndValueCallBack fetchColumnAndValueCallBack) {
+        new FetchCurrentColumnAndValue(postID, fetchColumnAndValueCallBack).execute();
+    }
+
+    public void updateCurrentColumnInBackground(int postID, PostExecutionCallBack postExecutionCallBack) {
+        new UpdateCurrentColumn(postID, postExecutionCallBack).execute();
+    }
+
+    public void updateValueInBackground(int postID, int value) {
+        new UpdateValue(postID, value).execute();
+    }
+
+    public class FetchCurrentColumnAndValue extends AsyncTask<Void, Void, Pair> {
+        private int postID;
+        private FetchColumnAndValueCallBack fetchColumnAndValueCallBack;
+
+        public FetchCurrentColumnAndValue(int postID, FetchColumnAndValueCallBack fetchColumnAndValueCallBack) {
+            this.postID = postID;
+            this.fetchColumnAndValueCallBack = fetchColumnAndValueCallBack;
+        }
+
+        @Override
+        protected Pair doInBackground(Void... params) {
+
+            HashMap<String, Object> userPost = new HashMap<>();
+            userPost.put("postID", postID);
+
+            JSONObject jObject = new JSONObject();
+            int currentColumn = 0;
+            int value = 0;
+            Pair<Integer, Integer> pairValues = null;
+            try {
+                HttpRequest req = new HttpRequest("http://idex.site88.net/fetchCurrentColumnAndValue.php");
+                jObject =  req.preparePost().withData(userPost).sendAndReadJSON();
+                currentColumn = jObject.getInt("currentColumn");
+                value = jObject.getInt("value");
+
+                System.out.println("COLUMN : " + currentColumn);
+                System.out.println("VALUE : " + value);
+
+                pairValues = new Pair(currentColumn, value);
+
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return pairValues;
+        }
+
+        @Override
+        protected void onPostExecute(Pair pairValues) {
+            super.onPostExecute(pairValues);
+            fetchColumnAndValueCallBack.columnAndValueCallBack(pairValues);
+        }
+    }
+
+    public class UpdateCurrentColumn extends AsyncTask<Void, Void, Void> {
+        private int postID;
+        private PostExecutionCallBack postExecutionCallBack;
+        public UpdateCurrentColumn(int postID, PostExecutionCallBack postExecutionCallBack) {
+            this.postID = postID;
+            this.postExecutionCallBack = postExecutionCallBack;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            HashMap<String, Object> userPost = new HashMap<>();
+            userPost.put("postID", postID);
+
+            try {
+                HttpRequest req = new HttpRequest("http://idex.site88.net/updateCurrentColumn.php");
+                req.preparePost().withData(userPost).send();
+
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            postExecutionCallBack.postExecution();
+        }
+    }
+
+    public class UpdateValue extends AsyncTask<Void, Void, Void> {
+        private int postID;
+        private int value;
+
+        public UpdateValue(int postID, int value) {
+            this.postID = postID;
+            this.value = value;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            HashMap<String, Object> userPost = new HashMap<>();
+            userPost.put("postID", postID);
+            userPost.put("value", value);
+
+            try {
+                HttpRequest req = new HttpRequest("http://idex.site88.net/updateValue.php");
+                req.preparePost().withData(userPost).send();
+
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
+
 
     // Delete a post from user click activity list. For example, they cancelled a fill or a kill.
     public class CancelClickAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -233,6 +373,43 @@ public class ServerRequests {
         }
     }
 
+    // Update fill AND current column to insert. Increment by 1 in the database.
+    public class UpdateKillAndFloorColumn extends AsyncTask<Void, Void, Void> {
+
+        private int postID;
+        private int currentColumn;
+
+        public UpdateKillAndFloorColumn(int postID, int currentColumn) {
+            this.postID = postID;
+            this.currentColumn = currentColumn;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            HashMap<String, Object> userPost = new HashMap<>();
+            userPost.put("postID", postID);
+            userPost.put("currentColumn", currentColumn);
+
+            try {
+                HttpRequest req = new HttpRequest("http://idex.site88.net/updateKillAndFloorColumn.php");
+                req.preparePost().withData(userPost).send();
+
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+        }
+    }
+
     // Update kill AND current column to insert. Increment by 1 in the database.
     public class UpdateKillAndCurrentColumn extends AsyncTask<Void, Void, Void> {
 
@@ -252,7 +429,7 @@ public class ServerRequests {
             userPost.put("currentColumn", currentColumn);
 
             try {
-                HttpRequest req = new HttpRequest("http://idex.site88.net/updateKillAndCurrentColumn.php");
+                HttpRequest req = new HttpRequest("http://idex.site88.net/updateKillAndKillColumn.php");
                 req.preparePost().withData(userPost).send();
 
             }catch (MalformedURLException e) {
@@ -269,6 +446,42 @@ public class ServerRequests {
             progressDialog.dismiss();
         }
     }
+
+    public class UpdateKillAndResetColumn extends AsyncTask<Void, Void, Void> {
+
+        private int postID;
+        private int currentColumn;
+
+        public UpdateKillAndResetColumn(int postID, int currentColumn) {
+            this.postID = postID;
+            this.currentColumn = currentColumn;
+        }
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            HashMap<String, Object> userPost = new HashMap<>();
+            userPost.put("postID", postID);
+            userPost.put("currentColumn", currentColumn);
+
+            try {
+                HttpRequest req = new HttpRequest("http://idex.site88.net/updateKillAndResetColumn.php");
+                req.preparePost().withData(userPost).send();
+
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+        }
+    }
+
 
     // Update fill of a unique post. Increment by 1 in the database.
     public class UpdateFill extends AsyncTask<Void, Void, Void> {
@@ -343,6 +556,40 @@ public class ServerRequests {
         }
     }
 
+    public class UpdateFillAndResetColumn extends AsyncTask<Void, Void, Void> {
+
+        private int postID;
+        private int currentColumn;
+
+        public UpdateFillAndResetColumn(int postID, int currentColumn) {
+            this.postID = postID;
+            this.currentColumn = currentColumn;
+        }
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            HashMap<String, Object> userPost = new HashMap<>();
+            userPost.put("postID", postID);
+            userPost.put("currentColumn", currentColumn);
+
+            try {
+                HttpRequest req = new HttpRequest("http://idex.site88.net/updateFillAndResetColumn.php");
+                req.preparePost().withData(userPost).send();
+
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+        }
+    }
 
     // Update fill AND current column to insert. Increment by 1 in the database.
     public class UpdateFillAndCurrentColumn extends AsyncTask<Void, Void, Void> {
@@ -363,7 +610,7 @@ public class ServerRequests {
             userPost.put("currentColumn", currentColumn);
 
             try {
-                HttpRequest req = new HttpRequest("http://idex.site88.net/updateFillAndCurrentColumn.php");
+                HttpRequest req = new HttpRequest("http://idex.site88.net/updateFillAndFillColumn.php");
                 req.preparePost().withData(userPost).send();
 
             }catch (MalformedURLException e) {
@@ -421,13 +668,11 @@ public class ServerRequests {
         private String post;
         private int userID;
         private String timeStamp;
-        private int currentColumn;
 
-        public StoreAPostAsyncTask(String post, int userID, String timeStamp, int currentColumn) {
+        public StoreAPostAsyncTask(String post, int userID, String timeStamp) {
             this.post = post;
             this.userID = userID;
             this.timeStamp = timeStamp;
-            this.currentColumn = currentColumn;
         }
 
         @Override
@@ -437,7 +682,6 @@ public class ServerRequests {
             userPost.put("post", post);
             userPost.put("userID", userID);
             userPost.put("timeStamp", timeStamp);
-            userPost.put("currentColumn", currentColumn);
 
             try {
                 HttpRequest req = new HttpRequest("http://idex.site88.net/insertnewpost.php");
@@ -642,19 +886,16 @@ public class ServerRequests {
     // Minus Fill
     public class MinusFill extends AsyncTask<Void, Void, Void> {
 
-        private int currentColumn;
         private int postID;
 
-        public MinusFill(int currentColumn, int postID) {
+        public MinusFill(int postID) {
             this.postID = postID;
-            this.currentColumn = currentColumn;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
 
             HashMap<String, Object> userPost = new HashMap<>();
-            userPost.put("currentColumn", currentColumn);
             userPost.put("postID", postID);
 
             try {
@@ -678,19 +919,16 @@ public class ServerRequests {
     // Minus Kill
     public class MinusKill extends AsyncTask<Void, Void, Void> {
 
-        private int currentColumn;
         private int postID;
 
-        public MinusKill(int currentColumn, int postID) {
+        public MinusKill(int postID) {
             this.postID = postID;
-            this.currentColumn = currentColumn;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
 
             HashMap<String, Object> userPost = new HashMap<>();
-            userPost.put("currentColumn", currentColumn);
             userPost.put("postID", postID);
 
             try {

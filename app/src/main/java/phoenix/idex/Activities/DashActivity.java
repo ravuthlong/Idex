@@ -1,6 +1,5 @@
-package phoenix.idex;
+package phoenix.idex.Activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,7 +14,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import phoenix.idex.VolleyServerConnections.VolleyConnections;
+import phoenix.idex.R;
 import phoenix.idex.ServerConnections.ServerRequests;
+import phoenix.idex.User;
+import phoenix.idex.UserLocalStore;
 
 
 /**
@@ -30,6 +33,7 @@ public class DashActivity extends AppCompatActivity implements TextWatcher, View
     private ImageButton imgbPostIdea;
     private UserLocalStore userLocalStore;
     private ServerRequests serverRequests;
+    private VolleyConnections volleyConnections;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,7 @@ public class DashActivity extends AppCompatActivity implements TextWatcher, View
 
         userLocalStore = new UserLocalStore(this);
         serverRequests = new ServerRequests(this);
+        volleyConnections = new VolleyConnections(this);
         editText.addTextChangedListener(this);
         imgbPostIdea.setOnClickListener(this);
     }
@@ -72,10 +77,15 @@ public class DashActivity extends AppCompatActivity implements TextWatcher, View
             case R.id.imgbPostIdea:
                 String unixTime = Long.toString(System.currentTimeMillis());
                 User user = userLocalStore.getLoggedInUser();
+
+                volleyConnections.storeAPostVolley(editText.getText().toString(),
+                        user.getUserID(), unixTime);
+                /*
                 serverRequests.storeAPostInBackground(editText.getText().toString(),
-                        user.getUserID(), unixTime, DateColumn.getRowNumber());
-                UserLocalStore.allowRefresh = true;
-                startActivity(new Intent(this, MainActivity.class));
+                        user.getUserID(), unixTime);*/
+
+                // move this to volley
+
                 break;
         }
     }

@@ -16,7 +16,7 @@
         <android.support.v7.widget.RecyclerView
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:background="#373636"
+            android:background="#1b1616"
             android:choiceMode="singleChoice"
             android:id="@+id/postRecyclerView1"
             android:layout_gravity='start'
