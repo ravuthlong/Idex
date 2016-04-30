@@ -21,10 +21,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import phoenix.idex.ButtonClickedSingleton;
 import phoenix.idex.Fragments.AboutFragment;
 import phoenix.idex.Fragments.LoginActivityFragment;
 import phoenix.idex.Fragments.PostListFragment;
-import phoenix.idex.Fragments.TabFragment;
 import phoenix.idex.R;
 import phoenix.idex.SlidingDrawer.ItemSlideMenu;
 import phoenix.idex.SlidingDrawer.SlidingMenuAdapter;
@@ -45,12 +45,14 @@ public class MainActivity extends AppCompatActivity {
     public static boolean isMainShown = false;
     private UserLocalStore userLocalStore;
     private int sizeOfToolBar;
+    private ButtonClickedSingleton clickActivity = ButtonClickedSingleton.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slidingdrawer);
         userLocalStore = new UserLocalStore(this);
+
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -139,9 +141,9 @@ public class MainActivity extends AppCompatActivity {
         itemList = new ArrayList<>();
 
         itemList.add(new ItemSlideMenu("Roll"));
-        itemList.add(new ItemSlideMenu("Profile"));
-        itemList.add(new ItemSlideMenu("Log Out"));
+        //itemList.add(new ItemSlideMenu("Profile"));
         itemList.add(new ItemSlideMenu("About"));
+        itemList.add(new ItemSlideMenu("Log Out"));
 
         adapter = new SlidingMenuAdapter(this, itemList);
         listView.setAdapter(adapter);
@@ -152,9 +154,9 @@ public class MainActivity extends AppCompatActivity {
         fragmentList = new ArrayList<>();
 
         fragmentList.add(new PostListFragment());
-        fragmentList.add(new TabFragment());
-        fragmentList.add(new PostListFragment());
+        //fragmentList.add(new TabFragment());
         fragmentList.add(new AboutFragment());
+        fragmentList.add(new PostListFragment());
     }
 
     // Start up state
@@ -183,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     currentPos = 0;
                     Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
                     // Erase local history of logged in user
+                    clickActivity.cancelClicks();
                     userLocalStore.clearUserData();
                     UserLocalStore.visitCounter = 0;
                     UserLocalStore.isUserLoggedIn = false;
@@ -192,11 +195,13 @@ public class MainActivity extends AppCompatActivity {
                     drawerListViewListener();
                 } else {
                     if (position == 0) {
+                        clickActivity.cancelClicks();
+                        clickActivity.setRollClicked();
                         isMainShown = true;
                         setTitle("");
                     } else {
                         isMainShown = false;
-                        setTitle(itemList.get(position).getTitle());
+                        //setTitle(itemList.get(position).getTitle());
                     }
                     drawerLayout.closeDrawer(listView);
                     // Set item to selected
@@ -227,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
                     setTitle("");
                 } else {
                     isMainShown = false;
-                    setTitle(itemList.get(position).getTitle());
+                    //setTitle(itemList.get(position).getTitle());
                 }
                 drawerLayout.closeDrawer(listView);
                 // Set item to selected

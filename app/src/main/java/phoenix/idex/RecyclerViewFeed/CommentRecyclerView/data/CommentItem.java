@@ -5,7 +5,7 @@ package phoenix.idex.RecyclerViewFeed.CommentRecyclerView.data;
  */
 
 public class CommentItem {
-    private int commentID;
+    private int commentID, postID, recommended, recommendTotalCount;
     private String username, name, comment, profilePic, timeStamp;
 
     public CommentItem() {
@@ -19,14 +19,40 @@ public class CommentItem {
         this.timeStamp = timeStamp;
     }
 
-
-    public int getId() {
-        return commentID;
+    public void minusRecommendTotal() {
+        this.recommendTotalCount -= 1;
     }
 
-    public void setId(int id) {
-        this.commentID = id;
+    public void addRecommendTotal() {
+        this.recommendTotalCount += 1;
     }
+    public void setRecommendTotalCount(int recommendTotalCount) {
+        this.recommendTotalCount = recommendTotalCount;
+    }
+
+    public int getRecommendTotalCount() {
+        return this.recommendTotalCount;
+    }
+
+    public void setRecommended(int recommended) {
+        this.recommended = recommended;
+    }
+
+    public int getRecommended() {
+        return this.recommended;
+    }
+
+    public int getPostId() {
+        return postID;
+    }
+
+    public void setPostId(int id) {
+        this.postID = id;
+    }
+
+    public void setCommentID(int id) { this.commentID = id;}
+
+    public int getCommentID() { return commentID; }
 
     public String getName() {
         return name;

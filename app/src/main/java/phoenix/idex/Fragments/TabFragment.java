@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import phoenix.idex.Activities.EditProfileActivity;
+import phoenix.idex.ButtonClickedSingleton;
 import phoenix.idex.R;
 import phoenix.idex.TabAdapter.ViewPagerAdapter;
 
@@ -30,6 +31,7 @@ public class TabFragment extends Fragment implements ViewPager.OnPageChangeListe
     public static TabHost tabHost;
     private View v;
     private ViewPagerAdapter viewPagerAdapter;
+    private ButtonClickedSingleton buttonMonitor = ButtonClickedSingleton.getInstance();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -123,6 +125,11 @@ public class TabFragment extends Fragment implements ViewPager.OnPageChangeListe
     public void onTabChanged(String tabId) {
         int selectedTab = tabHost.getCurrentTab();
         viewPager.setCurrentItem(selectedTab);
+        if (selectedTab == 0) {
+
+        } else {
+
+        }
     }
 
     // Set font size and type for the tabs

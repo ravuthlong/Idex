@@ -1,79 +1,99 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:ndroid="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    android:id="@+id/dashCorLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#000000">
+
+
+
+<ScrollView
+    ndroid:fitsSystemWindows="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:local="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    tools:context=".Activities.DashActivity"
-    android:background="#1a1313">
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:layout_marginTop="50dp">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbardash"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        local:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        />
 
-    <ScrollView
-        android:fillViewport="true"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent">
-        <LinearLayout
-
-            android:layout_height="match_parent"
-            android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:weightSum="5"
-            >
-            <EditText
-                android:padding="15dp"
-                android:id="@+id/editTextDash"
-                android:editable="true"
-                android:background="@drawable/bg_parent_rounded_corner"
-                android:textSize="20dp"
-                android:textColor="#ffffff"
-                android:maxLength="141"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:hint="Post your idea..." />
             <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:id="@+id/dashLayout">
+                <EditText
+                    android:focusable="true"
+                    android:padding="15dp"
+                    android:id="@+id/editTextDash"
+                    android:editable="true"
+                    android:background="@drawable/bg_parent_rounded_corner"
+                    android:textSize="20dp"
+                    android:textColor="#ffffff"
+                    android:maxLength="141"
 
-                <TextView
-                    android:id="@+id/wordCounter"
-                    android:text="0"
-                    android:textStyle="italic"
-                    android:textColor="#848482"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="300dp"
+                    android:hint="Post your idea..." />
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="/141"
-                    android:textStyle="italic"
-                    android:id="@+id/txtMaxText" />
+                    android:layout_height="wrap_content">
 
+                    <TextView
+                        android:id="@+id/wordCounter"
+                        android:text="0"
+                        android:textStyle="italic"
+                        android:textColor="#848482"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="/141"
+                        android:textStyle="italic"
+                        android:id="@+id/txtMaxText" />
+
+
+                </LinearLayout>
+
+                <ImageButton
+                    android:layout_width="130dp"
+                    android:layout_height="60dp"
+                    android:id="@+id/imgbPostIdea"
+                    android:background="@drawable/post"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="center_horizontal" />
 
             </LinearLayout>
 
-            <ImageButton
-                android:layout_width="130dp"
-                android:layout_height="60dp"
-                android:id="@+id/imgbPostIdea"
-                android:background="@drawable/post"
-                android:layout_marginTop="20dp"
-                android:layout_gravity="center_horizontal" />
+</ScrollView>
 
-        </LinearLayout>
-    </ScrollView>
 
-</LinearLayout>
+
+        <Button
+
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|left"
+            android:id="@+id/bDashRoll"
+            android:background="@drawable/roll" />
+
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|center"
+            android:id="@+id/bDashLog"
+            android:background="@drawable/log" />
+
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|right"
+            android:id="@+id/bDashInfo"
+            android:background="@drawable/info" />
+
+</android.support.design.widget.CoordinatorLayout>

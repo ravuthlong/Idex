@@ -34,7 +34,7 @@ import cz.msebera.android.httpclient.params.BasicHttpParams;
 import phoenix.idex.R;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
-import phoenix.idex.VolleyServerConnections.VolleyConnections;
+import phoenix.idex.VolleyServerConnections.VolleyUserInfo;
 
 public class EditProfileActivity extends AppCompatActivity implements View.OnClickListener {
     ImageView ivProfilePic;
@@ -45,7 +45,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
     private static final String SERVER_ADDRESS = "http://idex.site88.net/";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static boolean isNewPhotoUploaded = false;
-    private VolleyConnections volleyConnections;
+    private VolleyUserInfo volleyUserInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +87,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
 
         userLocalStore = new UserLocalStore(this);
         progressDialog = new ProgressDialog(this);
-        volleyConnections = new VolleyConnections(this);
+        volleyUserInfo = new VolleyUserInfo(this);
         progressDialog.setCancelable(false);
 
         ivProfilePic.setOnClickListener(this);
@@ -118,7 +118,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
                 new UploadImage(image, userLocalStore.getLoggedInUser().getUsername()).execute();
                 User editUser = new User(userLocalStore.getLoggedInUser().getUserID(), etChangeFirstName.getText().toString(), etChangeLastName.getText().toString(),
                         etChangeEmail.getText().toString(), etChangeUsername.getText().toString());
-                volleyConnections.updateUserInfo(editUser);
+                volleyUserInfo.updateUserInfo(editUser);
                 UserLocalStore.allowRefresh = true;
 
         }

@@ -26,7 +26,7 @@ public class AboutFragment extends android.support.v4.app.Fragment {
         View rootView = inflater.inflate(R.layout.frag_about, container, false);
 
         int sizeOfActionBar = MainActivity.getThemeAttributeDimensionSize(getActivity(), R.attr.actionBarSize);
-        MainActivity.rLayoutMain.setPadding(0, sizeOfActionBar, 0, 0);
+        MainActivity.rLayoutMain.setPadding(0, 205, 0, 0);
 
         tvInfo = (TextView) rootView.findViewById(R.id.tvInfo);
         Typeface osFont = Typeface.createFromAsset(getActivity().getAssets(), "tt.otf");

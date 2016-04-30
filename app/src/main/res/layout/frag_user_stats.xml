@@ -3,68 +3,180 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true"
+    android:id="@+id/statCorLayout"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout
-        android:orientation="horizontal"
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#000000">
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+
+        android:background="@drawable/border"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/linearLayout">
+        android:id="@+id/linearLayout"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="30dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Name:"
-            android:id="@+id/textView" />
+            android:id="@+id/textView"
+            android:textColor="#92926E"
+            android:focusableInTouchMode="false" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/etloggedInUser" />
+            android:id="@+id/etLoggedInUser"
+            android:textColor="#E6BE8A" />
     </LinearLayout>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/linearLayout">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center_horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Member Since:"
-                android:id="@+id/textView2" />
+                android:id="@+id/textView2"
+                android:textColor="#92926E" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/etSignedUpDate"
+                android:textColor="#E6BE8A" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="(1 Year, 3 Months)"
+                android:id="@+id/etSinceSignedUp"
+                android:layout_marginBottom="30dp"
+                android:textColor="#E6BE8A" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="45dp"
+            android:layout_marginRight="35dp">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Ideas Posted:"
+                    android:id="@+id/textView5"
+                    android:textColor="#92926E" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/etTotalIdeas"
+                    android:textColor="#E6BE8A" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="25dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Total Fills:"
+                    android:id="@+id/textView7"
+                    android:textColor="#92926E" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/etTotalFills"
+                    android:layout_marginLeft="34dp"
+                    android:textColor="#E6BE8A" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="25dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Total Kills:"
+                    android:id="@+id/textView9"
+                    android:textColor="#92926E" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/etTotalKills"
+                    android:layout_marginLeft="33dp"
+                    android:textColor="#E6BE8A" />
+            </LinearLayout>
+
         </LinearLayout>
 
-    </RelativeLayout>
 
-
+    </LinearLayout>
     <Button
 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_gravity="bottom|left"
         android:id="@+id/bStatRoll"
-        android:text="Roll" />
+        android:background="@drawable/roll" />
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_gravity="bottom|center"
-        android:id="@+id/bStatDash"
-        android:text="Dash" />
+        android:id="@+id/bStatLog"
+        android:background="@drawable/log" />
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_gravity="bottom|right"
         android:id="@+id/bStatInfo"
-        android:text="bStatInfo" />
+        android:background="@drawable/info" />
 </android.support.design.widget.CoordinatorLayout>

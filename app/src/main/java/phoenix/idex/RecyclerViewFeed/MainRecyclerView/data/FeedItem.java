@@ -40,56 +40,9 @@ public class FeedItem {
     public void setFillOrKill(int fillOrKill) {
         this.fillOrKill = fillOrKill;
     }
-    public void setOneFill(int numFill) {
-        fillArray.add(0, numFill);
-    }
-    public void setTwoFill(int numFill) {
-        fillArray.add(1, numFill);
-    }public void setThreeFill(int numFill) {
-        fillArray.add(numFill);
-    }public void setFourFill(int numFill) {
-        fillArray.add(numFill);
-    }public void setFiveFill(int numFill) {
-        fillArray.add(numFill);
-    }public void setSixFill(int numFill) {
-        fillArray.add(numFill);
-    }public void setSevenFill(int numFill) {
-        fillArray.add(numFill);
-    }public void setEightFill(int numFill) {
-        fillArray.add(numFill);
-    }public void setNineFill(int numFill) {
-        fillArray.add(numFill);
-    }public void setTenFill(int numFill) {
-        fillArray.add(numFill);
-    }
-
-    public void setOneKill(int numFill) {
-        killArray.add(0, numFill);
-    }
-    public void setTwoKill(int numFill) {
-        killArray.add(numFill);
-    }public void setThreeKill(int numFill) {
-        killArray.add(numFill);
-    }public void setFourKill(int numFill) {
-        killArray.add(numFill);
-    }public void setFiveKill(int numFill) {
-        killArray.add(numFill);
-    }public void setSixKill(int numFill) {
-        killArray.add(numFill);
-    }public void setSevenKill(int numFill) {
-        killArray.add(numFill);
-    }public void setEightKill(int numFill) {
-        killArray.add(numFill);
-    }public void setNineKill(int numFill) {
-        killArray.add(numFill);
-    }public void setTenKill(int numFill) {
-        killArray.add(numFill);
-    }
-
     public void setTotalFill(int totalFill) {
         this.totalFill = totalFill;
     }
-
     public void setTotalKill(int totalKill) {
         this.totalKill = totalKill;
     }
@@ -175,38 +128,5 @@ public class FeedItem {
 
     public void hitKillSecondTime() { totalKill--; }
     public void hitFillSecondTime() { totalFill--; }
-
-/*
-    public void setFill(int fill){
-        this.fill = fill;
-    }
-
-    public int getFill(){return this.fill;}
-
-    public void hitFill(){
-        this.fill++;
-        this.value++;
-    }
-
-    public void setKill(int kill){
-        this.kill = kill;
-    }
-
-    public int getKill(){
-        return this.kill;
-    }
-
-    public void hitKill(){
-        this.kill++;
-        if(this.value > 0){
-            this.value -= 0.25;
-        }
-    }
-    public void setValue(){
-        this.value = 9 + ((this.fill - (this.kill*0.25)));
-    }
-    public double getValue(){
-        return this.value;
-    }*/
 
 }

@@ -13,18 +13,21 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import phoenix.idex.R;
-import phoenix.idex.ServerConnections.ServerRequests;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
+import phoenix.idex.VolleyServerConnections.VolleyUserInfo;
 
 
 public class SignUpActivity extends AppCompatActivity {
-    ServerRequests serverRequests;
+    private VolleyUserInfo volleyUserInfo;
     EditText etFirstName, etLastName, etEmail, etUsername, etPassword, etConfirmPass;
     private UserLocalStore userLocalStore;
 
@@ -33,7 +36,7 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarSignUp);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarSignup);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -87,6 +90,7 @@ public class SignUpActivity extends AppCompatActivity {
         String email = etEmail.getText().toString();
         String username = etUsername.getText().toString();
         String password = etPassword.getText().toString();
+
         String errorFields = "";
 
         if (lastname.matches("")) {
@@ -122,16 +126,18 @@ public class SignUpActivity extends AppCompatActivity {
             toast.show();
         }
         if (errorFields.matches("")) {
-            User user = new User(firstname, lastname, email, username, password);
+            String timeStamp = new SimpleDateFormat("dd/MM/yyyy",  Locale.getDefault()).format(Calendar.getInstance().getTime());
+            User user = new User(firstname, lastname, email, username, password, timeStamp);
             registerUser(user);
         }
     }
 
     public void registerUser(User user) {
-        serverRequests = new ServerRequests(this);
-        serverRequests.storeUserDataInBackground(user, new GetUserCallBack() {
+        volleyUserInfo = new VolleyUserInfo(this);
+        volleyUserInfo.storeUserInfo(user, new GetUserCallBack() {
             @Override
             public void done(User returnedUser) {
+
                 // Username has been taken and user info will not be stored
                 if (returnedUser == null) {
                     AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SignUpActivity.this);

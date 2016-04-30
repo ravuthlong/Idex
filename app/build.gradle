@@ -31,12 +31,13 @@ dependencies {
     compile files('libs/volley.jar');
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.github.PhilJay:MPAndroidChart:v2.2.4'
-    compile "com.androidplot:androidplot-core:0.9.6"
+    compile 'com.androidplot:androidplot-core:0.9.6'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.facebook.android:facebook-android-sdk:4.+'
     compile 'com.android.support:design:23.1.1'
     compile 'com.github.dmytrodanylyk.android-process-button:library:1.0.4'
     compile 'com.wrapp.floatlabelededittext:library:0.0.6'
     compile 'com.daimajia.swipelayout:library:1.2.0@aar'//Swipe for recycler view
-    compile "cz.msebera.android:httpclient:4.4.1.1" //HttpClient support
+    compile 'cz.msebera.android:httpclient:4.4.1.1' //HttpClient support
+    compile 'com.github.ksoichiro:android-observablescrollview:1.6.0' //Manage toolbar visibility on scroll
 }

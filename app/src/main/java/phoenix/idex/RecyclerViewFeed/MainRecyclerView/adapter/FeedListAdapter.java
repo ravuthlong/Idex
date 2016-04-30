@@ -2,7 +2,7 @@ package phoenix.idex.RecyclerViewFeed.MainRecyclerView.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -27,14 +27,15 @@ import java.util.List;
 import phoenix.idex.Activities.CommentActivity;
 import phoenix.idex.Activities.EditProfileActivity;
 import phoenix.idex.Graphing.GraphActivity;
-import phoenix.idex.VolleyServerConnections.VolleyConnections;
 import phoenix.idex.R;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.data.FeedItem;
 import phoenix.idex.ServerConnections.ServerRequests;
 import phoenix.idex.ServerRequestCallBacks.FetchColumnAndValueCallBack;
 import phoenix.idex.ServerRequestCallBacks.PostExecutionCallBack;
+import phoenix.idex.SoundPlayer;
 import phoenix.idex.UserLocalStore;
+import phoenix.idex.VolleyServerConnections.VolleyMainPosts;
 
 /**
  * Created by Ravinder on 2/25/16.
@@ -51,7 +52,8 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
     boolean swipeIsActive = true;
     HashMap<Integer, String> hashMap;
     private boolean canClickAgain = true;
-    private VolleyConnections volleyConnections;
+    private VolleyMainPosts volleyMainPosts;
+    private SoundPlayer fillSound, killSound;
 
     public FeedListAdapter(Context context, List<FeedItem> feedItems) {
         inflater = LayoutInflater.from(context);
@@ -68,23 +70,34 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
         ViewHolder holder = new ViewHolder(this.postView);
 
+        // Initialize fill and kill sounds
+        fillSound = new SoundPlayer(mContext, R.raw.fillsound);
+        killSound = new SoundPlayer(mContext, R.raw.killsound);
+
         return holder;
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         serverRequests = new ServerRequests(mContext);
-        volleyConnections = new VolleyConnections(mContext);
+        volleyMainPosts = new VolleyMainPosts(mContext);
 
         // Initialize fonts
-        Typeface killFillFont = Typeface.createFromAsset(mContext.getAssets(), "Menufont.ttf");
-        holder.name.setTypeface(killFillFont);
+        //Typeface killFillFont = Typeface.createFromAsset(mContext.getAssets(), "Menufont.ttf");
+        //holder.name.setTypeface(killFillFont);
+
+        holder.name.setTextColor(ContextCompat.getColor(mContext, R.color.font));
+        holder.txtStatusMsg.setTextColor(ContextCompat.getColor(mContext, R.color.font));
+        holder.timestamp.setTextColor(ContextCompat.getColor(mContext, R.color.font));
+        holder.numFill.setTextColor(ContextCompat.getColor(mContext, R.color.font));
+        holder.numKill.setTextColor(ContextCompat.getColor(mContext, R.color.font));
+
 
         final FeedItem currentPos = feedItems.get(position);
 
         holder.name.setText(currentPos.getName());
-        holder.tvFillNum.setText("" + (currentPos.getTotalFill()));
-        holder.tvKillNum.setText("-" + (currentPos.getTotalKill()));
+        holder.numFill.setText("" + (currentPos.getTotalFill()));
+        holder.numKill.setText("-" + (currentPos.getTotalKill()));
 
         if (currentPos.getFillOrKill() == 0) {
             holder.imgbKill.setBackgroundResource(R.drawable.killed);
@@ -139,6 +152,9 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             @Override
             public void onClick(View view) {
 
+                fillSound.playSound();
+
+
                 if (userLocalStore.getLoggedInUser().getUsername().equals("dge93") ||
                         userLocalStore.getLoggedInUser().getUsername().equals("a")) {
 
@@ -149,7 +165,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                             int currentColumn = (int) values.first;
                             int currentValue = (int) values.second;
 
-                            if (currentColumn >= 20) {
+                            if (currentColumn >= 1000) {
                                 serverRequests.updateFillAndResetColumnInBackground(currentPos.getId(), currentColumn);
                             } else {
                                 //update fill only. change name
@@ -165,12 +181,13 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         }
                     });
                     currentPos.hitFill();
-                    holder.tvFillNum.setText("" + (currentPos.getTotalFill()));
+                    holder.numFill.setText("" + (currentPos.getTotalFill()));
 
                 } else {
                     if (currentPos.getFillOrKill() == 1) {
+                        System.out.println("HAS FILL CANCEL FILL");
+
                         // There's a fill already so cancel fill
-                        serverRequests.updateValueInBackground(currentPos.getId(), -2);
                         serverRequests.minusFillInBackground(currentPos.getId());
                         serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
                         currentPos.hitFillSecondTime();
@@ -179,18 +196,42 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                     } else {
 
                         if (currentPos.getFillOrKill() == 0) {
-                            // Case the post already has a Kill. Replace the kill with fill.
+
+                            System.out.println("CLICK FILL. ALREADY HAS KILL");
+
+                            serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
+                                @Override
+                                public void columnAndValueCallBack(Pair values) {
+                                    int currentColumn = (int) values.first;
+                                    int currentValue = (int) values.second;
+
+                                    if (currentColumn >= 20) {
+                                        serverRequests.updateFillAndResetColumnInBackground(currentPos.getId(), currentColumn);
+                                    } else {
+                                        //update fill only. change name
+                                        serverRequests.updateFillAndFillColumnInBackground(currentPos.getId(), currentColumn);
+                                    }
+                                    serverRequests.updateValueInBackground(currentPos.getId(), 2);
+
+                                }
+                            });
+                            serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
+                                @Override
+                                public void postExecution() {
+                                }
+                            });
+                            serverRequests.minusKillInBackground(currentPos.getId());
+
+                            // Case the post already has a Kill. Replace the kill with fill. Switching option.
                             currentPos.hitKillSecondTime();
-                            holder.tvKillNum.setText("-" + currentPos.getTotalKill());
+                            holder.numKill.setText("-" + currentPos.getTotalKill());
                             serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
-
-
-                            serverRequests.updateFillAndCancelKillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
-
-
+                            //serverRequests.updateFillAndCancelKillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
                             holder.imgbKill.setBackgroundResource(R.drawable.kill);
 
                         } else {
+                            System.out.println("FILL NORMAL");
+
                             // There's no fill so do normal operations
                             serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
                                 @Override
@@ -222,7 +263,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         currentPos.setFillOrKill(1);
                     }
                 }
-                holder.tvFillNum.setText("" + (currentPos.getTotalFill()));
+                holder.numFill.setText("" + (currentPos.getTotalFill()));
                 holder.swipeLayout.close();
             }
         });
@@ -231,6 +272,8 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         holder.imgbKill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                killSound.playSound();
 
                 if (userLocalStore.getLoggedInUser().getUsername().equals("dge93") ||
                         userLocalStore.getLoggedInUser().getUsername().equals("a")) {
@@ -245,7 +288,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                                 // Increase kill but set the column as -1, meaning floored with 0
                                 serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
                             } else {
-                                if (currentColumn >= 20) {
+                                if (currentColumn >= 100) {
                                     serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
                                 } else {
                                     //update fill only. change name
@@ -263,9 +306,102 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         }
                     });
                     currentPos.hitKill();
-                    holder.tvKillNum.setText("-" + currentPos.getTotalKill());
+                    holder.numKill.setText("-" + currentPos.getTotalKill());
 
-                } else {
+                }  else {
+                    if (currentPos.getFillOrKill() == 0) {
+                        System.out.println("CANCEL KILL");
+
+                        // There's a kill already so cancel kill
+                        serverRequests.minusKillInBackground(currentPos.getId());
+                        serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
+                        currentPos.hitKillSecondTime();
+                        currentPos.setFillOrKill(-1);
+                        holder.imgbKill.setBackgroundResource(R.drawable.kill);
+                    } else {
+
+                        if (currentPos.getFillOrKill() == 1) {
+                            System.out.println("CLICK KILL. ALREADY HAS FILL");
+
+                            serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
+                                @Override
+                                public void columnAndValueCallBack(Pair values) {
+                                    int currentColumn = (int) values.first;
+                                    int currentValue = (int) values.second;
+
+                                    if (currentValue <= 0) {
+                                        // Increase kill but set the column as -1, meaning floored with 0
+                                        serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
+                                    } else {
+                                        if (currentColumn >= 100) {
+                                            serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
+                                        } else {
+                                            //update fill only. change name
+                                            serverRequests.updateKillAndKillColumnInBackground(currentPos.getId(), currentColumn);
+                                        }
+                                        serverRequests.updateValueInBackground(currentPos.getId(), -1);
+                                    }
+                                }
+                            });
+
+                            serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
+                                @Override
+                                public void postExecution() {
+                                }
+                            });
+                            serverRequests.minusFillInBackground(currentPos.getId());
+
+                            // Case the post already has a Kill. Replace the kill with fill. Switching option.
+                            currentPos.hitFillSecondTime();
+                            holder.numFill.setText("" + currentPos.getTotalFill());
+
+                            System.out.println("TOTAL FILL CAHNGED TO: " + currentPos.getTotalFill());
+                            serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
+                            //serverRequests.updateKillAndCancelFillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
+                            holder.imgbFill.setBackgroundResource(R.drawable.fill);
+
+                        } else {
+                            System.out.println("KILL NORMAL");
+
+                            // There's no fill so do normal operations
+                            serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
+                                @Override
+                                public void columnAndValueCallBack(Pair values) {
+                                    int currentColumn = (int) values.first;
+                                    int currentValue = (int) values.second;
+
+                                    if (currentValue <= 0) {
+                                        // Increase kill but set the column as -1, meaning floored with 0
+                                        serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
+                                    } else {
+                                        if (currentColumn >= 20) {
+                                            serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
+                                        } else {
+                                            //update fill only. change name
+                                            serverRequests.updateKillAndKillColumnInBackground(currentPos.getId(), currentColumn);
+                                        }
+                                        serverRequests.updateValueInBackground(currentPos.getId(), -1);
+                                    }
+                                }
+                            });
+
+                            serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
+                                @Override
+                                public void postExecution() {
+                                }
+                            });
+                        }
+
+                        // Add to user list of Fill clicks database table
+                        serverRequests.addToKillListInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
+                        holder.imgbKill.setBackgroundResource(R.drawable.killed);
+                        currentPos.hitKill();
+                        currentPos.setFillOrKill(0);
+                    }
+                }
+
+
+                /*else {
 
                     if (currentPos.getFillOrKill() == 0) {
                         // There's already a kill. cancel kill.
@@ -285,14 +421,18 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                                 int currentColumn = (int) values.first;
                                 int currentValue = (int) values.second;
 
-                                if (currentColumn >= 20) {
-                                    serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
+                                if (currentValue <= 0) {
+                                    // Increase kill but set the column as -1, meaning floored with 0
+                                    serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
                                 } else {
-                                    //update fill only. change name
-                                    serverRequests.updateKillAndKillColumnInBackground(currentPos.getId(), currentColumn);
+                                    if (currentColumn >= 20) {
+                                        serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
+                                    } else {
+                                        //update fill only. change name
+                                        serverRequests.updateKillAndKillColumnInBackground(currentPos.getId(), currentColumn);
+                                    }
+                                    serverRequests.updateValueInBackground(currentPos.getId(), -1);
                                 }
-                                serverRequests.updateValueInBackground(currentPos.getId(), -1);
-
                             }
                         });
 
@@ -308,9 +448,9 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         currentPos.hitKill();
                         currentPos.setFillOrKill(0);
                     }
-                }
+                }*/
 
-                holder.tvKillNum.setText("-" + currentPos.getTotalKill());
+                holder.numKill.setText("-" + currentPos.getTotalKill());
                 holder.swipeLayout.close();
             }
         });
@@ -341,7 +481,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             public void onClick(View v) {
 
                 if (holder.tvManagePost.getText().toString().equals("Delete")) {
-                    volleyConnections.deleteAPostVolley(currentPos.getId());
+                    volleyMainPosts.deleteAPostVolley(currentPos.getId());
                     //serverRequests.deleteAPostInBackground(currentPos.getId());
                 } else {
                     Toast.makeText(v.getContext(), "Clicked on Report ", Toast.LENGTH_SHORT).show();
@@ -406,7 +546,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         NetworkImageView profilePic;
         Button bFill, bKill;
         ImageButton imgbFill, imgbKill;
-        TextView tvGraph, numFill, numKill, txtStatusMsg, timestamp, name, tvManagePost, tvFillNum, tvKillNum,
+        TextView tvGraph, numFill, numKill, txtStatusMsg, timestamp, name, tvManagePost,
                 tvEditPost;
         LinearLayout bottomWrapper1;
         LinearLayout postLayout;
@@ -424,8 +564,6 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             numKill = (TextView) itemView.findViewById(R.id.tvKillNum);
             imgbFill = (ImageButton) itemView.findViewById(R.id.imgbFill);
             imgbKill = (ImageButton) itemView.findViewById(R.id.imgbKill);
-            tvFillNum = (TextView) itemView.findViewById(R.id.tvFillNum);
-            tvKillNum = (TextView) itemView.findViewById(R.id.tvKillNum);
             tvEditPost = (TextView) itemView.findViewById(R.id.tvEditPost);
             bottomWrapper1 = (LinearLayout) itemView.findViewById(R.id.bottom_wrapper1);
             postLayout = (LinearLayout) itemView.findViewById(R.id.postLayout);
@@ -435,11 +573,8 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                 public void onClick(View v) {
 
                     if (!UserLocalStore.isUserLoggedIn) {
-                        System.out.println("HAHAA");
                         Toast.makeText(mContext, "Log in to comment", Toast.LENGTH_LONG).show();
                     } else {
-                        System.out.println("WTF");
-
                         int position = getAdapterPosition();
                         FeedItem currentItem = feedItems.get(position);
                         Intent postInfo = new Intent(mContext, CommentActivity.class);

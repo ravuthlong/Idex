@@ -30,6 +30,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 import phoenix.idex.Activities.MainActivity;
+import phoenix.idex.ButtonClickedSingleton;
 import phoenix.idex.R;
 import phoenix.idex.ServerConnections.ServerRequests;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
@@ -54,6 +55,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     private TextView etUsername, etPassword, tvIdexTitle, tvContinue, tvUsername, tvPassword;
     private android.support.v7.widget.Toolbar toolbar;
     private FragmentManager fragmentManager;
+    private ButtonClickedSingleton clickActivity = ButtonClickedSingleton.getInstance();
 
 
     private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
@@ -161,6 +163,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
                 startActivity(signUpIntent);
                 break;
             case R.id.tvContinue:
+                clickActivity.setRollClicked();
                 fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
                         new PostListFragment()).commit();
@@ -192,6 +195,8 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
                 }else{
                     userLocalStore.storeUserData(returnedUser);
                     UserLocalStore.isUserLoggedIn = true;
+                    UserLocalStore.allowRefresh = true;
+                    clickActivity.setRollClicked();
                     logUserIn();
                 }
             }

@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:fitsSystemWindows="false"
     android:layout_height="match_parent"
-    xmlns:local="http://schemas.android.com/tools">
+    xmlns:local="http://schemas.android.com/tools"
+    android:background="#000000">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="#1b1616"
+            android:layout_height="90dp"
+            android:background="@drawable/top_banner"
             local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             local:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 

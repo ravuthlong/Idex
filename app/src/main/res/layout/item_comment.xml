@@ -7,25 +7,6 @@
     swipe:leftEdgeSwipeOffset="0dp"
     swipe:rightEdgeSwipeOffset="0dp">
 
-    <!--Bottom View For Right to Left-->
-
-    <LinearLayout
-        android:id="@+id/bottom_wrapper"
-        android:layout_width="100dp"
-        android:layout_height="match_parent"
-        android:weightSum="1">
-
-        <TextView
-            android:id="@+id/tvGraph"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#246961"
-            android:gravity="center"
-            android:text="Graph"
-            android:textColor="#fff" />
-    </LinearLayout>
-
     <!-- Another Bottom View For Left to Right -->
 
     <LinearLayout
@@ -103,6 +84,18 @@
 
             </LinearLayout>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/tvRecommenedCount"
+                    android:layout_alignParentEnd="true" />
+            </RelativeLayout>
+
 
         </LinearLayout>
 
@@ -131,13 +124,12 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:id="@+id/imageView"
+                android:id="@+id/imgRecommend"
                 android:background="@android:drawable/star_off"
                 android:layout_alignWithParentIfMissing="false"
                 android:layout_alignBottom="@+id/tvRecommend"
                 android:layout_toStartOf="@+id/tvRecommend"
-                android:layout_toLeftOf="@+id/tvRecommend"
-                android:backgroundTint="#fefefe" />
+                android:layout_toLeftOf="@+id/tvRecommend" />
 
             <TextView
                 android:layout_width="wrap_content"

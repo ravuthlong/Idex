@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:local="http://schemas.android.com/tools"
     android:fitsSystemWindows="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/corLayout">
@@ -23,6 +23,7 @@
         android:id="@+id/postRecyclerView1"
         android:layout_gravity='start'
         />
+
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <ProgressBar
@@ -37,21 +38,22 @@
 
     <Button
 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_gravity="bottom|left"
         android:id="@+id/bMainRoll"
-        android:text="Roll" />
+        android:background="@drawable/roll" />
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_gravity="bottom|center"
-        android:id="@+id/bMainDash"
-        android:text="Dash" />
+        android:id="@+id/bMainLog"
+        android:background="@drawable/log" />
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_gravity="bottom|right"
         android:id="@+id/bMainInfo"
-        android:text="Info" />
+        android:background="@drawable/info" />
+
 </android.support.design.widget.CoordinatorLayout>

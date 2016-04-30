@@ -8,12 +8,12 @@
     tools:openDrawer="start"
     android:id="@+id/drawerLayoutMain">
 
+
     <include
         layout="@layout/frag_toolbar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     <RelativeLayout
-        android:paddingTop="?attr/actionBarSize"
         android:id="@+id/rLayoutMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

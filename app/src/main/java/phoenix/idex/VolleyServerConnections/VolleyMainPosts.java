@@ -24,33 +24,27 @@ import java.util.Map;
 
 import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.Graphing.Graph;
-import phoenix.idex.RecyclerViewFeed.CommentRecyclerView.adapter.CommentListAdapter;
-import phoenix.idex.RecyclerViewFeed.CommentRecyclerView.data.CommentItem;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.adapter.FeedListAdapter;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.data.FeedItem;
 import phoenix.idex.ServerRequestCallBacks.GraphInfoCallBack;
-import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
 
 /**
  * Created by Ravinder on 4/12/16.
  */
-public class VolleyConnections {
+public class VolleyMainPosts {
 
     private ProgressDialog progressDialog;
     private Context context;
 
-    public VolleyConnections(Context context) {
+    public VolleyMainPosts(Context context) {
         this.context = context;
         progressDialog = new ProgressDialog(context);
         progressDialog.setCancelable(false);
         progressDialog.setMessage("Loading...");
     }
-    public void fetchCommentVolley(CommentListAdapter commentListAdapter, List<CommentItem> commentItems, int postID) {
-        progressDialog.show();
-        new FetchCommentVolley(commentListAdapter, commentItems, postID).fetchCommentVolley();
-    }
+
 
     public void fetchAGraph(int postID, ProgressDialog progressDialog, GraphInfoCallBack graphInfoCallBack) {
         progressDialog.setMessage("Loading Graph...");
@@ -76,49 +70,6 @@ public class VolleyConnections {
     }
     public void getAUniqueUserPosts(FeedListAdapter feedListAdapter, List<FeedItem> feedItems, ProgressBar spinner, int userID) {
         new FetchUserPostsVolley(feedListAdapter, feedItems, spinner).getJsonLiveUniqueUser(userID);
-    }
-    public void updateUserInfo(User user) {
-        progressDialog.show();
-        new UpdateUserInfoVolley(user).updateUserInfo();
-    }
-
-    public class UpdateUserInfoVolley {
-        private User user;
-
-        public UpdateUserInfoVolley(User user) {
-            this.user = user;
-        }
-
-        // Pull JSON directly from the PHP JSON result
-        public void updateUserInfo() {
-
-            // making fresh volley request and getting json
-            StringRequest jsonReq = new StringRequest(Request.Method.POST,
-                    "http://idex.site88.net/updateUserInfo.php", new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    progressDialog.dismiss();
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    progressDialog.dismiss();
-                }
-            }) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("userID", Integer.toString(user.getUserID()));
-                    params.put("firstName", user.getFirstname());
-                    params.put("lastName", user.getLastname());
-                    params.put("email", user.getEmail());
-                    params.put("username", user.getUsername());
-                    return params;
-                }
-            };
-            // Adding request to volley request queue
-            AppController.getInstance().addToRequestQueue(jsonReq);
-        }
     }
 
     public class StoreAPostVolley {
@@ -249,6 +200,7 @@ public class VolleyConnections {
                 spinner.setVisibility(View.GONE);
 
             } catch (JSONException e) {
+                spinner.setVisibility(View.GONE);
                 e.printStackTrace();
             }
         }
@@ -313,12 +265,15 @@ public class VolleyConnections {
                 public void onResponse(JSONObject response) {
                     if (response != null) {
                         fetchUserPostsVolley(response);
+                    } else {
+                        spinner.setVisibility(View.GONE);
                     }
                 }
             }, new Response.ErrorListener() {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    spinner.setVisibility(View.GONE);
                 }
             });
 
@@ -344,63 +299,6 @@ public class VolleyConnections {
         }
     }
 
-    public class FetchCommentVolley {
-        private CommentListAdapter commentListAdapter;
-        private List<CommentItem> commentItems;
-        private int postID;
-
-        public FetchCommentVolley(CommentListAdapter commentListAdapter, List<CommentItem> commentItems, int postID) {
-            this.commentListAdapter = commentListAdapter;
-            this.commentItems = commentItems;
-            this.postID = postID;
-        }
-
-        // Pull JSON directly from the PHP JSON result
-        public void fetchCommentVolley() {
-            // making fresh volley request and getting json
-            JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
-                    "http://idex.site88.net/fetchComments.php?postID=" + postID, null, new Response.Listener<JSONObject>() {
-
-                @Override
-                public void onResponse(JSONObject response) {
-                    if (response != null) {
-                        try {
-                            JSONArray feedArray = response.getJSONArray("feed");
-
-                            for (int i = 0; i < feedArray.length(); i++) {
-                                JSONObject feedObj = (JSONObject) feedArray.get(i);
-
-                                CommentItem item = new CommentItem();
-                                String name;
-                                name = feedObj.getString("firstname") + " " + feedObj.getString("lastname");
-                                item.setId(feedObj.getInt("postID"));
-                                item.setName(name);
-                                item.setUsername(feedObj.getString("username"));
-                                item.setComment(feedObj.getString("comment"));
-                                item.setProfilePic(feedObj.getString("userpic"));
-                                item.setTimeStamp(feedObj.getString("date"));
-                                commentItems.add(item);
-                            }
-                            // notify data changes to list adapater
-                            commentListAdapter.notifyDataSetChanged();
-                            //spinner.setVisibility(View.GONE);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        progressDialog.dismiss();
-                    }
-                }
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    progressDialog.dismiss();
-                }
-            });
-            // Adding request to volley request queue
-            AppController.getInstance().addToRequestQueue(jsonReq);
-        }
-    }
 
     public class FetchGraphInfoVolley {
         private GraphInfoCallBack graphInfoCallBack;
@@ -423,7 +321,6 @@ public class VolleyConnections {
                 public void onResponse(JSONObject response) {
 
                     if (response != null) {
-                        System.out.println("NOT NULL;jhk");
 
                         try {
 
@@ -437,26 +334,110 @@ public class VolleyConnections {
                                 aGraph.setTotalKillFloor(feedObj.getInt("totalKillFloor"));
                                 aGraph.setValue(feedObj.getInt("value"));
                                 aGraph.setCurrentColumn(feedObj.getInt("currentColumn"));
-                                aGraph.setC1(feedObj.getInt("c1"));
-                                aGraph.setC2(feedObj.getInt("c2"));
-                                aGraph.setC3(feedObj.getInt("c3"));
-                                aGraph.setC4(feedObj.getInt("c4"));
-                                aGraph.setC5(feedObj.getInt("c5"));
-                                aGraph.setC6(feedObj.getInt("c6"));
-                                aGraph.setC7(feedObj.getInt("c7"));
-                                aGraph.setC8(feedObj.getInt("c8"));
-                                aGraph.setC9(feedObj.getInt("c9"));
-                                aGraph.setC10(feedObj.getInt("c10"));
-                                aGraph.setC11(feedObj.getInt("c11"));
-                                aGraph.setC12(feedObj.getInt("c12"));
-                                aGraph.setC13(feedObj.getInt("c13"));
-                                aGraph.setC14(feedObj.getInt("c14"));
-                                aGraph.setC15(feedObj.getInt("c15"));
-                                aGraph.setC16(feedObj.getInt("c16"));
-                                aGraph.setC17(feedObj.getInt("c17"));
-                                aGraph.setC18(feedObj.getInt("c18"));
-                                aGraph.setC19(feedObj.getInt("c19"));
-                                aGraph.setC20(feedObj.getInt("c20"));
+
+                                int[] columns = new int[100];
+                                columns[0] = feedObj.getInt("c1");
+                                columns[1] = feedObj.getInt("c2");
+                                columns[2] = feedObj.getInt("c3");
+                                columns[3] = feedObj.getInt("c4");
+                                columns[4] = feedObj.getInt("c5");
+                                columns[5] = feedObj.getInt("c6");
+                                columns[6] = feedObj.getInt("c7");
+                                columns[7] = feedObj.getInt("c8");
+                                columns[8] = feedObj.getInt("c9");
+                                columns[9] = feedObj.getInt("c10");
+                                columns[10] = feedObj.getInt("c11");
+                                columns[11] = feedObj.getInt("c12");
+                                columns[12] = feedObj.getInt("c13");
+                                columns[13] = feedObj.getInt("c14");
+                                columns[14] = feedObj.getInt("c15");
+                                columns[15] = feedObj.getInt("c16");
+                                columns[16] = feedObj.getInt("c17");
+                                columns[17] = feedObj.getInt("c18");
+                                columns[18] = feedObj.getInt("c19");
+                                columns[19] = feedObj.getInt("c20");
+                                columns[20] = feedObj.getInt("c21");
+                                columns[21] = feedObj.getInt("c22");
+                                columns[22] = feedObj.getInt("c23");
+                                columns[23] = feedObj.getInt("c24");
+                                columns[24] = feedObj.getInt("c25");
+                                columns[25] = feedObj.getInt("c26");
+                                columns[26] = feedObj.getInt("c27");
+                                columns[27] = feedObj.getInt("c28");
+                                columns[28] = feedObj.getInt("c29");
+                                columns[29] = feedObj.getInt("c30");
+                                columns[30] = feedObj.getInt("c31");
+                                columns[31] = feedObj.getInt("c32");
+                                columns[32] = feedObj.getInt("c33");
+                                columns[33] = feedObj.getInt("c34");
+                                columns[34] = feedObj.getInt("c35");
+                                columns[35] = feedObj.getInt("c36");
+                                columns[36] = feedObj.getInt("c37");
+                                columns[37] = feedObj.getInt("c38");
+                                columns[38] = feedObj.getInt("c39");
+                                columns[39] = feedObj.getInt("c40");
+                                columns[40] = feedObj.getInt("c41");
+                                columns[41] = feedObj.getInt("c42");
+                                columns[42] = feedObj.getInt("c43");
+                                columns[43] = feedObj.getInt("c44");
+                                columns[44] = feedObj.getInt("c45");
+                                columns[45] = feedObj.getInt("c46");
+                                columns[46] = feedObj.getInt("c47");
+                                columns[47] = feedObj.getInt("c48");
+                                columns[48] = feedObj.getInt("c49");
+                                columns[49] = feedObj.getInt("c50");
+                                columns[50] = feedObj.getInt("c51");
+                                columns[51] = feedObj.getInt("c52");
+                                columns[52] = feedObj.getInt("c53");
+                                columns[53] = feedObj.getInt("c54");
+                                columns[54] = feedObj.getInt("c55");
+                                columns[55] = feedObj.getInt("c56");
+                                columns[56] = feedObj.getInt("c57");
+                                columns[57] = feedObj.getInt("c58");
+                                columns[58] = feedObj.getInt("c59");
+                                columns[59] = feedObj.getInt("c60");
+                                columns[60] = feedObj.getInt("c61");
+                                columns[61] = feedObj.getInt("c62");
+                                columns[62] = feedObj.getInt("c63");
+                                columns[63] = feedObj.getInt("c64");
+                                columns[64] = feedObj.getInt("c65");
+                                columns[65] = feedObj.getInt("c66");
+                                columns[66] = feedObj.getInt("c67");
+                                columns[67] = feedObj.getInt("c68");
+                                columns[68] = feedObj.getInt("c69");
+                                columns[69] = feedObj.getInt("c70");
+                                columns[70] = feedObj.getInt("c71");
+                                columns[71] = feedObj.getInt("c72");
+                                columns[72] = feedObj.getInt("c73");
+                                columns[73] = feedObj.getInt("c74");
+                                columns[74] = feedObj.getInt("c75");
+                                columns[75] = feedObj.getInt("c76");
+                                columns[76] = feedObj.getInt("c77");
+                                columns[77] = feedObj.getInt("c78");
+                                columns[78] = feedObj.getInt("c79");
+                                columns[79] = feedObj.getInt("c80");
+                                columns[80] = feedObj.getInt("c81");
+                                columns[81] = feedObj.getInt("c82");
+                                columns[82] = feedObj.getInt("c83");
+                                columns[83] = feedObj.getInt("c84");
+                                columns[84] = feedObj.getInt("c85");
+                                columns[85] = feedObj.getInt("c86");
+                                columns[86] = feedObj.getInt("c87");
+                                columns[87] = feedObj.getInt("c88");
+                                columns[88] = feedObj.getInt("c89");
+                                columns[89] = feedObj.getInt("c90");
+                                columns[90] = feedObj.getInt("c91");
+                                columns[91] = feedObj.getInt("c92");
+                                columns[92] = feedObj.getInt("c93");
+                                columns[93] = feedObj.getInt("c94");
+                                columns[94] = feedObj.getInt("c95");
+                                columns[95] = feedObj.getInt("c96");
+                                columns[96] = feedObj.getInt("c97");
+                                columns[97] = feedObj.getInt("c98");
+                                columns[98] = feedObj.getInt("c99");
+                                columns[99] = feedObj.getInt("c100");
+
+                                aGraph.setColumns(columns);
                             }
 
                         } catch (JSONException e) {

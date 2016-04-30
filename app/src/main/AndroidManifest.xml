@@ -42,11 +42,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Activities.DashActivity"
-            android:label="dash_activity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".Graphing.GraphActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"

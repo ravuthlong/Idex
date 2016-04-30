@@ -22,16 +22,16 @@ import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
 
 import java.util.ArrayList;
 
-import phoenix.idex.VolleyServerConnections.VolleyConnections;
 import phoenix.idex.R;
 import phoenix.idex.ServerRequestCallBacks.GraphInfoCallBack;
+import phoenix.idex.VolleyServerConnections.VolleyMainPosts;
 
 /**
  * Created by Ravinder on 2/19/16.
  */
 public class GraphActivity extends AppCompatActivity {
     private CandleStickChart mChart;
-    private VolleyConnections volleyConnections;
+    private VolleyMainPosts volleyMainPosts;
     private ProgressDialog progressDialog;
 
     class FillKillObject {
@@ -57,7 +57,7 @@ public class GraphActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.frag_graph);
+        setContentView(R.layout.activity_graph);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
@@ -90,11 +90,11 @@ public class GraphActivity extends AppCompatActivity {
 
         mChart.getLegend().setEnabled(false);
 
-        volleyConnections = new VolleyConnections(this);
+        volleyMainPosts = new VolleyMainPosts(this);
         Bundle extra = getIntent().getExtras();
         int postID = extra.getInt("postID");
 
-        volleyConnections.fetchAGraph(postID, progressDialog, new GraphInfoCallBack() {
+        volleyMainPosts.fetchAGraph(postID, progressDialog, new GraphInfoCallBack() {
             @Override
             public void getGraphInfo(Graph graph) {
                 setGraph(graph);
@@ -221,7 +221,7 @@ public class GraphActivity extends AppCompatActivity {
         int value = graph.getValue();
         int nextInsert = graph.getCurrentColumn();
 
-        int[] arrayFillKill = new int[20];
+        int[] arrayFillKill = new int[100];
         arrayFillKill[0] = graph.getC1();
         arrayFillKill[1] = graph.getC2();
         arrayFillKill[2] = graph.getC3();
@@ -242,6 +242,86 @@ public class GraphActivity extends AppCompatActivity {
         arrayFillKill[17] = graph.getC18();
         arrayFillKill[18] = graph.getC19();
         arrayFillKill[19] = graph.getC20();
+        arrayFillKill[20] = graph.getC21();
+        arrayFillKill[21] = graph.getC22();
+        arrayFillKill[22] = graph.getC23();
+        arrayFillKill[23] = graph.getC24();
+        arrayFillKill[24] = graph.getC25();
+        arrayFillKill[25] = graph.getC26();
+        arrayFillKill[26] = graph.getC27();
+        arrayFillKill[27] = graph.getC28();
+        arrayFillKill[28] = graph.getC29();
+        arrayFillKill[29] = graph.getC30();
+        arrayFillKill[30] = graph.getC31();
+        arrayFillKill[31] = graph.getC32();
+        arrayFillKill[32] = graph.getC13();
+        arrayFillKill[33] = graph.getC34();
+        arrayFillKill[34] = graph.getC35();
+        arrayFillKill[35] = graph.getC36();
+        arrayFillKill[36] = graph.getC37();
+        arrayFillKill[37] = graph.getC38();
+        arrayFillKill[38] = graph.getC39();
+        arrayFillKill[39] = graph.getC40();
+        arrayFillKill[40] = graph.getC41();
+        arrayFillKill[41] = graph.getC42();
+        arrayFillKill[42] = graph.getC43();
+        arrayFillKill[43] = graph.getC44();
+        arrayFillKill[44] = graph.getC45();
+        arrayFillKill[45] = graph.getC46();
+        arrayFillKill[46] = graph.getC47();
+        arrayFillKill[47] = graph.getC48();
+        arrayFillKill[48] = graph.getC49();
+        arrayFillKill[49] = graph.getC50();
+        arrayFillKill[50] = graph.getC51();
+        arrayFillKill[51] = graph.getC52();
+        arrayFillKill[52] = graph.getC53();
+        arrayFillKill[53] = graph.getC54();
+        arrayFillKill[54] = graph.getC55();
+        arrayFillKill[55] = graph.getC56();
+        arrayFillKill[56] = graph.getC57();
+        arrayFillKill[57] = graph.getC58();
+        arrayFillKill[58] = graph.getC59();
+        arrayFillKill[59] = graph.getC60();
+        arrayFillKill[60] = graph.getC61();
+        arrayFillKill[61] = graph.getC62();
+        arrayFillKill[62] = graph.getC63();
+        arrayFillKill[63] = graph.getC64();
+        arrayFillKill[64] = graph.getC65();
+        arrayFillKill[65] = graph.getC66();
+        arrayFillKill[66] = graph.getC67();
+        arrayFillKill[67] = graph.getC68();
+        arrayFillKill[68] = graph.getC69();
+        arrayFillKill[69] = graph.getC70();
+        arrayFillKill[70] = graph.getC71();
+        arrayFillKill[71] = graph.getC72();
+        arrayFillKill[72] = graph.getC73();
+        arrayFillKill[73] = graph.getC74();
+        arrayFillKill[74] = graph.getC75();
+        arrayFillKill[75] = graph.getC76();
+        arrayFillKill[76] = graph.getC77();
+        arrayFillKill[77] = graph.getC78();
+        arrayFillKill[78] = graph.getC79();
+        arrayFillKill[79] = graph.getC80();
+        arrayFillKill[80] = graph.getC81();
+        arrayFillKill[81] = graph.getC82();
+        arrayFillKill[82] = graph.getC83();
+        arrayFillKill[83] = graph.getC84();
+        arrayFillKill[84] = graph.getC85();
+        arrayFillKill[85] = graph.getC86();
+        arrayFillKill[86] = graph.getC87();
+        arrayFillKill[87] = graph.getC88();
+        arrayFillKill[88] = graph.getC89();
+        arrayFillKill[89] = graph.getC90();
+        arrayFillKill[90] = graph.getC91();
+        arrayFillKill[91] = graph.getC92();
+        arrayFillKill[92] = graph.getC93();
+        arrayFillKill[93] = graph.getC94();
+        arrayFillKill[94] = graph.getC95();
+        arrayFillKill[95] = graph.getC96();
+        arrayFillKill[96] = graph.getC97();
+        arrayFillKill[97] = graph.getC98();
+        arrayFillKill[98] = graph.getC99();
+        arrayFillKill[99] = graph.getC100();
 
         int size = arrayFillKill.length;
 
@@ -260,10 +340,11 @@ public class GraphActivity extends AppCompatActivity {
             y++;
         }
 
+        /*
         System.out.println("SORTED");
         for (int i = 0; i < sortedFillKill.length; i++) {
             System.out.println(sortedFillKill[i]);
-        }
+        }*/
 
 
         FillKillObject[] fillKillArray = new FillKillObject[size];
@@ -292,16 +373,17 @@ public class GraphActivity extends AppCompatActivity {
         }
 
 
+        /*
         for (int i = 0; i < fillKillArray.length; i ++) {
             System.out.println("INDEX: " + i);
             System.out.print(fillKillArray[i].getFill() + ",");
             System.out.print(fillKillArray[i].getKill());
             System.out.println();
-        }
+        }*/
 
         for (int i = 0; i < fillKillArray.length; i ++) {
             int valuePoint = 2 * fillKillArray[i].getFill() - fillKillArray[i].getKill();
-            System.out.println("VALUE " + valuePoint);
+            //System.out.println("VALUE " + valuePoint);
 
             if (sortedFillKill[i] == 1 || sortedFillKill[i] == 0) {
                 if (sortedFillKill[i] == 1) {
@@ -344,6 +426,86 @@ public class GraphActivity extends AppCompatActivity {
         xVals.add("" + 18);
         xVals.add("" + 19);
         xVals.add("" + 20);
+        xVals.add("" + 21);
+        xVals.add("" + 22);
+        xVals.add("" + 23);
+        xVals.add("" + 24);
+        xVals.add("" + 25);
+        xVals.add("" + 26);
+        xVals.add("" + 27);
+        xVals.add("" + 28);
+        xVals.add("" + 29);
+        xVals.add("" + 30);
+        xVals.add("" + 31);
+        xVals.add("" + 32);
+        xVals.add("" + 33);
+        xVals.add("" + 34);
+        xVals.add("" + 35);
+        xVals.add("" + 36);
+        xVals.add("" + 37);
+        xVals.add("" + 38);
+        xVals.add("" + 39);
+        xVals.add("" + 40);
+        xVals.add("" + 41);
+        xVals.add("" + 42);
+        xVals.add("" + 43);
+        xVals.add("" + 44);
+        xVals.add("" + 45);
+        xVals.add("" + 46);
+        xVals.add("" + 47);
+        xVals.add("" + 48);
+        xVals.add("" + 49);
+        xVals.add("" + 50);
+        xVals.add("" + 51);
+        xVals.add("" + 52);
+        xVals.add("" + 53);
+        xVals.add("" + 54);
+        xVals.add("" + 55);
+        xVals.add("" + 56);
+        xVals.add("" + 57);
+        xVals.add("" + 58);
+        xVals.add("" + 59);
+        xVals.add("" + 60);
+        xVals.add("" + 61);
+        xVals.add("" + 62);
+        xVals.add("" + 63);
+        xVals.add("" + 64);
+        xVals.add("" + 65);
+        xVals.add("" + 66);
+        xVals.add("" + 67);
+        xVals.add("" + 68);
+        xVals.add("" + 69);
+        xVals.add("" + 70);
+        xVals.add("" + 71);
+        xVals.add("" + 72);
+        xVals.add("" + 73);
+        xVals.add("" + 74);
+        xVals.add("" + 75);
+        xVals.add("" + 76);
+        xVals.add("" + 77);
+        xVals.add("" + 78);
+        xVals.add("" + 79);
+        xVals.add("" + 80);
+        xVals.add("" + 81);
+        xVals.add("" + 82);
+        xVals.add("" + 83);
+        xVals.add("" + 84);
+        xVals.add("" + 85);
+        xVals.add("" + 86);
+        xVals.add("" + 87);
+        xVals.add("" + 88);
+        xVals.add("" + 89);
+        xVals.add("" + 90);
+        xVals.add("" + 91);
+        xVals.add("" + 92);
+        xVals.add("" + 93);
+        xVals.add("" + 94);
+        xVals.add("" + 95);
+        xVals.add("" + 96);
+        xVals.add("" + 97);
+        xVals.add("" + 98);
+        xVals.add("" + 99);
+        xVals.add("" + 100);
 
         CandleDataSet ySet = new CandleDataSet(yVals1, "Data Set");
 

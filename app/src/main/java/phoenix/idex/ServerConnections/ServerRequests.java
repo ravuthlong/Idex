@@ -17,7 +17,7 @@ import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.ServerRequestCallBacks.FetchColumnAndValueCallBack;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
 import phoenix.idex.ServerRequestCallBacks.PostExecutionCallBack;
-import phoenix.idex.ServerRequestCallBacks.UserPostsCallBack;
+import phoenix.idex.ServerRequestCallBacks.JSONOStringCallBack;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
 
@@ -37,7 +37,7 @@ public class ServerRequests {
     }
     public void storeUserDataInBackground(User user, GetUserCallBack userCallBack) {
         progressDialog.show();
-        new StoreUserDataAsyncTask(user, userCallBack).execute();
+        //new StoreUserDataAsyncTask(user, userCallBack).execute();
     }
     public void logUserInDataInBackground(User user, GetUserCallBack userCallBack) {
         progressDialog.show();
@@ -75,8 +75,8 @@ public class ServerRequests {
     public void updateKillAndResetColumnInBackground(int postID, int currentColumn) {
         new UpdateKillAndResetColumn(postID, currentColumn).execute();
     }
-    public void fetchOneUserPostsInBackground(int userID, UserPostsCallBack userPostsCallBack) {
-        new FetchOneUserPosts(userID, userPostsCallBack).execute();
+    public void fetchOneUserPostsInBackground(int userID, JSONOStringCallBack JSONOStringCallBack) {
+        new FetchOneUserPosts(userID, JSONOStringCallBack).execute();
     }
     public void deleteAPostInBackground(int postID) {
         progressDialog.show();
@@ -265,11 +265,11 @@ public class ServerRequests {
     public class FetchOneUserPosts extends AsyncTask<Void, Void, String> {
 
         private int userID;
-        private UserPostsCallBack userPostsCallBack;
+        private JSONOStringCallBack JSONOStringCallBack;
 
-        public FetchOneUserPosts(int userID, UserPostsCallBack userPostsCallBack) {
+        public FetchOneUserPosts(int userID, JSONOStringCallBack JSONOStringCallBack) {
             this.userID = userID;
-            this.userPostsCallBack = userPostsCallBack;
+            this.JSONOStringCallBack = JSONOStringCallBack;
         }
 
         @Override
@@ -294,7 +294,7 @@ public class ServerRequests {
         @Override
         protected void onPostExecute(String JSONString){
             super.onPostExecute(JSONString);
-            userPostsCallBack.jsonString(JSONString);
+            JSONOStringCallBack.jsonString(JSONString);
         }
     }
 
@@ -699,7 +699,7 @@ public class ServerRequests {
             progressDialog.dismiss();
         }
     }
-
+/*
     // Signed up will be stored in the database. User type will be returned for UserLocalStore shared preference purpose.
     public class StoreUserDataAsyncTask extends AsyncTask<Void, Void, User> {
 
@@ -754,7 +754,7 @@ public class ServerRequests {
             progressDialog.dismiss();
             userCallBack.done(returnedUser);
         }
-    }
+    }*/
 
     // When user logs in, get their information back. User type will be returned for UserLocalStore shared preference purpose.
     public class FetchUserDataAsyncTask extends AsyncTask<Void, Void, User> {
@@ -769,7 +769,6 @@ public class ServerRequests {
 
         @Override
         protected User doInBackground(Void... params) {
-
             User returnedUser = null;
 
             HashMap<String, Object> userInfo = new HashMap<>();
@@ -779,14 +778,12 @@ public class ServerRequests {
             JSONObject jObject = new JSONObject();
 
             try{
-
                 HttpRequest req = new HttpRequest("http://idex.site88.net/login.php");
                 jObject = req.preparePost().withData(userInfo).sendAndReadJSON();
 
                 if(jObject.getString("username").equals("")){
                     // No user returned
                     returnedUser = null;
-
                 }else{
                    //UserLocalStore.isUserLoggedIn = true;
                     // Get the user details
@@ -795,8 +792,8 @@ public class ServerRequests {
                     String lastname = jObject.getString("lastname");
                     String email = jObject.getString("email");
                     String username = jObject.getString("username");
-
-                    returnedUser = new User(userID, firstname, lastname, email, username);
+                    String date = jObject.getString("date");
+                    returnedUser = new User(userID, firstname, lastname, email, username, date);
                 }
             }catch(Exception e){
                 e.printStackTrace();

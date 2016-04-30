@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">quixotc</string>
+    <string name="app_name">InnGen</string>
+    <string name="app_title">innGen</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="userInfo_edit">Edit Info</string>

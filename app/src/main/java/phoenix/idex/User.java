@@ -4,15 +4,26 @@ package phoenix.idex;
  * Created by Ravinder on 3/2/16.
  */
 public class User {
-    private String firstname, lastname, email, username, password;
+    private String firstname, lastname, email, username, password, time;
     private int userID;
     // User for signing up
-    public User(String firstname, String lastname, String email, String username, String password) {
+    public User(String firstname, String lastname, String email, String username, String password, String time) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.username = username;
         this.password = password;
+        this.time = time;
+    }
+
+    // User for current user storage
+    public User(int userID, String firstname, String lastname, String email, String username, String time) {
+        this.userID = userID;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.username = username;
+        this.time = time;
     }
 
     // User for current user storage
@@ -23,6 +34,7 @@ public class User {
         this.email = email;
         this.username = username;
     }
+
 
 
 
@@ -54,6 +66,7 @@ public class User {
     public int getUserID() {
         return userID;
     }
+    public String getTime() { return time;}
 
 
     public void setFirstName(String firstname) {

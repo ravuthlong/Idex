@@ -15,5 +15,6 @@
     <item name="purple" type="color">#FFAA66CC</item>
     <item name="gray" type="color">#AEAEAE</item>
     <item name="darkblue" type="color">#FF0099CC</item>
-    <item name="brownorange" type="color">#AA8A18</item>
+    <item name="yellow" type="color">#CFBB3C</item>
+    <item name="font" type="color">#E6BE8A</item>
 </resources>

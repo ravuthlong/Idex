@@ -105,7 +105,7 @@
 
             <ImageButton
                 android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:id="@+id/imgbFill"
                 android:background="@drawable/fill"
                 android:clickable="false" />
@@ -139,7 +139,7 @@
 
             <ImageButton
                 android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:id="@+id/imgbKill"
                 android:background="@drawable/kill"
                 android:layout_gravity="right" />

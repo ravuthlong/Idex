@@ -1,14 +1,14 @@
 package phoenix.idex.Activities;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -28,16 +28,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import phoenix.idex.Fragments.PostListFragment;
-import phoenix.idex.VolleyServerConnections.VolleyConnections;
 import phoenix.idex.R;
 import phoenix.idex.RecyclerViewFeed.CommentRecyclerView.adapter.CommentListAdapter;
 import phoenix.idex.RecyclerViewFeed.CommentRecyclerView.data.CommentItem;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
-import phoenix.idex.ServerConnections.CommentServerRequests;
 import phoenix.idex.ServerRequestCallBacks.NetworkConnectionCallBack;
+import phoenix.idex.ServerRequestCallBacks.PostExecutionCallBack;
 import phoenix.idex.UserLocalStore;
+import phoenix.idex.Util;
+import phoenix.idex.VolleyServerConnections.VolleyComments;
 
-public class CommentActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+public class CommentActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
     SwipeLayout swipeLayout;
     NetworkImageView profilePic;
     ImageButton imgbFill, imgbKill;
@@ -56,20 +57,31 @@ public class CommentActivity extends Activity implements SwipeRefreshLayout.OnRe
     private int postID;
     private EditText etComment;
     private Button bComment;
-    private CommentServerRequests commentServerRequests;
     private RecyclerView commentRecyclerView;
     String receivedName, receivedTime, receivedPost, receivedProfilePic;
     int receivedNumFill, receivedNumKill;
     private Bundle savedIntent;
     private ProgressDialog progressDialog;
-    private VolleyConnections volleyConnections;
-
+    private VolleyComments volleyComments;
+    Util util = Util.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         swipeLayout = (SwipeLayout) findViewById(R.id.swipe);
         tvGraph = (TextView) findViewById(R.id.tvGraph);
         tvManagePost = (TextView) findViewById(R.id.tvManagePost);
@@ -85,16 +97,17 @@ public class CommentActivity extends Activity implements SwipeRefreshLayout.OnRe
         etComment = (EditText) findViewById(R.id.etComment);
         bComment = (Button) findViewById(R.id.bComment);
         commentRecyclerView = (RecyclerView) findViewById(R.id.commentRecyclerView);
+        refreshLayoutComment = (SwipeRefreshLayout) findViewById(R.id.refreshLayoutComment);
 
+
+        refreshLayoutComment.setOnRefreshListener(this);
         bComment.setOnClickListener(this);
         userLocalStore = new UserLocalStore(this);
-        commentServerRequests = new CommentServerRequests(this);
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
-        volleyConnections = new VolleyConnections(this);
+        volleyComments = new VolleyComments(this);
 
         setUpPostToComment();
-
 
         //refreshLayoutComment = (SwipeRefreshLayout) findViewById(R.id.refreshLayoutComment);
         //spinner = (ProgressBar) findViewById(R.id.progress_barComment);
@@ -107,7 +120,7 @@ public class CommentActivity extends Activity implements SwipeRefreshLayout.OnRe
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         //refreshLayoutComment.setOnRefreshListener(this);
 
-        volleyConnections.fetchCommentVolley(commentListAdapter, commentItems, postID);
+        volleyComments.fetchCommentVolley(commentListAdapter, commentItems, postID, userLocalStore.getLoggedInUser().getUserID());
 
         // We first check for cached request
         Cache cache = AppController.getInstance().getRequestQueue().getCache();
@@ -133,6 +146,17 @@ public class CommentActivity extends Activity implements SwipeRefreshLayout.OnRe
             receivedNumKill = postInfo.getInt("numKill");
             receivedProfilePic = postInfo.getString("profilePic");
             postID = postInfo.getInt("postID");
+
+
+            Bundle outState = new Bundle();
+            outState.putString("name", receivedName);
+            outState.putString("time", receivedTime);
+            outState.putInt("numKill", receivedNumKill);
+            outState.putInt("numFill", receivedNumKill);
+            outState.putString("post", receivedPost);
+            outState.putString("profilePic", receivedProfilePic);
+            outState.putInt("postID", postID);
+            savedIntent = outState;
         } else {
             savedIntent = getIntent().getExtras();
             receivedName = savedIntent.getString("name");
@@ -167,19 +191,24 @@ public class CommentActivity extends Activity implements SwipeRefreshLayout.OnRe
                 int userID = userLocalStore.getLoggedInUser().getUserID();
                 String comment = etComment.getText().toString();
 
-                commentServerRequests.storeACommentInBackground(postID, userID, comment, unixTime);
+                volleyComments.storeAComment(postID, userID, comment, unixTime, new PostExecutionCallBack() {
+                    @Override
+                    public void postExecution() {
+                        Intent newIntent = new Intent(CommentActivity.this, CommentActivity.class);
+                        newIntent.putExtra("name", receivedName);
+                        newIntent.putExtra("time", receivedTime);
+                        newIntent.putExtra("numKill", receivedNumKill);
+                        newIntent.putExtra("numFill", receivedNumKill);
+                        newIntent.putExtra("post", receivedPost);
+                        newIntent.putExtra("profilePic", receivedProfilePic);
+                        newIntent.putExtra("postID", postID);
 
-                Intent newIntent = new Intent(this, CommentActivity.class);
-                newIntent.putExtra("name", receivedName);
-                newIntent.putExtra("time", receivedTime);
-                newIntent.putExtra("numKill", receivedNumKill);
-                newIntent.putExtra("numFill", receivedNumKill);
-                newIntent.putExtra("post", receivedPost);
-                newIntent.putExtra("profilePic", receivedProfilePic);
-                newIntent.putExtra("postID", postID);
+                        startActivity(newIntent);
+                        finish();
+                    }
+                });
 
-                startActivity(newIntent);
-                finish();
+
                 break;
         }
     }
@@ -216,24 +245,19 @@ public class CommentActivity extends Activity implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onRefresh() {
-        new Handler().postDelayed(new Runnable() {
+
+        util.getInternetStatus(CommentActivity.this, new NetworkConnectionCallBack() {
             @Override
-            public void run() {
-                refreshLayoutComment.setRefreshing(false);
-                new PostListFragment.InternetAccess(CommentActivity.this, new NetworkConnectionCallBack() {
-                    @Override
-                    public void networkConnection(boolean isConnected) {
-                        if (isConnected) {
-                            UserLocalStore.allowRefresh = true;
-                            startActivity(new Intent(CommentActivity.this, CommentActivity.class));
-                            commentItems.clear();
-                        } else {
-                            displayNoInternet(CommentActivity.this);
-                        }
-                    }
-                }).execute();
+            public void networkConnection(boolean isConnected) {
+                if (isConnected) {
+                    UserLocalStore.allowRefresh = true;
+                    startActivity(new Intent(CommentActivity.this, CommentActivity.class));
+                    commentItems.clear();
+                } else {
+                    displayNoInternet(CommentActivity.this);
+                }
             }
-        }, 200);
+        });
     }
 
     public  static void displayNoInternet(Context context) {
@@ -248,6 +272,7 @@ public class CommentActivity extends Activity implements SwipeRefreshLayout.OnRe
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        System.out.println("SAVED STATE REACHED");
         if(outState != null) {
             outState.putString("name", receivedName);
             outState.putString("time", receivedTime);
@@ -259,4 +284,5 @@ public class CommentActivity extends Activity implements SwipeRefreshLayout.OnRe
             savedIntent = outState;
         }
     }
+
 }
