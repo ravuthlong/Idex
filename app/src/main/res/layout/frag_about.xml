@@ -29,4 +29,20 @@
         android:singleLine="false"
         android:textAlignment="gravity" />
 
+    <LinearLayout
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="false"
+        android:gravity="bottom">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:id="@+id/bottomBanner"
+            android:background="@drawable/bottom_banner" />
+
+    </LinearLayout>
 </LinearLayout>

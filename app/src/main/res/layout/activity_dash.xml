@@ -12,7 +12,7 @@
 <ScrollView
     ndroid:fitsSystemWindows="true"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:fillViewport="true"
     android:layout_marginTop="50dp">
 
@@ -35,8 +35,17 @@
                     android:maxLength="141"
 
                     android:layout_width="fill_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="210dp"
                     android:hint="Post your idea..." />
+
+                <ImageButton
+                    android:layout_width="130dp"
+                    android:layout_height="60dp"
+                    android:id="@+id/imgbPostIdea"
+                    android:background="@drawable/post"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="center_horizontal" />
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
@@ -60,40 +69,69 @@
 
                 </LinearLayout>
 
-                <ImageButton
-                    android:layout_width="130dp"
-                    android:layout_height="60dp"
-                    android:id="@+id/imgbPostIdea"
-                    android:background="@drawable/post"
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
                     android:layout_marginTop="20dp"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="bottom">
+
+                    <RelativeLayout
+                        android:layout_marginBottom="67dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom">
+
+                        <Button
+                            android:layout_width="100dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="bottom|left"
+                            android:id="@+id/bDashRoll"
+                            android:background="@drawable/roll" />
+
+                        <Button
+                            android:layout_width="100dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="bottom|center"
+                            android:id="@+id/bDashLog"
+                            android:background="@drawable/log"
+                            android:layout_alignParentTop="true"
+                            android:layout_centerHorizontal="true" />
+
+                        <Button
+
+                            android:layout_width="100dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="bottom|right"
+                            android:id="@+id/bDashInfo"
+                            android:background="@drawable/info"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true" />
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_gravity="bottom"
+                        android:layout_alignParentBottom="false"
+                        android:gravity="bottom">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="80dp"
+                            android:id="@+id/bottomBanner"
+                            android:background="@drawable/bottom_banner" />
+
+                    </LinearLayout>
+                </RelativeLayout>
 
             </LinearLayout>
+
+
 
 </ScrollView>
 
 
 
-        <Button
-
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:layout_gravity="bottom|left"
-            android:id="@+id/bDashRoll"
-            android:background="@drawable/roll" />
-
-        <Button
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:layout_gravity="bottom|center"
-            android:id="@+id/bDashLog"
-            android:background="@drawable/log" />
-
-        <Button
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:layout_gravity="bottom|right"
-            android:id="@+id/bDashInfo"
-            android:background="@drawable/info" />
 
 </android.support.design.widget.CoordinatorLayout>

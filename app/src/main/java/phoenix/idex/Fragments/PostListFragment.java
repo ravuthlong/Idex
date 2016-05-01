@@ -57,6 +57,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     Util util = Util.getInstance();
     ButtonClickedSingleton  buttonMonitor = ButtonClickedSingleton.getInstance();
     private Toolbar toolbar;
+    //private ImageView bottomBanner;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -76,6 +77,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         bMainRoll = (Button) v.findViewById(R.id.bMainRoll);
         bMainLog = (Button) v.findViewById(R.id.bMainLog);
         bMainInfo = (Button) v.findViewById(R.id.bMainInfo);
+       // bottomBanner = (ImageView) v.findViewById(R.id.bottomBanner);
 
         bMainRoll.setOnClickListener(this);
         bMainLog.setOnClickListener(this);
@@ -99,6 +101,8 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
 
+
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -106,14 +110,16 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
 
                 // Scroll down
                 if (dy > 0) {
-                    bMainLog.setVisibility(View.GONE);
-                    bMainRoll.setVisibility(View.GONE);
-                    bMainInfo.setVisibility(View.GONE);
+                   // bottomBanner.setVisibility(View.GONE);
+                    //bMainLog.setVisibility(View.GONE);
+                    //bMainRoll.setVisibility(View.GONE);
+                    //bMainInfo.setVisibility(View.GONE);
                 } else {
+                   // bottomBanner.setVisibility(View.VISIBLE);
                     // Scroll up
-                    bMainRoll.setVisibility(View.VISIBLE);
-                    bMainLog.setVisibility(View.VISIBLE);
-                    bMainInfo.setVisibility(View.VISIBLE);
+                    //bMainRoll.setVisibility(View.VISIBLE);
+                    //bMainLog.setVisibility(View.VISIBLE);
+                    //bMainInfo.setVisibility(View.VISIBLE);
                 }
             }
         });

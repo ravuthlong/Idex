@@ -3,7 +3,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     xmlns:local="http://schemas.android.com/tools"
-    android:fitsSystemWindows="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/corLayout">
 
@@ -11,7 +10,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         tools:context="com.example.swiperefreshlayouttest.MainActivity"
         tools:ignore="MergeRootFrame">
 
@@ -22,7 +21,7 @@
         android:choiceMode="singleChoice"
         android:id="@+id/postRecyclerView1"
         android:layout_gravity='start'
-        />
+        android:paddingBottom="75dp" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -35,25 +34,58 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <RelativeLayout
+        android:layout_marginBottom="67dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <Button
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|left"
+            android:id="@+id/bMainRoll"
+            android:background="@drawable/roll"
+            android:layout_alignParentTop="true" />
 
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_gravity="bottom|left"
-        android:id="@+id/bMainRoll"
-        android:background="@drawable/roll" />
-    <Button
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_gravity="bottom|center"
-        android:id="@+id/bMainLog"
-        android:background="@drawable/log" />
-    <Button
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_gravity="bottom|right"
-        android:id="@+id/bMainInfo"
-        android:background="@drawable/info" />
 
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|center"
+            android:id="@+id/bMainLog"
+            android:background="@drawable/log"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|right"
+            android:id="@+id/bMainInfo"
+            android:background="@drawable/info"
+            android:layout_centerHorizontal="true"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_alignParentRight="true" />
+
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:id="@+id/bottomBanner"
+            android:background="@drawable/bottom_banner" />
+
+    </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
