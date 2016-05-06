@@ -6,7 +6,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +30,6 @@ import phoenix.idex.R;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.data.FeedItem;
 import phoenix.idex.ServerConnections.ServerRequests;
-import phoenix.idex.ServerRequestCallBacks.FetchColumnAndValueCallBack;
-import phoenix.idex.ServerRequestCallBacks.PostExecutionCallBack;
 import phoenix.idex.SoundPlayer;
 import phoenix.idex.UserLocalStore;
 import phoenix.idex.VolleyServerConnections.VolleyMainPosts;
@@ -155,33 +152,13 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
                 fillSound.playSound();
 
-
                 if (userLocalStore.getLoggedInUser().getUsername().equals("dge93") ||
-                        userLocalStore.getLoggedInUser().getUsername().equals("a") ||
+                        userLocalStore.getLoggedInUser().getUsername().equals("aa") ||
                         userLocalStore.getLoggedInUser().getUsername().equals("")) {
 
                     // There's no fill so do normal operations
-                    serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
-                        @Override
-                        public void columnAndValueCallBack(Pair values) {
-                            int currentColumn = (int) values.first;
-                            int currentValue = (int) values.second;
+                    serverRequests.updateFillAndFillColumnInBackground(currentPos.getId());
 
-                            if (currentColumn >= 100) {
-                                serverRequests.updateFillAndResetColumnInBackground(currentPos.getId(), currentColumn);
-                            } else {
-                                //update fill only. change name
-                                serverRequests.updateFillAndFillColumnInBackground(currentPos.getId(), currentColumn);
-                            }
-                            serverRequests.updateValueInBackground(currentPos.getId(), 2);
-
-                        }
-                    });
-                    serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
-                        @Override
-                        public void postExecution() {
-                        }
-                    });
                     currentPos.hitFill();
                     holder.numFill.setText("" + (currentPos.getTotalFill()));
 
@@ -200,28 +177,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         if (currentPos.getFillOrKill() == 0) {
 
                             System.out.println("CLICK FILL. ALREADY HAS KILL");
-
-                            serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
-                                @Override
-                                public void columnAndValueCallBack(Pair values) {
-                                    int currentColumn = (int) values.first;
-                                    int currentValue = (int) values.second;
-
-                                    if (currentColumn >= 100) {
-                                        serverRequests.updateFillAndResetColumnInBackground(currentPos.getId(), currentColumn);
-                                    } else {
-                                        //update fill only. change name
-                                        serverRequests.updateFillAndFillColumnInBackground(currentPos.getId(), currentColumn);
-                                    }
-                                    serverRequests.updateValueInBackground(currentPos.getId(), 2);
-
-                                }
-                            });
-                            serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
-                                @Override
-                                public void postExecution() {
-                                }
-                            });
+                            serverRequests.updateFillAndFillColumnInBackground(currentPos.getId());
                             serverRequests.minusKillInBackground(currentPos.getId());
 
                             // Case the post already has a Kill. Replace the kill with fill. Switching option.
@@ -235,27 +191,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                             System.out.println("FILL NORMAL");
 
                             // There's no fill so do normal operations
-                            serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
-                                @Override
-                                public void columnAndValueCallBack(Pair values) {
-                                    int currentColumn = (int) values.first;
-                                    int currentValue = (int) values.second;
-
-                                    if (currentColumn >= 100) {
-                                        serverRequests.updateFillAndResetColumnInBackground(currentPos.getId(), currentColumn);
-                                    } else {
-                                        //update fill only. change name
-                                        serverRequests.updateFillAndFillColumnInBackground(currentPos.getId(), currentColumn);
-                                    }
-                                    serverRequests.updateValueInBackground(currentPos.getId(), 2);
-
-                                }
-                            });
-                            serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
-                                @Override
-                                public void postExecution() {
-                                }
-                            });
+                            serverRequests.updateFillAndFillColumnInBackground(currentPos.getId());
                         }
 
                         // Add to user list of Fill clicks database table
@@ -278,38 +214,11 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                 killSound.playSound();
 
                 if (userLocalStore.getLoggedInUser().getUsername().equals("dge93") ||
-                        userLocalStore.getLoggedInUser().getUsername().equals("a") ||
+                        userLocalStore.getLoggedInUser().getUsername().equals("aa") ||
                          userLocalStore.getLoggedInUser().getUsername().equals("")) {
-                    // There's no kill yet. Perform normal operations.
-                    serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
-                        @Override
-                        public void columnAndValueCallBack(Pair values) {
-                            int currentColumn = (int) values.first;
-                            int currentValue = (int) values.second;
 
-                            if (currentValue <= 0) {
-                                // Increase kill but set the column as -1, meaning floored with 0
-                                System.out.println("CURRENT VALUE: " + currentValue);
-
-                                serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
-                            } else {
-                                if (currentColumn >= 100) {
-                                    serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
-                                } else {
-                                    //update fill only. change name
-                                    serverRequests.updateKillAndKillColumnInBackground(currentPos.getId(), currentColumn);
-                                }
-                                serverRequests.updateValueInBackground(currentPos.getId(), -1);
-                            }
-                        }
-                    });
-
-
-                    serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
-                        @Override
-                        public void postExecution() {
-                        }
-                    });
+                    //update fill only. change name
+                    serverRequests.updateKillAndKillColumnInBackground(currentPos.getId());
                     currentPos.hitKill();
                     holder.numKill.setText("-" + currentPos.getTotalKill());
 
@@ -328,42 +237,13 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         if (currentPos.getFillOrKill() == 1) {
                             System.out.println("CLICK KILL. ALREADY HAS FILL");
 
-                            serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
-                                @Override
-                                public void columnAndValueCallBack(Pair values) {
-                                    int currentColumn = (int) values.first;
-                                    int currentValue = (int) values.second;
-
-                                    System.out.println("CURRENT VALUE: " + currentValue);
-
-                                    if (currentValue <= 0) {
-                                        System.out.println("VALUE WATCH");
-                                        // Increase kill but set the column as -1, meaning floored with 0
-                                        serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
-                                    } else {
-                                        if (currentColumn >= 100) {
-                                            serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
-                                        } else {
-                                            //update fill only. change name
-                                            serverRequests.updateKillAndKillColumnInBackground(currentPos.getId(), currentColumn);
-                                        }
-                                        serverRequests.updateValueInBackground(currentPos.getId(), -1);
-                                    }
-                                }
-                            });
-
-                            serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
-                                @Override
-                                public void postExecution() {
-                                }
-                            });
+                            serverRequests.updateKillAndKillColumnInBackground(currentPos.getId());
                             serverRequests.minusFillInBackground(currentPos.getId());
 
                             // Case the post already has a Kill. Replace the kill with fill. Switching option.
                             currentPos.hitFillSecondTime();
                             holder.numFill.setText("" + currentPos.getTotalFill());
 
-                            System.out.println("TOTAL FILL CAHNGED TO: " + currentPos.getTotalFill());
                             serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
                             //serverRequests.updateKillAndCancelFillInBackground(currentPos.getId(), currentPos.getCurrentColumn());
                             holder.imgbFill.setBackgroundResource(R.drawable.fill);
@@ -372,32 +252,8 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                             System.out.println("KILL NORMAL");
 
                             // There's no fill so do normal operations
-                            serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
-                                @Override
-                                public void columnAndValueCallBack(Pair values) {
-                                    int currentColumn = (int) values.first;
-                                    int currentValue = (int) values.second;
-
-                                    if (currentValue <= 0) {
-                                        // Increase kill but set the column as -1, meaning floored with 0
-                                        serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
-                                    } else {
-                                        if (currentColumn >= 100) {
-                                            serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
-                                        } else {
-                                            //update fill only. change name
-                                            serverRequests.updateKillAndKillColumnInBackground(currentPos.getId(), currentColumn);
-                                        }
-                                        serverRequests.updateValueInBackground(currentPos.getId(), -1);
-                                    }
-                                }
-                            });
-
-                            serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
-                                @Override
-                                public void postExecution() {
-                                }
-                            });
+                            //update fill only. change name
+                            serverRequests.updateKillAndKillColumnInBackground(currentPos.getId());
                         }
 
                         // Add to user list of Fill clicks database table
@@ -407,57 +263,6 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         currentPos.setFillOrKill(0);
                     }
                 }
-
-
-                /*else {
-
-                    if (currentPos.getFillOrKill() == 0) {
-                        // There's already a kill. cancel kill.
-
-                        serverRequests.updateValueInBackground(currentPos.getId(), +1);
-                        serverRequests.minusKillInBackground(currentPos.getId());
-                        serverRequests.cancelClickInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
-                        currentPos.hitKillSecondTime();
-                        currentPos.setFillOrKill(-1);
-                        holder.imgbKill.setBackgroundResource(R.drawable.kill);
-
-                    } else {
-                        // There's no kill yet. Perform normal operations.
-                        serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
-                            @Override
-                            public void columnAndValueCallBack(Pair values) {
-                                int currentColumn = (int) values.first;
-                                int currentValue = (int) values.second;
-
-                                if (currentValue <= 0) {
-                                    // Increase kill but set the column as -1, meaning floored with 0
-                                    serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
-                                } else {
-                                    if (currentColumn >= 20) {
-                                        serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
-                                    } else {
-                                        //update fill only. change name
-                                        serverRequests.updateKillAndKillColumnInBackground(currentPos.getId(), currentColumn);
-                                    }
-                                    serverRequests.updateValueInBackground(currentPos.getId(), -1);
-                                }
-                            }
-                        });
-
-                        serverRequests.updateCurrentColumnInBackground(currentPos.getId(), new PostExecutionCallBack() {
-                            @Override
-                            public void postExecution() {
-                            }
-                        });
-
-                        // Add to user list of Fill clicks database table
-                        serverRequests.addToKillListInBackground(userLocalStore.getLoggedInUser().getUserID(), currentPos.getId());
-                        holder.imgbKill.setBackgroundResource(R.drawable.killed);
-                        currentPos.hitKill();
-                        currentPos.setFillOrKill(0);
-                    }
-                }*/
-
                 holder.numKill.setText("-" + currentPos.getTotalKill());
                 holder.swipeLayout.close();
             }

@@ -83,7 +83,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
         etChangeEmail.setText(userLocalStore.getLoggedInUser().getEmail());
 
         // Get current Profile Pic
-        new DownloadImage(userLocalStore.getLoggedInUser().getUsername()).execute();
+        new DownloadImage(userLocalStore.getLoggedInUser().getUserID()).execute();
 
         userLocalStore = new UserLocalStore(this);
         progressDialog = new ProgressDialog(this);
@@ -102,7 +102,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
             Uri selectedImage = data.getData();
             ivProfilePic.setImageURI(selectedImage);
             // Update the new photo in the database
-            new UploadImage(((BitmapDrawable) ivProfilePic.getDrawable()).getBitmap(), userLocalStore.getLoggedInUser().getUsername()).execute();
+            new UploadImage(((BitmapDrawable) ivProfilePic.getDrawable()).getBitmap(), userLocalStore.getLoggedInUser().getUserID()).execute();
         }
     }
 
@@ -150,13 +150,13 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
 
     // Download Profile_Pic
     private class DownloadImage extends AsyncTask<Void, Void, Bitmap>{
-        String name;
-        public DownloadImage(String name){
-            this.name = name;
+        int userID;
+        public DownloadImage(int userID){
+            this.userID = userID;
         }
         @Override
         protected Bitmap doInBackground(Void... params) {
-            String url = SERVER_ADDRESS + "profile_pic/" + name + ".JPG";
+            String url = SERVER_ADDRESS + "profile_pic/" + userID + ".JPG";
 
             try{
                 URLConnection connection = new URL(url).openConnection();
@@ -184,17 +184,17 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private void UploadImageInBackground(Bitmap image, String name) {
-        new UploadImage(image, name).execute();
+    private void UploadImageInBackground(Bitmap image, int userID) {
+        new UploadImage(image, userID).execute();
     }
 
     // Upload new Profile Pic to Server
     private class UploadImage extends AsyncTask<Void,Void, Void> {
         Bitmap image;
-        String name;
-        public UploadImage(Bitmap image, String name){
+        int userID;
+        public UploadImage(Bitmap image, int userID){
             this.image = image;
-            this.name = name;
+            this.userID = userID;
         }
 
         @Override
@@ -211,7 +211,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
 
             ArrayList<NameValuePair> dataToSend = new ArrayList<>();
             dataToSend.add(new BasicNameValuePair("image", encodedImage));
-            dataToSend.add(new BasicNameValuePair("name", name));
+            dataToSend.add(new BasicNameValuePair("userID", Integer.toString(userID)));
 
             cz.msebera.android.httpclient.params.HttpParams httpRequestParams = getHttpRequestParams();
 

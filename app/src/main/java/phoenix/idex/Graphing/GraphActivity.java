@@ -98,13 +98,14 @@ public class GraphActivity extends AppCompatActivity {
 
                 if (e.getXIndex() == 0) {
                     tvPressedPercent.setText("0.00%");
-                } else if ((Math.round(yVals1.get(e.getXIndex()).getHigh()) == 0)) {
+                } else if (((Math.round(yVals1.get(e.getXIndex()).getHigh()) == 0) &&
+                        (Math.round(yVals1.get(e.getXIndex()).getOpen()) == 0)) || (Math.round(yVals1.get(e.getXIndex() - 1).getClose()) == 0)) {
                     linearGraph4.setVisibility(View.GONE);
                 } else {
-                    double avg = (Math.round(yVals1.get(e.getXIndex() - 1).getHigh()) + Math.round(yVals1.get(e.getXIndex()).getHigh())) / 2.0;
-                    double percent = ((Math.round(yVals1.get(e.getXIndex()).getHigh()) -
-                            Math.round(yVals1.get(e.getXIndex() - 1).getHigh())) / avg) * 100.0;
-
+                    //double avg = (Math.round(yVals1.get(e.getXIndex() - 1).getHigh()) + Math.round(yVals1.get(e.getXIndex()).getHigh())) / 2.0;
+                    double percent = ((yVals1.get(e.getXIndex()).getHigh() -
+                           yVals1.get(e.getXIndex() - 1).getHigh()) / yVals1.get(e.getXIndex() - 1).getHigh()) * 100.0;
+                    float f = (Math.round(yVals1.get(e.getXIndex() - 1).getHigh()));
                     linearGraph4.setVisibility(View.VISIBLE);
 
                     NumberFormat formatter = new DecimalFormat("#0.00");

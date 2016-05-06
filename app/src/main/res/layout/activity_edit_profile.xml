@@ -7,7 +7,7 @@
     xmlns:local="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scrollView1"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#110202">
+    android:background="#000000">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbarEditProfile"
@@ -66,7 +66,6 @@
             android:layout_height="wrap_content"
             float:fletPadding="10dp">
             <EditText
-                android:editable="false"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
@@ -81,7 +80,6 @@
             android:layout_height="wrap_content"
             float:fletPadding="10dp">
             <EditText
-                android:editable="false"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:ems="10"

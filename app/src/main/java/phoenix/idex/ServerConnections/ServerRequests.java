@@ -53,8 +53,8 @@ public class ServerRequests {
     public void updateFillAndCancelKillInBackground(int postID, int currentColumn) {
         new UpdateFillAndCancelKill(postID, currentColumn).execute();
     }
-    public void updateFillAndFillColumnInBackground(int postID, int columnToUpdate) {
-        new UpdateFillAndCurrentColumn(postID, columnToUpdate).execute();
+    public void updateFillAndFillColumnInBackground(int postID) {
+        new UpdateFillAndCurrentColumn(postID).execute();
     }
 
     public void updateFillAndResetColumnInBackground(int postID, int currentColumn) {
@@ -66,8 +66,8 @@ public class ServerRequests {
     public void updateKillAndCancelFillInBackground(int postID, int currentColumn) {
         new UpdateKillAndCancelFill(postID, currentColumn).execute();
     }
-    public void updateKillAndKillColumnInBackground(int postID, int currentColumn) {
-        new UpdateKillAndCurrentColumn(postID, currentColumn).execute();
+    public void updateKillAndKillColumnInBackground(int postID) {
+        new UpdateKillAndCurrentColumn(postID).execute();
     }
     public void updateKillAndFloorColumnInBackground(int postID, int columnToUpdate) {
         new UpdateKillAndFloorColumn(postID, columnToUpdate).execute();
@@ -414,11 +414,9 @@ public class ServerRequests {
     public class UpdateKillAndCurrentColumn extends AsyncTask<Void, Void, Void> {
 
         private int postID;
-        private int currentColumn;
 
-        public UpdateKillAndCurrentColumn(int postID, int currentColumn) {
+        public UpdateKillAndCurrentColumn(int postID) {
             this.postID = postID;
-            this.currentColumn = currentColumn;
         }
 
         @Override
@@ -426,7 +424,6 @@ public class ServerRequests {
 
             HashMap<String, Object> userPost = new HashMap<>();
             userPost.put("postID", postID);
-            userPost.put("currentColumn", currentColumn);
 
             try {
                 HttpRequest req = new HttpRequest("http://idex.site88.net/updateKillAndKillColumn.php");
@@ -595,11 +592,9 @@ public class ServerRequests {
     public class UpdateFillAndCurrentColumn extends AsyncTask<Void, Void, Void> {
 
         private int postID;
-        private int currentColumn;
 
-        public UpdateFillAndCurrentColumn(int postID, int currentColumn) {
+        public UpdateFillAndCurrentColumn(int postID) {
             this.postID = postID;
-            this.currentColumn = currentColumn;
         }
 
         @Override
@@ -607,7 +602,6 @@ public class ServerRequests {
 
             HashMap<String, Object> userPost = new HashMap<>();
             userPost.put("postID", postID);
-            userPost.put("currentColumn", currentColumn);
 
             try {
                 HttpRequest req = new HttpRequest("http://idex.site88.net/updateFillAndFillColumn.php");
