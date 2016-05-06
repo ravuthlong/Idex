@@ -2,6 +2,7 @@ package phoenix.idex.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import phoenix.idex.Activities.EditProfileActivity;
+import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.ButtonClickedSingleton;
 import phoenix.idex.R;
 import phoenix.idex.TabAdapter.ViewPagerAdapter;
@@ -36,6 +38,28 @@ public class TabFragment extends Fragment implements ViewPager.OnPageChangeListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.activity_tabs, container, false);
+
+        int screenSize = getResources().getConfiguration().screenLayout &
+                Configuration.SCREENLAYOUT_SIZE_MASK;
+
+        switch (screenSize) {
+            case Configuration.SCREENLAYOUT_SIZE_SMALL:
+                System.out.println("SMALL SCREEN");
+                break;
+            case Configuration.SCREENLAYOUT_SIZE_NORMAL:
+                System.out.println("NORMAL SCREEN");
+                MainActivity.rLayoutMain.setPadding(0, 320, 0, 0);
+
+                break;
+            case Configuration.SCREENLAYOUT_SIZE_LARGE:
+                System.out.println("LARGE SCREEN");
+                break;
+            case Configuration.SCREENLAYOUT_SIZE_XLARGE:
+                System.out.println("X-LARGE SCREEN");
+                break;
+            default:
+                break;
+        }
 
         setHasOptionsMenu(true);
         initTabHost();

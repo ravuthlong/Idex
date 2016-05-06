@@ -101,6 +101,8 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
         if(requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null){
             Uri selectedImage = data.getData();
             ivProfilePic.setImageURI(selectedImage);
+            // Update the new photo in the database
+            new UploadImage(((BitmapDrawable) ivProfilePic.getDrawable()).getBitmap(), userLocalStore.getLoggedInUser().getUsername()).execute();
         }
     }
 
@@ -113,12 +115,19 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMAGE);
                 break;
             case R.id.bEditProfile:
-                isNewPhotoUploaded = true;
-                Bitmap image = ((BitmapDrawable) ivProfilePic.getDrawable()).getBitmap();
-                new UploadImage(image, userLocalStore.getLoggedInUser().getUsername()).execute();
+                //isNewPhotoUploaded = true;
+                //Bitmap image = ((BitmapDrawable) ivProfilePic.getDrawable()).getBitmap();
+                //new UploadImage(image, userLocalStore.getLoggedInUser().getUsername()).execute();
+
+                // Update user photo in the database
                 User editUser = new User(userLocalStore.getLoggedInUser().getUserID(), etChangeFirstName.getText().toString(), etChangeLastName.getText().toString(),
                         etChangeEmail.getText().toString(), etChangeUsername.getText().toString());
                 volleyUserInfo.updateUserInfo(editUser);
+
+                // Update the shared-preference (local storage of current active user)
+                //userLocalStore.clearUserData();
+                userLocalStore.storeUserData(new User(userLocalStore.getLoggedInUser().getUserID(), etChangeFirstName.getText().toString(), etChangeLastName.getText().toString(),
+                        etChangeEmail.getText().toString(), etChangeUsername.getText().toString()));
                 UserLocalStore.allowRefresh = true;
 
         }
@@ -224,7 +233,6 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
             super.onPostExecute(aVoid);
             progressDialog.dismiss();
             isNewPhotoUploaded = true;
-            startActivity(new Intent(EditProfileActivity.this, MainActivity.class));
         }
     }
     @Override

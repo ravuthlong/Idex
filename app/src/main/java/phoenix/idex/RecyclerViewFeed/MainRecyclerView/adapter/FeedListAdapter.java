@@ -138,6 +138,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         }
         imageLoader = AppController.getInstance().getImageLoader();
 
+
         // user profile pic
         if (!currentPos.getProfilePic().equals("")) {
             holder.profilePic.setImageUrl(currentPos.getProfilePic(), imageLoader);
@@ -156,7 +157,8 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
 
                 if (userLocalStore.getLoggedInUser().getUsername().equals("dge93") ||
-                        userLocalStore.getLoggedInUser().getUsername().equals("a")) {
+                        userLocalStore.getLoggedInUser().getUsername().equals("a") ||
+                        userLocalStore.getLoggedInUser().getUsername().equals("")) {
 
                     // There's no fill so do normal operations
                     serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
@@ -165,7 +167,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                             int currentColumn = (int) values.first;
                             int currentValue = (int) values.second;
 
-                            if (currentColumn >= 1000) {
+                            if (currentColumn >= 100) {
                                 serverRequests.updateFillAndResetColumnInBackground(currentPos.getId(), currentColumn);
                             } else {
                                 //update fill only. change name
@@ -205,7 +207,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                                     int currentColumn = (int) values.first;
                                     int currentValue = (int) values.second;
 
-                                    if (currentColumn >= 20) {
+                                    if (currentColumn >= 100) {
                                         serverRequests.updateFillAndResetColumnInBackground(currentPos.getId(), currentColumn);
                                     } else {
                                         //update fill only. change name
@@ -239,7 +241,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                                     int currentColumn = (int) values.first;
                                     int currentValue = (int) values.second;
 
-                                    if (currentColumn >= 20) {
+                                    if (currentColumn >= 100) {
                                         serverRequests.updateFillAndResetColumnInBackground(currentPos.getId(), currentColumn);
                                     } else {
                                         //update fill only. change name
@@ -276,7 +278,8 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                 killSound.playSound();
 
                 if (userLocalStore.getLoggedInUser().getUsername().equals("dge93") ||
-                        userLocalStore.getLoggedInUser().getUsername().equals("a")) {
+                        userLocalStore.getLoggedInUser().getUsername().equals("a") ||
+                         userLocalStore.getLoggedInUser().getUsername().equals("")) {
                     // There's no kill yet. Perform normal operations.
                     serverRequests.fetchCurrentColumnInBackground(currentPos.getId(), new FetchColumnAndValueCallBack() {
                         @Override
@@ -286,6 +289,8 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
                             if (currentValue <= 0) {
                                 // Increase kill but set the column as -1, meaning floored with 0
+                                System.out.println("CURRENT VALUE: " + currentValue);
+
                                 serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
                             } else {
                                 if (currentColumn >= 100) {
@@ -329,7 +334,10 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                                     int currentColumn = (int) values.first;
                                     int currentValue = (int) values.second;
 
+                                    System.out.println("CURRENT VALUE: " + currentValue);
+
                                     if (currentValue <= 0) {
+                                        System.out.println("VALUE WATCH");
                                         // Increase kill but set the column as -1, meaning floored with 0
                                         serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
                                     } else {
@@ -374,7 +382,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                                         // Increase kill but set the column as -1, meaning floored with 0
                                         serverRequests.updateKillAndFloorColumnInBackground(currentPos.getId(), currentColumn);
                                     } else {
-                                        if (currentColumn >= 20) {
+                                        if (currentColumn >= 100) {
                                             serverRequests.updateKillAndResetColumnInBackground(currentPos.getId(), currentColumn);
                                         } else {
                                             //update fill only. change name

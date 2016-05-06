@@ -25,6 +25,7 @@
                 android:layout_width="match_parent"
                 android:id="@+id/dashLayout">
                 <EditText
+                    android:inputType="textCapSentences"
                     android:focusable="true"
                     android:padding="15dp"
                     android:id="@+id/editTextDash"

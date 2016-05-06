@@ -6,7 +6,7 @@
     <solid android:color="#000000" >
     </solid>
 
-    <!-- view border color and width -->
+    <!-- view userstat_border color and width -->
     <stroke
         android:width="@dimen/feed_item_border_width"
         android:color="@color/feed_item_border" >

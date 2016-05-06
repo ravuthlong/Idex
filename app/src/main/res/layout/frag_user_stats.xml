@@ -17,7 +17,7 @@
         android:layout_marginLeft="25dp"
         android:layout_marginRight="25dp"
 
-        android:background="@drawable/border"
+        android:background="@drawable/userstat_border"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
@@ -18,8 +21,13 @@ import com.github.mikephil.charting.components.YAxis.AxisDependency;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import phoenix.idex.R;
@@ -33,6 +41,10 @@ public class GraphActivity extends AppCompatActivity {
     private CandleStickChart mChart;
     private VolleyMainPosts volleyMainPosts;
     private ProgressDialog progressDialog;
+    private TextView tvCurrentValue, tvValueTxt, tvPressedValue, tvPressedPercent;
+    private LinearLayout linearGraph3, linearGraph4;
+
+    ArrayList<CandleEntry> yVals1 = new ArrayList<>();
 
     class FillKillObject {
         private int fill;
@@ -59,6 +71,13 @@ public class GraphActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_graph);
 
+        tvCurrentValue = (TextView) findViewById(R.id.tvCurrentValue);
+        tvValueTxt = (TextView) findViewById(R.id.tvValueTxt);
+        tvPressedValue = (TextView) findViewById(R.id.tvPressedValue);
+        linearGraph3 = (LinearLayout) findViewById(R.id.linearGraph3);
+        linearGraph4 = (LinearLayout) findViewById(R.id.linearGraph4);
+        tvPressedPercent = (TextView) findViewById(R.id.tvPercent);
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         progressDialog.setMessage("Loading...");
@@ -69,6 +88,37 @@ public class GraphActivity extends AppCompatActivity {
         mChart.setNoDataText("");
         mChart.setDescription("Past Clicks");
         mChart.setMaxVisibleValueCount(60); // max 60 entries
+
+        mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+                linearGraph3.setVisibility(View.VISIBLE);
+                tvPressedValue.setText(Float.toString(Math.round(yVals1.get(e.getXIndex()).getHigh())));
+
+
+                if (e.getXIndex() == 0) {
+                    tvPressedPercent.setText("0.00%");
+                } else if ((Math.round(yVals1.get(e.getXIndex()).getHigh()) == 0)) {
+                    linearGraph4.setVisibility(View.GONE);
+                } else {
+                    double avg = (Math.round(yVals1.get(e.getXIndex() - 1).getHigh()) + Math.round(yVals1.get(e.getXIndex()).getHigh())) / 2.0;
+                    double percent = ((Math.round(yVals1.get(e.getXIndex()).getHigh()) -
+                            Math.round(yVals1.get(e.getXIndex() - 1).getHigh())) / avg) * 100.0;
+
+                    linearGraph4.setVisibility(View.VISIBLE);
+
+                    NumberFormat formatter = new DecimalFormat("#0.00");
+
+                    tvPressedPercent.setText(formatter.format(percent) + "%");
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
 
         // scaling can now only be done on x- and y-axis separately
         mChart.setPinchZoom(false);
@@ -98,6 +148,8 @@ public class GraphActivity extends AppCompatActivity {
             @Override
             public void getGraphInfo(Graph graph) {
                 setGraph(graph);
+                tvValueTxt.setVisibility(View.VISIBLE);
+                tvCurrentValue.setText(Integer.toString(graph.getValue()));
             }
         });
 
@@ -203,7 +255,7 @@ public class GraphActivity extends AppCompatActivity {
 
     void setGraph(Graph graph) {
         // *** Note: Value will be CandleEntry.class
-        ArrayList<CandleEntry> yVals1 = new ArrayList<>();
+        yVals1 = new ArrayList<>();
 
         /** Those are the parameter for the CandleEntry .. Kinda not really understand what each of these mean
          *
@@ -254,7 +306,7 @@ public class GraphActivity extends AppCompatActivity {
         arrayFillKill[29] = graph.getC30();
         arrayFillKill[30] = graph.getC31();
         arrayFillKill[31] = graph.getC32();
-        arrayFillKill[32] = graph.getC13();
+        arrayFillKill[32] = graph.getC33();
         arrayFillKill[33] = graph.getC34();
         arrayFillKill[34] = graph.getC35();
         arrayFillKill[35] = graph.getC36();
@@ -328,18 +380,46 @@ public class GraphActivity extends AppCompatActivity {
         // loop  3-2 index to 0 index then loop n down to nextInsert - 1
 
         int[] sortedFillKill = new int[size];
+        //= arrayFillKill;
+
+
+        int noValueCount = 0;
+        for (int i = 0; i < arrayFillKill.length; i++) {
+            if (arrayFillKill[i] == -1) {
+                noValueCount++;
+                break;
+            }
+        }
 
         int y = 0;
-        for (int i = nextInsert - 1; i < arrayFillKill.length; i++) {
-            sortedFillKill[y] = arrayFillKill[i];
-            y++;
-        }
 
-        for (int i = 0; i < nextInsert - 1; i++) {
-            sortedFillKill[y] = arrayFillKill[i];
-            y++;
-        }
 
+        if (noValueCount != 0) {
+            System.out.println("FOUND NO VALUE COUNT -1");
+            for (int i = 0; i < nextInsert - 1; i++) {
+                sortedFillKill[y] = arrayFillKill[i];
+                y++;
+            }
+
+            for (int i = nextInsert - 1; i < arrayFillKill.length; i++) {
+                sortedFillKill[y] = arrayFillKill[i];
+                y++;
+            }
+
+        } else {
+            System.out.println("CANNOT FIND NO VALUE COUNT");
+
+            for (int i = nextInsert - 1; i < arrayFillKill.length; i++) {
+                sortedFillKill[y] = arrayFillKill[i];
+                y++;
+            }
+            for (int i = 0; i < nextInsert - 1; i++) {
+                sortedFillKill[y] = arrayFillKill[i];
+                y++;
+            }
+
+
+        }
         /*
         System.out.println("SORTED");
         for (int i = 0; i < sortedFillKill.length; i++) {
@@ -355,31 +435,55 @@ public class GraphActivity extends AppCompatActivity {
         for (int i = sortedFillKill.length - 2; i >= 0; i--) {
 
             if ((sortedFillKill[i] == 0 && sortedFillKill[i+1] == 0) || (sortedFillKill[i] == 1 && sortedFillKill[i+1] == 0)) {
+                //System.out.println("11111");
                 numKill--;
                 fillKillArray[i] = new FillKillObject(numFill, numKill);
             } else if ((sortedFillKill[i] == 1 && sortedFillKill[i+1] == 1) || (sortedFillKill[i] == 0 && sortedFillKill[i+1] == 1)) {
+                //System.out.println("222222");
+
                 numFill--;
                 fillKillArray[i] = new FillKillObject(numFill, numKill);
             } else if ((sortedFillKill[i] == 0 && sortedFillKill[i+1] == -1) ) {
+                //System.out.println("333333");
+
                 fillKillArray[i] = new FillKillObject(numFill, numKill);
             } else if (sortedFillKill[i] == -1 && sortedFillKill[i+1] == -1) {
+                //System.out.println("444444");
+
                 fillKillArray[i] = new FillKillObject(numFill, numKill);
             } else if (sortedFillKill[i] == -1 && sortedFillKill[i+1] == 1) {
+                //System.out.println("5555555");
+
                 numFill--;
                 fillKillArray[i] = new FillKillObject(numFill, numKill);
+            } else if ((sortedFillKill[i] == 1 && sortedFillKill[i+1] == -1) )  {
+
+                fillKillArray[i] = new FillKillObject(numFill, numKill);
+            } else if (sortedFillKill[i] == -2 && sortedFillKill[i+1] == 1) {
+                System.out.println("LOL");
+                System.out.println("IN HERE: " + sortedFillKill[i] + " NEXT: " + sortedFillKill[i+1]);
+                numFill--;
+                fillKillArray[i] = new FillKillObject(numFill, numKill);
+            } else if (sortedFillKill[i] == -2 && sortedFillKill[i+1] == -2 || sortedFillKill[i] == 0 && sortedFillKill[i+1] == -2) {
+                System.out.println("LOLz");
+                //System.out.println("IN HERE: " + sortedFillKill[i] + " NEXT: " + sortedFillKill[i+1]);
+                fillKillArray[i] = new FillKillObject(numFill, numKill);
+
             } else {
+                //System.out.println("6666666");
+
                 fillKillArray[i] = new FillKillObject(0, 0);
             }
         }
 
 
-        /*
+
         for (int i = 0; i < fillKillArray.length; i ++) {
             System.out.println("INDEX: " + i);
             System.out.print(fillKillArray[i].getFill() + ",");
             System.out.print(fillKillArray[i].getKill());
             System.out.println();
-        }*/
+        }
 
         for (int i = 0; i < fillKillArray.length; i ++) {
             int valuePoint = 2 * fillKillArray[i].getFill() - fillKillArray[i].getKill();
@@ -405,7 +509,6 @@ public class GraphActivity extends AppCompatActivity {
 
 */
         ArrayList<String> xVals = new ArrayList<>();
-
         xVals.add("" + 1);
         xVals.add("" + 2);
         xVals.add("" + 3);
@@ -525,6 +628,11 @@ public class GraphActivity extends AppCompatActivity {
         // ** include y-set
         CandleData data = new CandleData(xVals, ySet); // xaxis
         // then add to the chart
+
+        mChart.getXAxis().setTextColor(Color.WHITE);
+        mChart.getAxisLeft().setTextColor(Color.WHITE);
+        mChart.getLegend().setTextColor(Color.WHITE);
+
         mChart.setData(data);
         mChart.invalidate();
         progressDialog.dismiss();

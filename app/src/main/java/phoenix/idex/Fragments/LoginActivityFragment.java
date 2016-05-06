@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -30,11 +31,11 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 import phoenix.idex.Activities.MainActivity;
+import phoenix.idex.Activities.SignUpActivity;
 import phoenix.idex.ButtonClickedSingleton;
 import phoenix.idex.R;
 import phoenix.idex.ServerConnections.ServerRequests;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
-import phoenix.idex.Activities.SignUpActivity;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
 
@@ -45,6 +46,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     private TextView mTextDetails;
     private CallbackManager mCallbackManager;
     private ImageButton imgbRegister, imgbLogin;
+    private ImageView imgLogo;
     private Button bRegister, bLogin, bBrowseIdea;
     private AccessTokenTracker mTokenTracker;
     private ProfileTracker mProfileTracker;
@@ -82,6 +84,8 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        userLocalStore = new UserLocalStore(getActivity());
 
         FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
         mCallbackManager = CallbackManager.Factory.create();
@@ -122,14 +126,16 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
         v = inflater.inflate(R.layout.frag_login, container, false);
         imgbRegister = (ImageButton) v.findViewById(R.id.imgbRegister);
         imgbLogin = (ImageButton) v.findViewById(R.id.imgbLogin);
-        tvIdexTitle = (TextView) v.findViewById(R.id.tvIdexTitle);
         etUsername = (TextView) v.findViewById(R.id.etUsername);
         etPassword = (TextView) v.findViewById(R.id.etPassword);
         tvContinue = (TextView) v.findViewById(R.id.tvContinue);
-        tvIdexTitle.setOnClickListener(this);
+        imgLogo = (ImageView) v.findViewById(R.id.imgLogo);
+
+//        tvIdexTitle.setOnClickListener(this);
         imgbLogin.setOnClickListener(this);
         imgbRegister.setOnClickListener(this);
         tvContinue.setOnClickListener(this);
+        imgLogo.setOnClickListener(this);
 
         tvUsername = (TextView) v.findViewById(R.id.tvUsername);
         tvPassword = (TextView) v.findViewById(R.id.tvPassword);
@@ -143,7 +149,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
         // Remove toolbar from login activity
         MainActivity.rLayoutMain.setPadding(0, 0, 0, 0);
         userLocalStore = new UserLocalStore(getActivity());
-        userLocalStore.clearUserData(); // Clear the last logged in user before storing the new one
+        //userLocalStore.clearUserData(); // Clear the last logged in user before storing the new one
         return v;
     }
 
@@ -151,7 +157,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgbLogin:
-                String   myAndroidDeviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+                String  myAndroidDeviceId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
                 System.out.println("THE DEVICE ID IS : " + myAndroidDeviceId);
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
@@ -169,7 +175,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
                         new PostListFragment()).commit();
                 MainActivity.listView.setItemChecked(1, true);
                 break;
-            case R.id.tvIdexTitle:
+            case R.id.imgLogo:
                 fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
                         new AboutFragment()).commit();
@@ -235,11 +241,6 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
         loginButton.setReadPermissions("basic_info");
         loginButton.setFragment(this);
         loginButton.registerCallback(mCallbackManager, mCallback);
-
-        // Change title font
-        Typeface myTypeface = Typeface.createFromAsset(getActivity().getAssets(), "Starjhol.ttf" );
-        TextView idexTitle = (TextView) view.findViewById(R.id.tvIdexTitle);
-        idexTitle.setTypeface(myTypeface);
 
     }
 

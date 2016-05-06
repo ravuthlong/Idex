@@ -1,6 +1,7 @@
 package phoenix.idex.Fragments;
 
 import android.app.ProgressDialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -89,8 +90,29 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         // set up the buttons
         buttonMonitor.setUpButtons(bMainRoll, bMainLog, bMainInfo);
 
+        int screenSize = getResources().getConfiguration().screenLayout &
+                Configuration.SCREENLAYOUT_SIZE_MASK;
+
+        switch (screenSize) {
+            case Configuration.SCREENLAYOUT_SIZE_SMALL:
+                System.out.println("SMALL SCREEN");
+                break;
+            case Configuration.SCREENLAYOUT_SIZE_NORMAL:
+                System.out.println("NORMAL SCREEN");
+                MainActivity.rLayoutMain.setPadding(0, 310, 0, 0);
+
+                break;
+            case Configuration.SCREENLAYOUT_SIZE_LARGE:
+                System.out.println("LARGE SCREEN");
+                break;
+            case Configuration.SCREENLAYOUT_SIZE_XLARGE:
+                System.out.println("X-LARGE SCREEN");
+                break;
+            default:
+                break;
+        }
+
         //int sizeOfActionBar = MainActivity.getThemeAttributeDimensionSize(getActivity(), R.attr.actionBarSize);
-        MainActivity.rLayoutMain.setPadding(0, 200, 0, 0);
 
         recyclerView = (RecyclerView) v.findViewById(R.id.postRecyclerView1);
         feedItems = new ArrayList<>();
@@ -242,9 +264,10 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
 
                 break;
             case R.id.bMainLog:
+                /*
                 if (userLocalStore.getLoggedInUser().getUsername().equals("")) {
                     notLoggedInMessage();
-                } else {
+                } else {*/
                     buttonMonitor.cancelClicks(bMainRoll, bMainLog, bMainInfo);
                     buttonMonitor.setLogClicked();
                     bMainLog.setBackgroundResource(R.drawable.logged);
@@ -252,12 +275,12 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                     fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
                             new DashFragment()).commit();
-                }
+                //}
                 break;
             case R.id.bMainInfo:
-                if (userLocalStore.getLoggedInUser().getUsername().equals("")) {
+               /* if (userLocalStore.getLoggedInUser().getUsername().equals("")) {
                     notLoggedInMessage();
-                } else {
+                } else {*/
                     buttonMonitor.cancelClicks(bMainRoll, bMainLog, bMainInfo);
                     buttonMonitor.setInfoClicked();
                     bMainInfo.setBackgroundResource(R.drawable.infoed);
@@ -266,7 +289,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                     fragmentManager.beginTransaction().replace(R.id.rLayoutMain,
                             new TabFragment()).commit();
                     MainActivity.listView.setItemChecked(1, true);
-                }
+                //}
                 break;
 
         }
@@ -284,7 +307,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                     ft.detach(PostListFragment.this).attach(PostListFragment.this).commit();
                     feedItems.clear();
                 } else {
-                    util.displayNoInternet(getContext());
+                    Util.displayNoInternet(getContext());
                 }
             }
         });

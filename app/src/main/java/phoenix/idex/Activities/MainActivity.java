@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_slidingdrawer);
         userLocalStore = new UserLocalStore(this);
 
-
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -66,17 +65,21 @@ public class MainActivity extends AppCompatActivity {
 
         sizeOfToolBar = getThemeAttributeDimensionSize(this, R.attr.actionBarSize);
 
-        if (!UserLocalStore.isUserLoggedIn) {
-            setUpDrawerList();
-            setUpFragments();
-            screenStartUpState();
-            drawerListViewListener();
-            toggleListener();
-        } else {
+        // If user logged in before, keep them logged in
+        if (!userLocalStore.getLoggedInUser().getUsername().equals("")) {
+            UserLocalStore.isUserLoggedIn = true;
+            UserLocalStore.allowRefresh = true;
+            clickActivity.setRollClicked();
             setUpLoggedInDrawerList();
             setUpLoggedInFragments();
             screenStartUpState();
             drawerListViewLoggedInUserListener();
+            toggleListener();
+        } else  {
+            setUpDrawerList();
+            setUpFragments();
+            screenStartUpState();
+            drawerListViewListener();
             toggleListener();
         }
     }

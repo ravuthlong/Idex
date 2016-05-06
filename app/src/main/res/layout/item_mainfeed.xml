@@ -80,7 +80,7 @@
                 android:id="@+id/profilePic"
                 android:layout_width="@dimen/feed_item_profile_pic"
                 android:layout_height="@dimen/feed_item_profile_pic"
-                android:scaleType="fitCenter" >
+                android:scaleType="fitCenter">
             </com.android.volley.toolbox.NetworkImageView>
 
             <LinearLayout
