@@ -1,15 +1,18 @@
 package phoenix.idex.RecyclerViewFeed.MainRecyclerView.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,7 +23,6 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 
-import java.util.HashMap;
 import java.util.List;
 
 import phoenix.idex.Activities.CommentActivity;
@@ -47,16 +49,16 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
     private UserLocalStore userLocalStore;
     private View postView;
     boolean swipeIsActive = true;
-    HashMap<Integer, String> hashMap;
-    private boolean canClickAgain = true;
     private VolleyMainPosts volleyMainPosts;
     private SoundPlayer fillSound, killSound;
+    private AlertDialog.Builder editPostDialog;
 
     public FeedListAdapter(Context context, List<FeedItem> feedItems) {
         inflater = LayoutInflater.from(context);
         this.mContext = context;
         this.feedItems = feedItems;
         userLocalStore = new UserLocalStore(mContext);
+        editPostDialog = new AlertDialog.Builder(context);
     }
 
     @Override
@@ -70,7 +72,6 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         // Initialize fill and kill sounds
         fillSound = new SoundPlayer(mContext, R.raw.fillsound);
         killSound = new SoundPlayer(mContext, R.raw.killsound);
-
         return holder;
     }
 
@@ -86,6 +87,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         holder.name.setTextColor(ContextCompat.getColor(mContext, R.color.font));
         holder.txtStatusMsg.setTextColor(ContextCompat.getColor(mContext, R.color.font));
         holder.timestamp.setTextColor(ContextCompat.getColor(mContext, R.color.font));
+
         holder.numFill.setTextColor(ContextCompat.getColor(mContext, R.color.font));
         holder.numKill.setTextColor(ContextCompat.getColor(mContext, R.color.font));
 
@@ -93,6 +95,12 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         final FeedItem currentPos = feedItems.get(position);
 
         holder.name.setText(currentPos.getName());
+
+        if (currentPos.getTotalFill() >= 100) {
+            holder.numFill.setTextSize(TypedValue.COMPLEX_UNIT_PX, holder.numKill.getTextSize() / (float) 1.2);
+        } else if (currentPos.getTotalKill() >= 100) {
+            holder.numKill.setTextSize(TypedValue.COMPLEX_UNIT_PX, holder.numKill.getTextSize() / (float) 1.2);
+        }
         holder.numFill.setText("" + (currentPos.getTotalFill()));
         holder.numKill.setText("-" + (currentPos.getTotalKill()));
 
@@ -137,8 +145,10 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
 
         // user profile pic
+
         if (!currentPos.getProfilePic().equals("")) {
             holder.profilePic.setImageUrl(currentPos.getProfilePic(), imageLoader);
+            //holder.profilePic.setBackgroundResource(R.drawable.profilepic_border);
         } else { // default
             holder.profilePic.setImageUrl("http://oi67.tinypic.com/24npqbk.jpg", imageLoader);
         }
@@ -149,12 +159,12 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         holder.imgbFill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                UserLocalStore.allowRefresh = true;
 
                 fillSound.playSound();
 
-                if (userLocalStore.getLoggedInUser().getUsername().equals("dge93") ||
-                        userLocalStore.getLoggedInUser().getUsername().equals("aa") ||
-                        userLocalStore.getLoggedInUser().getUsername().equals("")) {
+                if (userLocalStore.getLoggedInUser().getUsername().equals("a") ||
+                        userLocalStore.getLoggedInUser().getUsername().equals("sealcub22")) {
 
                     // There's no fill so do normal operations
                     serverRequests.updateFillAndFillColumnInBackground(currentPos.getId());
@@ -211,11 +221,11 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             @Override
             public void onClick(View view) {
 
+                UserLocalStore.allowRefresh = true;
                 killSound.playSound();
 
-                if (userLocalStore.getLoggedInUser().getUsername().equals("dge93") ||
-                        userLocalStore.getLoggedInUser().getUsername().equals("aa") ||
-                         userLocalStore.getLoggedInUser().getUsername().equals("")) {
+                if (userLocalStore.getLoggedInUser().getUsername().equals("a") ||
+                         userLocalStore.getLoggedInUser().getUsername().equals("sealcub22")) {
 
                     //update fill only. change name
                     serverRequests.updateKillAndKillColumnInBackground(currentPos.getId());
@@ -250,7 +260,6 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
                         } else {
                             System.out.println("KILL NORMAL");
-
                             // There's no fill so do normal operations
                             //update fill only. change name
                             serverRequests.updateKillAndKillColumnInBackground(currentPos.getId());
@@ -277,6 +286,30 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
             }
         });
 
+        holder.tvEditPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText edittext = new EditText(mContext);
+                edittext.setText(currentPos.getStatus());
+
+                //editPostDialog.setMessage("Enter Your Message");
+                editPostDialog.setTitle("Edit Post");
+                editPostDialog.setView(edittext);
+
+                editPostDialog.setPositiveButton("Save Changes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        volleyMainPosts.updateAPost(currentPos.getId(), edittext.getText().toString());
+                    }
+                });
+
+                editPostDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // what ever you want to do with No option.
+                    }
+                });
+                editPostDialog.show();
+            }
+        });
         /*
        //  Close the swipeLayout when user click on the post
         holder.swipeLayout.getSurfaceView().setOnClickListener(new View.OnClickListener() {
@@ -295,7 +328,6 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
                 if (holder.tvManagePost.getText().toString().equals("Delete")) {
                     volleyMainPosts.deleteAPostVolley(currentPos.getId());
-                    //serverRequests.deleteAPostInBackground(currentPos.getId());
                 } else {
                     Toast.makeText(v.getContext(), "Clicked on Report ", Toast.LENGTH_SHORT).show();
                 }
@@ -313,7 +345,6 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         holder.swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
             @Override
             public void onClose(SwipeLayout layout) {
-                //postView.setOnClickListener(mContext);
                 swipeIsActive = false;
 
             }
@@ -355,14 +386,13 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
     // Holder knows and references where the fields are
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        SwipeLayout swipeLayout;
-        NetworkImageView profilePic;
-        Button bFill, bKill;
-        ImageButton imgbFill, imgbKill;
-        TextView tvGraph, numFill, numKill, txtStatusMsg, timestamp, name, tvManagePost,
+        private SwipeLayout swipeLayout;
+        private NetworkImageView profilePic;
+        private ImageButton imgbFill, imgbKill;
+        private TextView tvGraph, numFill, numKill, txtStatusMsg, timestamp, name, tvManagePost,
                 tvEditPost;
-        LinearLayout bottomWrapper1;
-        LinearLayout postLayout;
+        private LinearLayout bottomWrapper1;
+        private LinearLayout postLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -391,6 +421,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         int position = getAdapterPosition();
                         FeedItem currentItem = feedItems.get(position);
                         Intent postInfo = new Intent(mContext, CommentActivity.class);
+                        postInfo.putExtra("userID", currentItem.getUserID());
                         postInfo.putExtra("name", currentItem.getName());
                         postInfo.putExtra("time", currentItem.getTimeStamp());
                         postInfo.putExtra("numKill", currentItem.getTotalKill());
@@ -398,6 +429,11 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         postInfo.putExtra("post", currentItem.getStatus());
                         postInfo.putExtra("profilePic", currentItem.getProfilePic());
                         postInfo.putExtra("postID", currentItem.getId());
+                        postInfo.putExtra("clickStatus", currentItem.getFillOrKill());
+                        postInfo.putExtra("username", currentItem.getUsername());
+                        postInfo.putExtra("fillOrkill", currentItem.getFillOrKill());
+
+
                         mContext.startActivity(postInfo);
                     }
                 }

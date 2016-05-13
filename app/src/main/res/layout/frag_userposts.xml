@@ -5,6 +5,23 @@
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true"
     >
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layoutUserPostNoPost"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="You have no post"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp" />
+    </LinearLayout>
+
     <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/refreshLayout"

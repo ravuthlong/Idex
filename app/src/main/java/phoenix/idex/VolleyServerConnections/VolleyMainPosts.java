@@ -54,6 +54,12 @@ public class VolleyMainPosts {
         progressDialog.show();
         new StoreAPostVolley(post, userID, timeStamp).storeAPost();
     }
+
+    public void updateAPost(int postID, String newPost) {
+        progressDialog.show();
+        new UpdateAPost(postID, newPost).updateAPost();
+    }
+
     public void deleteAPostVolley(int postID) {
         progressDialog.setMessage("Deleting...");
         progressDialog.show();
@@ -70,6 +76,48 @@ public class VolleyMainPosts {
     }
     public void getAUniqueUserPosts(FeedListAdapter feedListAdapter, List<FeedItem> feedItems, ProgressBar spinner, int userID) {
         new FetchUserPostsVolley(feedListAdapter, feedItems, spinner).getJsonLiveUniqueUser(userID);
+    }
+
+
+
+    public class UpdateAPost {
+        private int postID;
+        private String newPost;
+
+        public UpdateAPost(int postID, String newPost) {
+            this.postID = postID;
+            this.newPost = newPost;
+        }
+
+        // Pull JSON directly from the PHP JSON result
+        public void updateAPost() {
+
+            // making fresh volley request and getting json
+            StringRequest jsonReq = new StringRequest(Request.Method.POST,
+                    "http://idex.site88.net/updatePost.php", new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    progressDialog.dismiss();
+                    UserLocalStore.allowRefresh = true;
+                    context.startActivity(new Intent(context, MainActivity.class));
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    progressDialog.dismiss();
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("postID", Integer.toString(postID));
+                    params.put("newPost", newPost);
+                    return params;
+                }
+            };
+            // Adding request to volley request queue
+            AppController.getInstance().addToRequestQueue(jsonReq);
+        }
     }
 
     public class StoreAPostVolley {
@@ -114,7 +162,6 @@ public class VolleyMainPosts {
             // Adding request to volley request queue
             AppController.getInstance().addToRequestQueue(jsonReq);
         }
-
     }
 
     public class DeletePostVolley {
@@ -175,6 +222,8 @@ public class VolleyMainPosts {
 
                     FeedItem item = new FeedItem();
                     String name;
+
+                    item.setUserID(feedObj.getInt("userID"));
                     name = feedObj.getString("firstname") + " " + feedObj.getString("lastname");
                     item.setId(feedObj.getInt("postID"));
                     item.setName(name);
@@ -264,7 +313,50 @@ public class VolleyMainPosts {
                 @Override
                 public void onResponse(JSONObject response) {
                     if (response != null) {
-                        fetchUserPostsVolley(response);
+                        try {
+                            JSONArray feedArray = response.getJSONArray("feed");
+                            JSONObject feedObj = (JSONObject) feedArray.get(0);
+                            int result = feedObj.getInt("success");
+
+                            if (result == 1) {
+                                for (int i = 0; i < feedArray.length(); i++) {
+                                    feedObj = (JSONObject) feedArray.get(i);
+
+                                    FeedItem item = new FeedItem();
+                                    String name;
+
+                                    item.setUserID(feedObj.getInt("userID"));
+                                    name = feedObj.getString("firstname") + " " + feedObj.getString("lastname");
+                                    item.setId(feedObj.getInt("postID"));
+                                    item.setName(name);
+                                    item.setUsername(feedObj.getString("username"));
+
+                                    String post = feedObj.getString("post");
+                                    post = post.replace("\\", "");
+                                    item.setStatus(post);
+                                    item.setProfilePic(feedObj.getString("userpic"));
+                                    item.setTimeStamp(feedObj.getString("timeStamp"));
+                                    item.setTotalFill(feedObj.getInt("totalFill"));
+                                    item.setTotalKill(feedObj.getInt("totalKill"));
+
+                                    try {
+                                        item.setFillOrKill(feedObj.getInt("status"));
+                                    } catch (JSONException e) {
+                                        item.setFillOrKill(-1); // Default value for posts user never clicked fill nor kill
+                                    }
+                                    feedItems.add(item);
+                                }
+                                // notify data changes to list adapater
+                                feedListAdapter.notifyDataSetChanged();
+                            } else {
+                                // User has no post
+                                System.out.println("You don't have a post");
+                            }
+                            spinner.setVisibility(View.GONE);
+                        } catch (JSONException e) {
+                            spinner.setVisibility(View.GONE);
+                            e.printStackTrace();
+                        }
                     } else {
                         spinner.setVisibility(View.GONE);
                     }

@@ -1,6 +1,5 @@
 package phoenix.idex.Activities;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -137,18 +136,9 @@ public class SignUpActivity extends AppCompatActivity {
         volleyUserInfo.storeUserInfo(user, new GetUserCallBack() {
             @Override
             public void done(User returnedUser) {
-
-                // Username has been taken and user info will not be stored
-                if (returnedUser == null) {
-                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SignUpActivity.this);
-                    dialogBuilder.setMessage("User has been taken");
-                    dialogBuilder.setPositiveButton("Ok", null);
-                    dialogBuilder.show();
-                } else {
-                    userLocalStore.storeUserData(returnedUser);
-                    UserLocalStore.isUserLoggedIn = true;
-                    startActivity(new Intent(SignUpActivity.this, MainActivity.class));
-                }
+                userLocalStore.storeUserData(returnedUser);
+                UserLocalStore.isUserLoggedIn = true;
+                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
             }
         });
     }

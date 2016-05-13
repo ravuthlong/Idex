@@ -1,21 +1,17 @@
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     xmlns:ndroid="http://schemas.android.com/tools"
-    android:fitsSystemWindows="true"
     android:id="@+id/dashCorLayout"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:windowSoftInputMode="adjustPan|adjustResize"
     android:background="#000000">
 
-
-
-<ScrollView
-    ndroid:fitsSystemWindows="true"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:layout_marginTop="50dp">
-
+    <ScrollView
+        ndroid:fitsSystemWindows="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:layout_marginTop="50dp">
 
             <LinearLayout
                 android:layout_height="wrap_content"
@@ -34,11 +30,9 @@
                     android:textSize="20dp"
                     android:textColor="#ffffff"
                     android:maxLength="141"
-
                     android:layout_width="fill_parent"
                     android:layout_height="210dp"
                     android:hint="Post your idea..." />
-
                 <ImageButton
                     android:layout_width="130dp"
                     android:layout_height="60dp"
@@ -59,7 +53,6 @@
                         android:textColor="#848482"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -72,10 +65,9 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_height="match_parent"
                     android:layout_marginTop="20dp"
                     android:layout_gravity="bottom">
-
                     <RelativeLayout
                         android:layout_marginBottom="67dp"
                         android:layout_width="match_parent"
@@ -88,7 +80,6 @@
                             android:layout_gravity="bottom|left"
                             android:id="@+id/bDashRoll"
                             android:background="@drawable/roll" />
-
                         <Button
                             android:layout_width="100dp"
                             android:layout_height="50dp"
@@ -97,9 +88,7 @@
                             android:background="@drawable/log"
                             android:layout_alignParentTop="true"
                             android:layout_centerHorizontal="true" />
-
                         <Button
-
                             android:layout_width="100dp"
                             android:layout_height="50dp"
                             android:layout_gravity="bottom|right"
@@ -110,29 +99,18 @@
                             android:layout_alignParentEnd="true" />
                     </RelativeLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="bottom"
-                        android:layout_alignParentBottom="false"
-                        android:gravity="bottom">
-
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="bottom"
+                        android:layout_alignParentBottom="true">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="80dp"
                             android:id="@+id/bottomBanner"
                             android:background="@drawable/bottom_banner" />
-
-                    </LinearLayout>
+                    </RelativeLayout>
                 </RelativeLayout>
-
             </LinearLayout>
-
-
-
-</ScrollView>
-
-
-
-
-</android.support.design.widget.CoordinatorLayout>
+    </ScrollView>
+</RelativeLayout>

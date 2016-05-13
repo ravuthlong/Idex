@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 
 public class FeedItem {
-    private int id;
+    private int id, userID;
     private String username, name, status, profilePic, timeStamp;
     private ArrayList<Integer> fillArray = new ArrayList<>();
     private ArrayList<Integer> killArray = new ArrayList<>();
@@ -16,6 +16,7 @@ public class FeedItem {
     private int currentColumn; // if 10, reset to 0 and update all fill/kill columns to 0
     private double value;
     private int fillOrKill; // Fill has value 1 and kill has value 0
+
 
     public FeedItem() {
     }
@@ -128,5 +129,12 @@ public class FeedItem {
 
     public void hitKillSecondTime() { totalKill--; }
     public void hitFillSecondTime() { totalFill--; }
+
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
+    public int getUserID() {
+        return this.userID;
+    }
 
 }

@@ -114,7 +114,30 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Fill Rate: "
+                    android:id="@+id/textViewRate"
+                    android:textColor="#92926E" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/etFillRate"
+                    android:textColor="#E6BE8A"
+                    android:layout_marginLeft="42dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -137,7 +160,7 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="5dp">
 
                 <TextView
                     android:layout_width="wrap_content"

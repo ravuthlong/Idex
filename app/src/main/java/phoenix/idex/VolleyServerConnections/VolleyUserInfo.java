@@ -1,8 +1,10 @@
 package phoenix.idex.VolleyServerConnections;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -49,6 +51,80 @@ public class VolleyUserInfo {
         new FetchPostStatVolley(userID, jsonObjectCallBack).fetchPostStat();
     }
 
+    public void updatePassword(int userID, String oldPassword, String newPassword) {
+        progressDialog.show();
+        new UpdatePasswordInfoVolley(userID, oldPassword, newPassword).updatePassword();
+    }
+
+    public void fetchUserInfo(User user, GetUserCallBack userCallBack) {
+        progressDialog.show();
+        new FetchUserDataVolley(user, userCallBack).fetchUserData();
+    }
+
+    public class FetchUserDataVolley {
+        private User user;
+        private GetUserCallBack userCallBack;
+
+        public FetchUserDataVolley(User user, GetUserCallBack userCallBack) {
+            this.user = user;
+            this.userCallBack = userCallBack;
+        }
+
+        // Pull JSON directly from the PHP JSON result
+        public void fetchUserData() {
+
+            Map<String, String> params = new HashMap<>();
+            params.put("username", user.getUsername());
+            params.put("password", user.getPassword());
+
+            CustomRequest jsObjRequest = new CustomRequest(Request.Method.POST, "http://idex.site88.net/login.php",
+                    params, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    progressDialog.dismiss();
+                    User returnedUser = null;
+
+                    progressDialog.dismiss();
+                    try {
+                        if(response.getInt("success") == 0){
+                            // No user returned
+                            returnedUser = null;
+                        } else {
+                            //UserLocalStore.isUserLoggedIn = true;
+                            // Get the user details
+                            int userID = response.getInt("userID");
+                            String firstname = response.getString("firstname");
+                            String lastname = response.getString("lastname");
+                            String email = response.getString("email");
+                            String username = response.getString("username");
+                            String date = response.getString("date");
+                            returnedUser = new User(userID, firstname, lastname, email, username, date);
+                        }
+                        userCallBack.done(returnedUser);
+
+                    } catch (JSONException e) {
+                        System.out.println("22222");
+
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    System.out.println("jaja");
+                    progressDialog.dismiss();
+                    error.printStackTrace();
+                }
+            });
+
+            jsObjRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+            AppController.getInstance().addToRequestQueue(jsObjRequest);
+        }
+    }
+
     public class FetchPostStatVolley {
         private int userID;
         private JSONObjectCallBack jsonObjectCallBack;
@@ -66,6 +142,7 @@ public class VolleyUserInfo {
                     null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
+
                     progressDialog.dismiss();
                     jsonObjectCallBack.returnedJSONObject(response);
                 }
@@ -81,6 +158,51 @@ public class VolleyUserInfo {
         }
     }
 
+    public class UpdatePasswordInfoVolley {
+        private int userID;
+        private String oldPassword, newPassword;
+
+        public UpdatePasswordInfoVolley(int userID, String oldPassword, String newPassword) {
+            this.userID = userID;
+            this.oldPassword = oldPassword;
+            this.newPassword = newPassword;
+        }
+
+        // Pull JSON directly from the PHP JSON result
+        public void updatePassword() {
+
+            Map<String, String> params = new HashMap<>();
+            params.put("userID", Integer.toString(userID));
+            params.put("oldPassword", oldPassword);
+            params.put("newPassword", newPassword);
+
+            CustomRequest jsObjRequest = new CustomRequest(Request.Method.POST, "http://idex.site88.net/updateUserPassword.php",
+                    params, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+
+                    progressDialog.dismiss();
+                    try {
+                        String resultMessage = response.getString("error");
+                        if ("success".equals(resultMessage)) {
+                            showProgressDialog("Password has been changed");
+                        } else {
+                            showProgressDialog("Incorrect Old Password");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    progressDialog.dismiss();
+                    error.printStackTrace();
+                }
+            });
+            AppController.getInstance().addToRequestQueue(jsObjRequest);
+        }
+    }
 
     public class StoreUserInfoVolley {
         private User user;
@@ -107,16 +229,24 @@ public class VolleyUserInfo {
                 @Override
                 public void onResponse(JSONObject response) {
                     progressDialog.dismiss();
-                    int userID = 0;
+
                     try {
-                        userID = response.getInt("id");
+                        int userID = response.getInt("id");
+                        userCallBack.done(new User(userID, user.getFirstname(), user.getLastname(), user.getEmail(),
+                                user.getUsername(), user.getTime()));
+
                     } catch (JSONException e) {
+                        try {
+                            if (response.getInt("error") == 1) {
+                                showProgressDialog("Username has been taken");
+                            } else if (response.getInt("error") == 2) {
+                                showProgressDialog("Email has been taken");
+                            }
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
                         e.printStackTrace();
                     }
-
-                    userCallBack.done(new User(userID, user.getFirstname(), user.getLastname(), user.getEmail(),
-                            user.getUsername(), user.getTime()));
-
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -125,6 +255,10 @@ public class VolleyUserInfo {
                     error.printStackTrace();
                 }
             });
+
+            jsObjRequest.setRetryPolicy(new DefaultRetryPolicy(5000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
             AppController.getInstance().addToRequestQueue(jsObjRequest);
         }
@@ -168,6 +302,13 @@ public class VolleyUserInfo {
             // Adding request to volley request queue
             AppController.getInstance().addToRequestQueue(jsonReq);
         }
+    }
+
+    private void showProgressDialog(String message) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setMessage(message);
+        dialogBuilder.setPositiveButton("Ok", null);
+        dialogBuilder.show();
     }
 
 }

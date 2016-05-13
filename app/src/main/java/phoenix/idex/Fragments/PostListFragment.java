@@ -59,6 +59,7 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     ButtonClickedSingleton  buttonMonitor = ButtonClickedSingleton.getInstance();
     private Toolbar toolbar;
     //private ImageView bottomBanner;
+    public static boolean allowRefreshFromBackButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,19 +68,10 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refreshLayout);
         spinner = (ProgressBar) v.findViewById(R.id.progress_bar);
 
-/*
-        toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(true);*/
-       // String url = "http://idex.site88.net/fetchCurrentValue.php?postID=59";
-        //getJsonLive(url);
-
+        allowRefreshFromBackButton = false;
         bMainRoll = (Button) v.findViewById(R.id.bMainRoll);
         bMainLog = (Button) v.findViewById(R.id.bMainLog);
         bMainInfo = (Button) v.findViewById(R.id.bMainInfo);
-       // bottomBanner = (ImageView) v.findViewById(R.id.bottomBanner);
-
         bMainRoll.setOnClickListener(this);
         bMainLog.setOnClickListener(this);
         bMainInfo.setOnClickListener(this);
@@ -113,7 +105,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         }
 
         //int sizeOfActionBar = MainActivity.getThemeAttributeDimensionSize(getActivity(), R.attr.actionBarSize);
-
         recyclerView = (RecyclerView) v.findViewById(R.id.postRecyclerView1);
         feedItems = new ArrayList<>();
 
@@ -121,9 +112,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(feedListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-
-
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -166,8 +154,11 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
             entry = cache.get("http://idex.site88.net/fetchLoggedInUserPosts.php?userID=" + userLocalStore.getLoggedInUser().getUserID());
         }
 
+        System.out.println("WEEEE: " + UserLocalStore.allowRefresh);
+
         if (UserLocalStore.allowRefresh) {
             UserLocalStore.allowRefresh = false;
+            System.out.println("WOOOO");
 
             util.getInternetStatus(getContext(), new NetworkConnectionCallBack() {
                 @Override
@@ -315,8 +306,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
 
 
 
-
-
     // If user is not logged in, hide the widget. Otherwise, show the widget.
     private void hideWidget() {
         if (!UserLocalStore.isUserLoggedIn) {
@@ -327,6 +316,31 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     private void notLoggedInMessage() {
         Toast.makeText(getContext(), "You are not logged in", Toast.LENGTH_SHORT).show();
 
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (allowRefreshFromBackButton) {
+
+            System.out.println("I'M ON RESUME");
+            util.getInternetStatus(getContext(), new NetworkConnectionCallBack() {
+                @Override
+                public void networkConnection(boolean isConnected) {
+                    if (isConnected) {
+                        UserLocalStore.allowRefresh = true;
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.detach(PostListFragment.this).attach(PostListFragment.this).commit();
+                        feedItems.clear();
+                        allowRefreshFromBackButton = false;
+                    } else {
+                        Util.displayNoInternet(getContext());
+                    }
+                }
+            });
+        }
     }
 
 }

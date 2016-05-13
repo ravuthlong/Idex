@@ -49,7 +49,16 @@
             android:name=".Activities.EditProfileActivity"
             android:label="@string/title_activity_edit_profile"
             android:screenOrientation="portrait"></activity>
-        <activity android:name=".Activities.CommentActivity"></activity>
+        <activity
+            android:name=".Activities.CommentActivity"
+            android:noHistory="true"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
+            android:screenOrientation="portrait"
+            ></activity>
+        <activity
+            android:name=".Activities.EditPasswordActivity"
+            android:label="editPassword"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package phoenix.idex.Activities;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -37,10 +39,10 @@ import phoenix.idex.UserLocalStore;
 import phoenix.idex.VolleyServerConnections.VolleyUserInfo;
 
 public class EditProfileActivity extends AppCompatActivity implements View.OnClickListener {
-    ImageView ivProfilePic;
-    EditText etChangeFirstName, etChangeLastName, etChangeEmail, etChangeUsername;
+    private ImageView ivProfilePic;
+    private EditText etChangeFirstName, etChangeLastName, etChangeEmail, etChangeUsername;
     private UserLocalStore userLocalStore;
-    Button bEditProfile, bChangePassword;
+    private Button bEditProfile, bChangePassword;
     private ProgressDialog progressDialog;
     private static final String SERVER_ADDRESS = "http://idex.site88.net/";
     private static final int RESULT_LOAD_IMAGE = 1;
@@ -92,6 +94,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
 
         ivProfilePic.setOnClickListener(this);
         bEditProfile.setOnClickListener(this);
+        bChangePassword.setOnClickListener(this);
     }
 
     // Set the image from gallery onto ivProfilePic imageview
@@ -129,6 +132,15 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
                 userLocalStore.storeUserData(new User(userLocalStore.getLoggedInUser().getUserID(), etChangeFirstName.getText().toString(), etChangeLastName.getText().toString(),
                         etChangeEmail.getText().toString(), etChangeUsername.getText().toString()));
                 UserLocalStore.allowRefresh = true;
+
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+                dialogBuilder.setMessage("Changes saved");
+                dialogBuilder.setPositiveButton("Ok", null);
+                dialogBuilder.show();
+                break;
+            case R.id.bChangePassword:
+                startActivity(new Intent(this, EditPasswordActivity.class));
+                break;
 
         }
     }
@@ -188,6 +200,9 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
         new UploadImage(image, userID).execute();
     }
 
+
+
+
     // Upload new Profile Pic to Server
     private class UploadImage extends AsyncTask<Void,Void, Void> {
         Bitmap image;
@@ -224,14 +239,21 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
             }catch(Exception e){
                 e.printStackTrace();
             }
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            progressDialog.dismiss();
+
+            // Delay progress dialog to give enough time for image to upload to the server
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.dismiss();
+                }
+            }, 500);
             isNewPhotoUploaded = true;
         }
     }

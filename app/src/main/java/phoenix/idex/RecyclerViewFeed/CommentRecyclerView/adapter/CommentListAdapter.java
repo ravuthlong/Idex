@@ -1,12 +1,14 @@
 package phoenix.idex.RecyclerViewFeed.CommentRecyclerView.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Typeface;
+import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,12 +42,14 @@ public class CommentListAdapter extends RecyclerSwipeAdapter<CommentListAdapter.
     private UserLocalStore userLocalStore;
     private View postView;
     private VolleyComments volleyComments;
+    private AlertDialog.Builder editCommentDialog;
 
     public CommentListAdapter(Context context, List<CommentItem> commentItems) {
         inflater = LayoutInflater.from(context);
         this.mContext = context;
         this.commentItems = commentItems;
         userLocalStore = new UserLocalStore(mContext);
+        editCommentDialog = new AlertDialog.Builder(context);
     }
 
     @Override
@@ -60,10 +64,6 @@ public class CommentListAdapter extends RecyclerSwipeAdapter<CommentListAdapter.
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         serverRequests = new ServerRequests(mContext);
-
-        // Initialize fonts
-        Typeface killFillFont = Typeface.createFromAsset(mContext.getAssets(), "Menufont.ttf");
-        holder.name.setTypeface(killFillFont);
 
         final CommentItem currentPos = commentItems.get(position);
         holder.name.setText(currentPos.getName());
@@ -144,11 +144,37 @@ public class CommentListAdapter extends RecyclerSwipeAdapter<CommentListAdapter.
             public void onClick(View v) {
 
                 if (holder.tvManagePost.getText().toString().equals("Delete")) {
-
-                    serverRequests.deleteAPostInBackground(currentPos.getPostId());
+                    volleyComments.deleteAComment(currentPos.getCommentID());
+                    //serverRequests.deleteAPostInBackground(currentPos.getPostId());
                 } else {
                     Toast.makeText(v.getContext(), "Clicked on Report ", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        holder.tvEditPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText edittext = new EditText(mContext);
+                edittext.setText(currentPos.getComment());
+
+                editCommentDialog.setTitle("Edit Comment");
+                editCommentDialog.setView(edittext);
+
+                editCommentDialog.setPositiveButton("Save Changes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        volleyComments.updateAComment(currentPos.getCommentID(), edittext.getText().toString());
+                    }
+                });
+
+                editCommentDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // what ever you want to do with No option.
+                    }
+                });
+
+                editCommentDialog.show();
+
             }
         });
 

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.android.volley.Cache;
@@ -49,6 +50,7 @@ public class AUserPostListFragment extends Fragment implements  View.OnClickList
     private FragmentManager fragmentManager;
     private Util util = Util.getInstance();
     private ButtonClickedSingleton buttonMonitor = ButtonClickedSingleton.getInstance();
+    private LinearLayout layoutUserPostNoPost;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class AUserPostListFragment extends Fragment implements  View.OnClickList
         bMainRoll = (Button) v.findViewById(R.id.bMainRoll);
         bMainLog = (Button) v.findViewById(R.id.bMainLog);
         bMainInfo = (Button) v.findViewById(R.id.bMainInfo);
+        layoutUserPostNoPost = (LinearLayout) v.findViewById(R.id.layoutUserPostNoPost);
 
         bMainRoll.setOnClickListener(this);
         bMainLog.setOnClickListener(this);
@@ -94,7 +97,7 @@ public class AUserPostListFragment extends Fragment implements  View.OnClickList
         entry = cache.get(URL_LoggedInUser);
 
         if (UserLocalStore.allowRefresh) {
-            UserLocalStore.allowRefresh = false;
+            //UserLocalStore.allowRefresh = false;
 
             util.getInternetStatus(getContext(), new NetworkConnectionCallBack() {
                 @Override

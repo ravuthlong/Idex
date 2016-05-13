@@ -38,6 +38,7 @@ import phoenix.idex.ServerConnections.ServerRequests;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
+import phoenix.idex.VolleyServerConnections.VolleyUserInfo;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -58,6 +59,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     private android.support.v7.widget.Toolbar toolbar;
     private FragmentManager fragmentManager;
     private ButtonClickedSingleton clickActivity = ButtonClickedSingleton.getInstance();
+    private VolleyUserInfo volleyUserInfo;
 
 
     private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
@@ -187,7 +189,9 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     // Authenticate that the correct user is trying to log in
     private void authenticate(User user){
         ServerRequests serverRequests = new ServerRequests(getActivity());
-        serverRequests.logUserInDataInBackground(user, new GetUserCallBack() {
+        volleyUserInfo = new VolleyUserInfo(getActivity());
+
+        volleyUserInfo.fetchUserInfo(user, new GetUserCallBack() {
             @Override
             public void done(User returnedUser) {
                 // Wrong username and password
@@ -207,6 +211,29 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
                 }
             }
         });
+
+
+        /*
+        serverRequests.logUserInDataInBackground(user, new GetUserCallBack() {
+            @Override
+            public void done(User returnedUser) {
+                // Wrong username and password
+                ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo  = connectivityManager.getActiveNetworkInfo();
+
+                if (networkInfo == null) {
+                    showNoInternetError();
+                } else if(returnedUser == null){
+                    showNoUserErrorMessage();
+                }else{
+                    userLocalStore.storeUserData(returnedUser);
+                    UserLocalStore.isUserLoggedIn = true;
+                    UserLocalStore.allowRefresh = true;
+                    clickActivity.setRollClicked();
+                    logUserIn();
+                }
+            }
+        });*/
     }
 
     // Error if the user info is incorrect

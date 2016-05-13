@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:local="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -22,6 +21,23 @@
         layout="@layout/item_mainfeed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layoutNoComment"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="No Comment"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp" />
+    </LinearLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -54,36 +70,46 @@
 
     <ScrollView
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="-50dp">
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="80dp"
+        android:fillViewport="true"
+        android:layout_marginTop="-70dp">
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <EditText
-        android:padding="15dp"
-        android:id="@+id/etComment"
-        android:editable="true"
-        android:textSize="20sp"
-        android:textColor="#ffffff"
-        android:maxLength="141"
-            android:maxLines="5"
+            android:windowSoftInputMode="adjustPan"
+            android:id="@+id/etComment"
+            android:editable="true"
+            android:textSize="20sp"
+            android:textColor="#ffffff"
+            android:maxLength="141"
             android:layout_gravity="center_vertical|center_horizontal"
             android:gravity="top|left"
             android:scrollHorizontally="false"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
             android:inputType="textMultiLine|textCapSentences"
-        android:hint="@string/comment"
-            android:layout_marginRight="55dp" />
+            android:hint="@string/comment"
+            android:background="@drawable/profilepic_border"
+            android:layout_toLeftOf="@+id/bComment"
+            android:layout_marginLeft="5dp"
+            android:padding="5dp" />
         <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Submit"
-        android:layout_alignParentRight="true"
-        android:id="@+id/bComment"/>
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:id="@+id/bComment"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
+
+
     </ScrollView>
+
+
 </LinearLayout>

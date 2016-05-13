@@ -113,7 +113,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1"
                 android:id="@+id/tvFillNum"
                 android:textSize="10sp"
                 android:visibility="visible"
@@ -150,8 +149,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/tvKillNum"
                 android:textSize="10sp"
-                android:visibility="visible"
-                android:text="1" />
+                android:visibility="visible" />
 
         </LinearLayout>
 

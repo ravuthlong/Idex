@@ -12,10 +12,11 @@ public class UserLocalStore {
     private static User storedUser;
     public static boolean isUserLoggedIn = false;
     public static int visitCounter = 0;
-    public static boolean allowRefresh = false;
+    public static boolean allowRefresh;
 
     public UserLocalStore(Context context) {
         userLocalDataStore = context.getSharedPreferences(SP_NAME, 0);
+
     }
     public void storeUserData(User user) {
         SharedPreferences.Editor spEditor = userLocalDataStore.edit();

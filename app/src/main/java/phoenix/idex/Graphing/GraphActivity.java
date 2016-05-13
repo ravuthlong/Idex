@@ -633,6 +633,7 @@ public class GraphActivity extends AppCompatActivity {
         mChart.getXAxis().setTextColor(Color.WHITE);
         mChart.getAxisLeft().setTextColor(Color.WHITE);
         mChart.getLegend().setTextColor(Color.WHITE);
+        mChart.setDescriptionColor(Color.WHITE);
 
         mChart.setData(data);
         mChart.invalidate();
