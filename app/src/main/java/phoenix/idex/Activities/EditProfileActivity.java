@@ -16,8 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -42,7 +42,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
     private ImageView ivProfilePic;
     private EditText etChangeFirstName, etChangeLastName, etChangeEmail, etChangeUsername;
     private UserLocalStore userLocalStore;
-    private Button bEditProfile, bChangePassword;
+    private ImageButton imgbEditProfile, imgbChangePassword;
     private ProgressDialog progressDialog;
     private static final String SERVER_ADDRESS = "http://idex.site88.net/";
     private static final int RESULT_LOAD_IMAGE = 1;
@@ -68,8 +68,8 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
             }
         });
 
-        bEditProfile = (Button) findViewById(R.id.bEditProfile);
-        bChangePassword = (Button) findViewById(R.id.bChangePassword);
+        imgbEditProfile = (ImageButton) findViewById(R.id.imgbEditProfile);
+        imgbChangePassword = (ImageButton) findViewById(R.id.imgbChangePassword);
         ivProfilePic = (ImageView) findViewById(R.id.ivProfilePic);
         etChangeFirstName = (EditText) findViewById(R.id.etChangeFirstName);
         etChangeLastName = (EditText) findViewById(R.id.etChangeLastName);
@@ -93,8 +93,8 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
         progressDialog.setCancelable(false);
 
         ivProfilePic.setOnClickListener(this);
-        bEditProfile.setOnClickListener(this);
-        bChangePassword.setOnClickListener(this);
+        imgbEditProfile.setOnClickListener(this);
+        imgbChangePassword.setOnClickListener(this);
     }
 
     // Set the image from gallery onto ivProfilePic imageview
@@ -117,7 +117,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMAGE);
                 break;
-            case R.id.bEditProfile:
+            case R.id.imgbEditProfile:
                 //isNewPhotoUploaded = true;
                 //Bitmap image = ((BitmapDrawable) ivProfilePic.getDrawable()).getBitmap();
                 //new UploadImage(image, userLocalStore.getLoggedInUser().getUsername()).execute();
@@ -138,7 +138,7 @@ public class EditProfileActivity extends AppCompatActivity implements View.OnCli
                 dialogBuilder.setPositiveButton("Ok", null);
                 dialogBuilder.show();
                 break;
-            case R.id.bChangePassword:
+            case R.id.imgbChangePassword:
                 startActivity(new Intent(this, EditPasswordActivity.class));
                 break;
 

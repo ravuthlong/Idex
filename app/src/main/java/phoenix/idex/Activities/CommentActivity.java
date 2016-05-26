@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -102,7 +103,6 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
         fillOrKill = sharedPref.getInt("clickStatus", 0);
         receivedUsername = sharedPref.getString("username", "");
 
-        System.out.println("COLLECTED VALUE " + postID);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -201,8 +201,6 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
         postInfo = getIntent().getExtras();
 
         if (postInfo != null) {
-
-            System.out.println("POST INFO IS NULL");
             // User click on the post, bundle extra was sent to the top post of comment
             userID = postInfo.getInt("userID");
             receivedName = postInfo.getString("name");
@@ -215,7 +213,6 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
             fillOrKill = postInfo.getInt("clickStatus");
             receivedUsername = postInfo.getString("username");
             fillOrKill = postInfo.getInt("fillOrkill");
-            System.out.println("REAL POST ID: " + postID);
 
             // Converting timestamp into x ago format
             CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
@@ -227,8 +224,16 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
             timestamp.setText(timeAgo);
             txtStatusMsg.setText(receivedPost);
 
+            if (receivedNumKill >= 100) {
+                tvKillNum.setTextSize(TypedValue.COMPLEX_UNIT_PX, tvFillNum.getTextSize() / (float) 1.2);
+            }
+            if (receivedNumFill >= 100) {
+                tvFillNum.setTextSize(TypedValue.COMPLEX_UNIT_PX, tvFillNum.getTextSize() / (float) 1.2);
+            }
+
             tvKillNum.setText("-" + receivedNumKill);
             tvFillNum.setText("" + receivedNumFill);
+
             postInfo = null;
             setSharedPreference();
             volleyComments.fetchCommentVolley(layoutNoComment, commentRecyclerView, commentListAdapter,
@@ -259,7 +264,6 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
                             receivedNumKill = feedObj.getInt("totalKill");
                             receivedNumFill = feedObj.getInt("totalFill");
                             postID = feedObj.getInt("postID");
-                            System.out.println("SECOND REAL POST ID: " + postID);
 
                             try {
                                 item.setFillOrKill(feedObj.getInt("status"));
@@ -305,7 +309,6 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
             bottomWrapper1.setWeightSum(1);
             tvManagePost.setText("Report");
         }
-
     }
 
     @Override

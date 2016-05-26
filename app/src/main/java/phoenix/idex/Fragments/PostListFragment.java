@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,14 +56,12 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
     private VolleyMainPosts volleyMainPosts;
     Util util = Util.getInstance();
     ButtonClickedSingleton  buttonMonitor = ButtonClickedSingleton.getInstance();
-    private Toolbar toolbar;
     //private ImageView bottomBanner;
     public static boolean allowRefreshFromBackButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_mainpost,container, false);
-        //postWidget = (FloatingActionButton) v.findViewById(R.id.postWidget);
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refreshLayout);
         spinner = (ProgressBar) v.findViewById(R.id.progress_bar);
 
@@ -104,7 +101,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                 break;
         }
 
-        //int sizeOfActionBar = MainActivity.getThemeAttributeDimensionSize(getActivity(), R.attr.actionBarSize);
         recyclerView = (RecyclerView) v.findViewById(R.id.postRecyclerView1);
         feedItems = new ArrayList<>();
 
@@ -113,26 +109,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         recyclerView.setAdapter(feedListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                // Scroll down
-                if (dy > 0) {
-                   // bottomBanner.setVisibility(View.GONE);
-                    //bMainLog.setVisibility(View.GONE);
-                    //bMainRoll.setVisibility(View.GONE);
-                    //bMainInfo.setVisibility(View.GONE);
-                } else {
-                   // bottomBanner.setVisibility(View.VISIBLE);
-                    // Scroll up
-                    //bMainRoll.setVisibility(View.VISIBLE);
-                    //bMainLog.setVisibility(View.VISIBLE);
-                    //bMainInfo.setVisibility(View.VISIBLE);
-                }
-            }
-        });
 
         refreshLayout.setOnRefreshListener(this);
         //postWidget.setOnClickListener(this);
@@ -154,11 +130,9 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
             entry = cache.get("http://idex.site88.net/fetchLoggedInUserPosts.php?userID=" + userLocalStore.getLoggedInUser().getUserID());
         }
 
-        System.out.println("WEEEE: " + UserLocalStore.allowRefresh);
 
         if (UserLocalStore.allowRefresh) {
             UserLocalStore.allowRefresh = false;
-            System.out.println("WOOOO");
 
             util.getInternetStatus(getContext(), new NetworkConnectionCallBack() {
                 @Override

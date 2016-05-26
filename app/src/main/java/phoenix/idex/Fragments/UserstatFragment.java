@@ -44,31 +44,10 @@ public class UserstatFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.frag_user_stats, container, false);
 
-        System.out.println("VALUE IN STAAt: " + UserLocalStore.allowRefresh);
-
-        etLoggedInUser = (TextView) v.findViewById(R.id.etLoggedInUser);
-        etSignedUpDate = (TextView) v.findViewById(R.id.etSignedUpDate);
-        etSinceSignedUp = (TextView) v.findViewById(R.id.etSinceSignedUp);
-        etTotalIdeas = (TextView) v.findViewById(R.id.etTotalIdeas);
-        etTotalKills = (TextView) v.findViewById(R.id.etTotalKills);
-        etTotalFills = (TextView) v.findViewById(R.id.etTotalFills);
-        etFillRate = (TextView) v.findViewById(R.id.etFillRate);
-
-        bStatRoll = (Button) v.findViewById(R.id.bStatRoll);
-        bStatLog = (Button) v.findViewById(R.id.bStatLog);
-        bStatInfo = (Button) v.findViewById(R.id.bStatInfo);
-
-        bStatRoll.setOnClickListener(this);
-        bStatLog.setOnClickListener(this);
-        bStatInfo.setOnClickListener(this);
-        userLocalStore = new UserLocalStore(getContext());
-        volleyUserInfo = new VolleyUserInfo(getContext());
-
+        setUpVariables(v);
         String user = userLocalStore.getLoggedInUser().getFirstname() + " "
                 + userLocalStore.getLoggedInUser().getLastname();
         etLoggedInUser.setText(user);
-
-
 
         String signupFormatted = "";
 
@@ -91,7 +70,6 @@ public class UserstatFragment extends Fragment implements View.OnClickListener {
         etSignedUpDate.setText(signupFormatted);
         etSinceSignedUp.setText(daysAgo + " days ago");
         buttonMonitor.setUpButtons(bStatRoll, bStatLog, bStatInfo);
-        System.out.println("VALUE IN MR STATEEE: " + UserLocalStore.allowRefresh);
 
 
         // Set retrieved stats about user's posts and member status
@@ -99,11 +77,6 @@ public class UserstatFragment extends Fragment implements View.OnClickListener {
             @Override
             public void returnedJSONObject(JSONObject jsonObject) {
                 try {
-
-                    // UserLocalStore.allowRefresh = true;
-
-                    System.out.println("VALUE IN MR STATEEESS: " + UserLocalStore.allowRefresh);
-
                     etTotalIdeas.setText(String.valueOf(jsonObject.getInt("postCount")));
 
                     if (jsonObject.isNull("totalFill")) {
@@ -133,11 +106,8 @@ public class UserstatFragment extends Fragment implements View.OnClickListener {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
             }
         });
-
         return v;
     }
 
@@ -165,5 +135,25 @@ public class UserstatFragment extends Fragment implements View.OnClickListener {
             case R.id.bStatInfo:
                 break;
         }
+    }
+
+    private void setUpVariables(View v) {
+        etLoggedInUser = (TextView) v.findViewById(R.id.etLoggedInUser);
+        etSignedUpDate = (TextView) v.findViewById(R.id.etSignedUpDate);
+        etSinceSignedUp = (TextView) v.findViewById(R.id.etSinceSignedUp);
+        etTotalIdeas = (TextView) v.findViewById(R.id.etTotalIdeas);
+        etTotalKills = (TextView) v.findViewById(R.id.etTotalKills);
+        etTotalFills = (TextView) v.findViewById(R.id.etTotalFills);
+        etFillRate = (TextView) v.findViewById(R.id.etFillRate);
+
+        bStatRoll = (Button) v.findViewById(R.id.bStatRoll);
+        bStatLog = (Button) v.findViewById(R.id.bStatLog);
+        bStatInfo = (Button) v.findViewById(R.id.bStatInfo);
+
+        bStatRoll.setOnClickListener(this);
+        bStatLog.setOnClickListener(this);
+        bStatInfo.setOnClickListener(this);
+        userLocalStore = new UserLocalStore(getContext());
+        volleyUserInfo = new VolleyUserInfo(getContext());
     }
 }

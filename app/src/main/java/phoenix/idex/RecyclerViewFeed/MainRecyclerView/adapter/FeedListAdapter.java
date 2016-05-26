@@ -44,7 +44,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
     private Context mContext;
     private LayoutInflater inflater;
     private List<FeedItem> feedItems;
-    private ImageLoader imageLoader = AppController.getInstance().getImageLoader();;
+    private ImageLoader imageLoader;
     private ServerRequests serverRequests;
     private UserLocalStore userLocalStore;
     private View postView;
@@ -98,7 +98,8 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
 
         if (currentPos.getTotalFill() >= 100) {
             holder.numFill.setTextSize(TypedValue.COMPLEX_UNIT_PX, holder.numKill.getTextSize() / (float) 1.2);
-        } else if (currentPos.getTotalKill() >= 100) {
+        }
+        if (currentPos.getTotalKill() >= 100) {
             holder.numKill.setTextSize(TypedValue.COMPLEX_UNIT_PX, holder.numKill.getTextSize() / (float) 1.2);
         }
         holder.numFill.setText("" + (currentPos.getTotalFill()));

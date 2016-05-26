@@ -94,22 +94,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal">
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Edit Profile"
-            android:id="@+id/bEditProfile"
-            android:layout_gravity="center_horizontal"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
-            android:layout_marginRight="5dp"/>
-        <Button
-            android:id="@+id/bChangePassword"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="Change Password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:id="@+id/imgbEditProfile"
+            android:background="@drawable/save_changes" />
+
+        <ImageButton
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:id="@+id/imgbChangePassword"
+            android:background="@drawable/change_password"
+            android:layout_marginLeft="20dp" />
+
     </LinearLayout>
 
 

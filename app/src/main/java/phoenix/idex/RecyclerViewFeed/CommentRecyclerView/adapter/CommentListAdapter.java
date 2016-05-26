@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,6 @@ import phoenix.idex.Activities.EditProfileActivity;
 import phoenix.idex.R;
 import phoenix.idex.RecyclerViewFeed.CommentRecyclerView.data.CommentItem;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
-import phoenix.idex.ServerConnections.ServerRequests;
 import phoenix.idex.UserLocalStore;
 import phoenix.idex.VolleyServerConnections.VolleyComments;
 
@@ -38,7 +38,6 @@ public class CommentListAdapter extends RecyclerSwipeAdapter<CommentListAdapter.
     private LayoutInflater inflater;
     private List<CommentItem> commentItems;
     private ImageLoader imageLoader = AppController.getInstance().getImageLoader();;
-    private ServerRequests serverRequests;
     private UserLocalStore userLocalStore;
     private View postView;
     private VolleyComments volleyComments;
@@ -63,7 +62,6 @@ public class CommentListAdapter extends RecyclerSwipeAdapter<CommentListAdapter.
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        serverRequests = new ServerRequests(mContext);
 
         final CommentItem currentPos = commentItems.get(position);
         holder.name.setText(currentPos.getName());
@@ -107,7 +105,10 @@ public class CommentListAdapter extends RecyclerSwipeAdapter<CommentListAdapter.
             holder.profilePic.setImageUrl("http://oi67.tinypic.com/24npqbk.jpg", imageLoader);
         }
 
-        // Set total recommend count in the text view
+        // Set total recommend count in the text view. Adjust size if number is big
+        if (currentPos.getRecommendTotalCount() >= 100) {
+            holder.tvRecommendedCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, holder.tvRecommendedCount.getTextSize() / (float) 1.2);
+        }
         holder.tvRecommendedCount.setText(currentPos.getRecommendTotalCount() + "");
 
         // Recommend button
@@ -228,13 +229,11 @@ public class CommentListAdapter extends RecyclerSwipeAdapter<CommentListAdapter.
 
     // Holder knows and references where the fields are
     public class ViewHolder extends RecyclerView.ViewHolder {
-        SwipeLayout swipeLayout;
-        NetworkImageView profilePic;
-        TextView txtComment, timestamp, name, tvManagePost, tvEditPost, tvRecommend, tvRecommendedCount;
-        LinearLayout bottomWrapper1;
-        LinearLayout commentLayout;
-        ImageView imgRecommend;
-
+        private SwipeLayout swipeLayout;
+        private NetworkImageView profilePic;
+        private TextView txtComment, timestamp, name, tvManagePost, tvEditPost, tvRecommend, tvRecommendedCount;
+        private LinearLayout bottomWrapper1;
+        private ImageView imgRecommend;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -247,26 +246,10 @@ public class CommentListAdapter extends RecyclerSwipeAdapter<CommentListAdapter.
             timestamp = (TextView) itemView.findViewById(R.id.timestampComment);
             tvEditPost = (TextView) itemView.findViewById(R.id.tvEditPost);
             bottomWrapper1 = (LinearLayout) itemView.findViewById(R.id.bottom_wrapper1);
-            commentLayout = (LinearLayout) itemView.findViewById(R.id.commentLayout);
             tvRecommend = (TextView) itemView.findViewById(R.id.tvRecommend);
             tvRecommendedCount =  (TextView) itemView.findViewById(R.id.tvRecommenedCount);
             imgRecommend = (ImageView) itemView.findViewById(R.id.imgRecommend);
-
-
-            /*
-            tvRecommend.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    CommentItem currentItem = commentItems.get(position);
-                    volleyComments.updateRecommend(currentItem.getCommentID());
-                    System.out.println("ID of comment is: " + currentItem.getCommentID());
-                    Toast.makeText(mContext, "Adding to recommend...", Toast.LENGTH_SHORT).show();
-                }
-            });*/
-
         }
-
     }
     @Override
     public int getSwipeLayoutResourceId(int position) {

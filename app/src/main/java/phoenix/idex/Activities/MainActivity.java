@@ -1,15 +1,20 @@
 package phoenix.idex.Activities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +23,9 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +33,7 @@ import phoenix.idex.ButtonClickedSingleton;
 import phoenix.idex.Fragments.AboutFragment;
 import phoenix.idex.Fragments.LoginActivityFragment;
 import phoenix.idex.Fragments.PostListFragment;
+import phoenix.idex.GCMRegistrationIntentService;
 import phoenix.idex.R;
 import phoenix.idex.SlidingDrawer.ItemSlideMenu;
 import phoenix.idex.SlidingDrawer.SlidingMenuAdapter;
@@ -46,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private UserLocalStore userLocalStore;
     private int sizeOfToolBar;
     private ButtonClickedSingleton clickActivity = ButtonClickedSingleton.getInstance();
+    private BroadcastReceiver registrationBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +92,62 @@ public class MainActivity extends AppCompatActivity {
             drawerListViewListener();
             toggleListener();
         }
+
+
+        registrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // Check the type of intent filter
+
+                if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_SUCCESS)) {
+                    // Registration success
+                    String token = intent.getStringExtra("token");
+                    Toast.makeText(getApplicationContext(), "GCM token " + token, Toast.LENGTH_SHORT).show();
+                } else if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_ERROR)) {
+                    // Registration error
+                    Toast.makeText(getApplicationContext(), "GCM registration error ", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Tobe define
+                }
+            }
+        };
+
+        // Check status of google play in the device
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+        if (ConnectionResult.SUCCESS != resultCode) {
+            // Check the type of error
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                Toast.makeText(getApplicationContext(), "Google play service is not enabled on this device ", Toast.LENGTH_SHORT).show();
+                // So notify
+                GooglePlayServicesUtil.showErrorNotification(resultCode, getApplicationContext());
+            } else {
+                Toast.makeText(getApplicationContext(), "Device doesn't support google play service ", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Start service
+            Intent intent = new Intent(this, GCMRegistrationIntentService.class);
+            startService(intent);
+
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.v("MainActivity", "onResume");
+        LocalBroadcastManager.getInstance(this).registerReceiver(registrationBroadcastReceiver,
+                new IntentFilter(GCMRegistrationIntentService.REGISTRATION_SUCCESS));
+        LocalBroadcastManager.getInstance(this).registerReceiver(registrationBroadcastReceiver,
+                new IntentFilter(GCMRegistrationIntentService.REGISTRATION_ERROR));
+    }
+
+    @Override
+    protected void onPause() {
+        // Unregister broadcast receiver
+
+        super.onPause();
+        Log.v("MainActivity", "onPause");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(registrationBroadcastReceiver);
     }
 
     public static int getThemeAttributeDimensionSize(Context context, int attr)

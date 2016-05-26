@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 23
@@ -15,6 +16,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
 
 
@@ -28,10 +30,10 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:multidex:1.0.0'
     compile files('libs/volley.jar');
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.github.PhilJay:MPAndroidChart:v2.2.4'
-    compile 'com.androidplot:androidplot-core:0.9.6'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.facebook.android:facebook-android-sdk:4.+'
     compile 'com.android.support:design:23.1.1'
@@ -40,4 +42,5 @@ dependencies {
     compile 'com.daimajia.swipelayout:library:1.2.0@aar'//Swipe for recycler view
     compile 'cz.msebera.android:httpclient:4.4.1.1' //HttpClient support
     compile 'com.github.ksoichiro:android-observablescrollview:1.6.0' //Manage toolbar visibility on scroll
+    compile 'com.google.android.gms:play-services-gcm:8.3.0'
 }

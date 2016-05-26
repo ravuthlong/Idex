@@ -399,7 +399,9 @@ public class VolleyComments {
                                     item.setCommentID(feedObj.getInt("commentID"));
                                     item.setName(name);
                                     item.setUsername(feedObj.getString("username"));
-                                    item.setComment(feedObj.getString("comment"));
+                                    String comment = feedObj.getString("comment");
+                                    comment = comment.replace("\\", "");
+                                    item.setComment(comment);
                                     item.setProfilePic(feedObj.getString("userpic"));
                                     item.setTimeStamp(feedObj.getString("date"));
                                     try {
