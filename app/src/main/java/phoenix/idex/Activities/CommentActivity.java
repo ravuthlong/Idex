@@ -264,6 +264,8 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
                             receivedNumKill = feedObj.getInt("totalKill");
                             receivedNumFill = feedObj.getInt("totalFill");
                             postID = feedObj.getInt("postID");
+                            receivedPost = feedObj.getString("post");
+
 
                             try {
                                 item.setFillOrKill(feedObj.getInt("status"));
@@ -316,10 +318,11 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
         switch (v.getId()) {
             case R.id.tvManagePost:
                 if (tvManagePost.getText().toString().equals("Delete")) {
-                    //volleyMainPosts.deleteAPostVolley(postID);
-                    Toast.makeText(v.getContext(), "Clicked on Delete ", Toast.LENGTH_SHORT).show();
+                    volleyMainPosts.deleteAPostVolley(postID);
                 } else {
                     Toast.makeText(v.getContext(), "Clicked on Report ", Toast.LENGTH_SHORT).show();
+
+                    // LATER.... push notify reported person
                 }
                 break;
             case R.id.tvEditPost:
@@ -333,7 +336,13 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
 
                 editPostDialog.setPositiveButton("Save Changes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        volleyMainPosts.updateAPost(postID, edittext.getText().toString());
+                        volleyMainPosts.updateAPost(postID, edittext.getText().toString(), new PostExecutionCallBack() {
+                            @Override
+                            public void postExecution() {
+                                // Refresh the comment page
+                                startActivity(new Intent(CommentActivity.this, CommentActivity.class));
+                            }
+                        });
                         setSharedPreference();
                     }
                 });
@@ -419,7 +428,6 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
 
                 }  else {
                     if (fillOrKill == 0) {
-                        System.out.println("CANCEL KILL");
 
                         // There's a kill already so cancel kill
                         serverRequests.minusKillInBackground(postID);
@@ -430,7 +438,6 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
                     } else {
 
                         if (fillOrKill == 1) {
-                            System.out.println("CLICK KILL. ALREADY HAS FILL");
 
                             serverRequests.updateKillAndKillColumnInBackground(postID);
                             serverRequests.minusFillInBackground(postID);
@@ -473,41 +480,9 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
                         //finish();
                     }
                 });
-
-
                 break;
         }
     }
-
-    /*
-    // Pull JSON directly from the PHP JSON result
-    private void getJsonLive() {
-
-        progressDialog.show();
-        // making fresh volley request and getting json
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
-                URL_Comment, null, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                VolleyLog.d(TAG, "Response: " + response.toString());
-                if (response != null) {
-                    jsonParserComment.parseJsonFeed(response);
-                    progressDialog.dismiss();
-                }
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                progressDialog.dismiss();
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-            }
-        });
-        // Adding request to volley request queue
-        AppController.getInstance().addToRequestQueue(jsonReq);
-    }*/
-
 
     @Override
     public void onRefresh() {
@@ -535,8 +510,6 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
 
     }
 
-
-
     private void setSharedPreference() {
         sharedPref = getSharedPreferences("mySettings", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -544,6 +517,7 @@ public class CommentActivity extends AppCompatActivity implements SwipeRefreshLa
         editor.putInt("postID", postID);
         editor.putInt("clickStatus", fillOrKill);
         editor.putString("username", receivedUsername);
+        editor.putString("receivedPost", receivedPost);
         editor.apply();
     }
 }

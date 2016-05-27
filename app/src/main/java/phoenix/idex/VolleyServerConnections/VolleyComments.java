@@ -52,8 +52,8 @@ public class VolleyComments {
     public void updateRecommend(int commentID) {
         new UpdateRecommendVolley(commentID).updateRecommend();
     }
-    public void addToUserCommentList(int commentID, int userID) {
-        new AddToCommentList(commentID, userID).addToCommentList();
+    public void addToUserCommentList(int commentID, int postID, int userID) {
+        new AddToCommentList(commentID, postID, userID).addToCommentList();
     }
     public void removeFromRecommendedList(int commentID, int userID) {
         new RemoveRecommendVolley(commentID, userID).removeRecommend();
@@ -478,10 +478,12 @@ public class VolleyComments {
     public class AddToCommentList {
         private int commentID;
         private int userID;
+        private int postID;
 
-        public AddToCommentList(int commentID, int userID) {
+        public AddToCommentList(int commentID, int postID, int userID) {
             this.commentID = commentID;
             this.userID = userID;
+            this.postID = postID;
         }
 
         // Pull JSON directly from the PHP JSON result
@@ -505,6 +507,7 @@ public class VolleyComments {
                     Map<String, String> params = new HashMap<>();
                     params.put("commentID", Integer.toString(commentID));
                     params.put("userID", Integer.toString(userID));
+                    params.put("postID", Integer.toString(postID));
 
                     return params;
                 }

@@ -1,6 +1,7 @@
 package phoenix.idex.Fragments;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -13,73 +14,48 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.Profile;
 import com.facebook.ProfileTracker;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.Activities.SignUpActivity;
 import phoenix.idex.ButtonClickedSingleton;
+import phoenix.idex.GoogleCloudMessaging.GCMRegistrationIntentService;
 import phoenix.idex.R;
-import phoenix.idex.ServerConnections.ServerRequests;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
+import phoenix.idex.VolleyServerConnections.VolleyGCM;
 import phoenix.idex.VolleyServerConnections.VolleyUserInfo;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class LoginActivityFragment extends Fragment implements View.OnClickListener {
-    private TextView mTextDetails;
+
     private CallbackManager mCallbackManager;
     private ImageButton imgbRegister, imgbLogin;
     private ImageView imgLogo;
-    private Button bRegister, bLogin, bBrowseIdea;
     private AccessTokenTracker mTokenTracker;
     private ProfileTracker mProfileTracker;
     private View v;
-    private int sizeOfActionBar;
-    RelativeLayout rLayoutMain;
     private UserLocalStore userLocalStore;
-    private TextView etUsername, etPassword, tvIdexTitle, tvContinue, tvUsername, tvPassword;
+    private TextView etUsername, etPassword, tvContinue, tvUsername, tvPassword;
     private android.support.v7.widget.Toolbar toolbar;
     private FragmentManager fragmentManager;
     private ButtonClickedSingleton clickActivity = ButtonClickedSingleton.getInstance();
     private VolleyUserInfo volleyUserInfo;
+    private VolleyGCM volleyGCM;
+    private BroadcastReceiver registrationBroadcastReceiver;
 
-
-    private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
-        @Override
-        public void onSuccess(LoginResult loginResult) {
-            AccessToken accessToken = loginResult.getAccessToken();
-            Profile profile = Profile.getCurrentProfile();
-            displayWelcomeMessage(profile);
-        }
-
-        @Override
-        public void onCancel() {
-
-        }
-
-        @Override
-        public void onError(FacebookException e) {
-
-        }
-    };
     public LoginActivityFragment() {
     }
 
@@ -88,28 +64,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
         super.onCreate(savedInstanceState);
 
         userLocalStore = new UserLocalStore(getActivity());
-
-        FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
-        mCallbackManager = CallbackManager.Factory.create();
-
-        // Track facebook users here
-        AccessTokenTracker tracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldToken, AccessToken newToken) {
-
-            }
-        };
-
-        ProfileTracker profileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(Profile oldProfile, Profile newProfile) {
-                displayWelcomeMessage(newProfile);
-            }
-        };
-
-
-        tracker.startTracking();
-        profileTracker.startTracking();
+        volleyGCM = new VolleyGCM(getContext());
     }
 
     @Override
@@ -126,6 +81,8 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
                              Bundle savedInstanceState) {
 
         v = inflater.inflate(R.layout.frag_login, container, false);
+
+
         imgbRegister = (ImageButton) v.findViewById(R.id.imgbRegister);
         imgbLogin = (ImageButton) v.findViewById(R.id.imgbLogin);
         etUsername = (TextView) v.findViewById(R.id.etUsername);
@@ -188,7 +145,6 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
 
     // Authenticate that the correct user is trying to log in
     private void authenticate(User user){
-        ServerRequests serverRequests = new ServerRequests(getActivity());
         volleyUserInfo = new VolleyUserInfo(getActivity());
 
         volleyUserInfo.fetchUserInfo(user, new GetUserCallBack() {
@@ -202,38 +158,74 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
                     showNoInternetError();
                 } else if(returnedUser == null){
                     showNoUserErrorMessage();
-                }else{
+                } else {
+                    System.out.println("RETURNED USER'S");
+
                     userLocalStore.storeUserData(returnedUser);
                     UserLocalStore.isUserLoggedIn = true;
                     UserLocalStore.allowRefresh = true;
                     clickActivity.setRollClicked();
                     logUserIn();
+
+                    // UPDATE TOKEN IF PHONE TOKEN CHANGED
+                    checkForTokenUpdate(returnedUser);
+                    System.out.println("RETURNED USER'S TOKEN IS: " + returnedUser.getToken());
                 }
             }
         });
 
+    }
 
-        /*
-        serverRequests.logUserInDataInBackground(user, new GetUserCallBack() {
+    // Check if there needs to be a token update based on token on current logged in device
+    // and the token saved in the user's database
+    private void checkForTokenUpdate(final User user) {
+
+        System.out.println("WTFFFFF");
+
+        // Check status of google play in the device
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext().getApplicationContext());
+        if (ConnectionResult.SUCCESS != resultCode) {
+            // Check the type of error
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                Toast.makeText(getContext().getApplicationContext(), "Google play service is not enabled on this device ", Toast.LENGTH_SHORT).show();
+                // So notify
+                GooglePlayServicesUtil.showErrorNotification(resultCode, getContext().getApplicationContext());
+            } else {
+                Toast.makeText(getContext().getApplicationContext(), "Device doesn't support google play service ", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            /*
+             * Start service for registering GCM
+             */
+            Intent intent = new Intent(getActivity(), GCMRegistrationIntentService.class);
+            getContext().startService(intent);
+
+        }
+
+        registrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
-            public void done(User returnedUser) {
-                // Wrong username and password
-                ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo  = connectivityManager.getActiveNetworkInfo();
+            public void onReceive(Context context, Intent intent) {
+                System.out.println("I RECEIVED SOME SHIT");
 
-                if (networkInfo == null) {
-                    showNoInternetError();
-                } else if(returnedUser == null){
-                    showNoUserErrorMessage();
-                }else{
-                    userLocalStore.storeUserData(returnedUser);
-                    UserLocalStore.isUserLoggedIn = true;
-                    UserLocalStore.allowRefresh = true;
-                    clickActivity.setRollClicked();
-                    logUserIn();
+                // Check the type of intent filter
+                if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_SUCCESS)) {
+                    // Registration success
+                    String currentDeviceToken = intent.getStringExtra("token");
+
+                    // If the current logged in device doesn't match user's database token, update it
+                    if (!currentDeviceToken.equals(user.getToken())) {
+
+                        System.out.println("I'M UPDATING THE TOKEN NOW HAHAHAHA");
+                        // Update to the logged in device's token for push notification
+                        volleyGCM.updateGCMToken(user.getUserID(), currentDeviceToken);
+                    }
+                } else if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_ERROR)) {
+                    // Registration error
+                } else {
+                    // Tobe define
                 }
             }
-        });*/
+        };
     }
 
     // Error if the user info is incorrect
@@ -262,31 +254,8 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        LoginButton loginButton = (LoginButton) view.findViewById(R.id.login_button);
-        loginButton.setReadPermissions("basic_info");
-        loginButton.setFragment(this);
-        loginButton.registerCallback(mCallbackManager, mCallback);
-
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Profile profile = Profile.getCurrentProfile();
-        displayWelcomeMessage(profile);
-    }
-
-    private void displayWelcomeMessage(Profile profile){
-        if(profile != null){
-            mTextDetails.setText("Welcome " + profile.getName());
-        }
     }
 }

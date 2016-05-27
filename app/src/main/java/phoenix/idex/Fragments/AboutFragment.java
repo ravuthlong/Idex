@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.R;
 
 /**
@@ -35,7 +34,7 @@ public class AboutFragment extends android.support.v4.app.Fragment {
                 break;
             case Configuration.SCREENLAYOUT_SIZE_NORMAL:
                 System.out.println("NORMAL SCREEN");
-                MainActivity.rLayoutMain.setPadding(0, 290, 0, 0);
+                //MainActivity.rLayoutMain.setPadding(0, 290, 0, 0);
 
                 break;
             case Configuration.SCREENLAYOUT_SIZE_LARGE:

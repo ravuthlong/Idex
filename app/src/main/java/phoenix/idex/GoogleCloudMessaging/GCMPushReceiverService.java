@@ -1,4 +1,4 @@
-package phoenix.idex;
+package phoenix.idex.GoogleCloudMessaging;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,14 +12,14 @@ import android.support.v7.app.NotificationCompat;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import phoenix.idex.Activities.MainActivity;
+import phoenix.idex.R;
 
 /**
  * Created by Ravinder on 5/25/16.
  */
 
 // To receive message send from GCM server
-
-public class GCMPushReceiverService extends GcmListenerService{
+public class GCMPushReceiverService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
@@ -28,6 +28,7 @@ public class GCMPushReceiverService extends GcmListenerService{
     }
 
     private void sendNotification(String message) {
+
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         int requestCode = 0; // our request code
@@ -39,7 +40,7 @@ public class GCMPushReceiverService extends GcmListenerService{
         // Build notification
         android.support.v4.app.NotificationCompat.Builder noBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentText("GCM Test")
+                .setContentTitle("Notification")
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);

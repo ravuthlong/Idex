@@ -41,7 +41,6 @@ public class DashFragment extends Fragment implements TextWatcher, View.OnClickL
     private ButtonClickedSingleton buttonMonitor = ButtonClickedSingleton.getInstance();
     private FragmentManager fragmentManager;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_dash, container, false);
@@ -58,23 +57,6 @@ public class DashFragment extends Fragment implements TextWatcher, View.OnClickL
 
         buttonMonitor.setUpButtons(bDashRoll, bDashLog, bDashInfo);
 
-        /*
-        setSupportActionBar(toolbardash);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
-
-        if (toolbardash != null) {
-            toolbardash.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onBackPressed();
-                }
-            });
-        }*/
-
-
         userLocalStore = new UserLocalStore(getContext());
         serverRequests = new ServerRequests(getContext());
         volleyMainPosts = new VolleyMainPosts(getContext());
@@ -84,7 +66,6 @@ public class DashFragment extends Fragment implements TextWatcher, View.OnClickL
         bDashLog.setOnClickListener(this);
         bDashRoll.setOnClickListener(this);
         return v;
-
     }
 
 
@@ -95,7 +76,7 @@ public class DashFragment extends Fragment implements TextWatcher, View.OnClickL
                 String unixTime = Long.toString(System.currentTimeMillis());
                 User user = userLocalStore.getLoggedInUser();
 
-                volleyMainPosts.storeAPostVolley(editText.getText().toString(),
+                volleyMainPosts.storeAPostVolley(getContext(), editText.getText().toString(),
                         user.getUserID(), unixTime);
 
             case R.id.bDashRoll:

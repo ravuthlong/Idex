@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import phoenix.idex.Activities.EditProfileActivity;
-import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.ButtonClickedSingleton;
 import phoenix.idex.R;
 import phoenix.idex.TabAdapter.ViewPagerAdapter;
@@ -48,7 +47,7 @@ public class TabFragment extends Fragment implements ViewPager.OnPageChangeListe
                 break;
             case Configuration.SCREENLAYOUT_SIZE_NORMAL:
                 System.out.println("NORMAL SCREEN");
-                MainActivity.rLayoutMain.setPadding(0, 320, 0, 0);
+                //MainActivity.rLayoutMain.setPadding(0, 130, 0, 0);
 
                 break;
             case Configuration.SCREENLAYOUT_SIZE_LARGE:

@@ -93,25 +93,23 @@ public class VolleyUserInfo {
                             //UserLocalStore.isUserLoggedIn = true;
                             // Get the user details
                             int userID = response.getInt("userID");
+                            String token = response.getString("token");
                             String firstname = response.getString("firstname");
                             String lastname = response.getString("lastname");
                             String email = response.getString("email");
                             String username = response.getString("username");
                             String date = response.getString("date");
-                            returnedUser = new User(userID, firstname, lastname, email, username, date);
+                            returnedUser = new User(userID, token, firstname, lastname, email, username, date);
                         }
                         userCallBack.done(returnedUser);
 
                     } catch (JSONException e) {
-                        System.out.println("22222");
-
                         e.printStackTrace();
                     }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println("jaja");
                     progressDialog.dismiss();
                     error.printStackTrace();
                 }
@@ -217,6 +215,7 @@ public class VolleyUserInfo {
         public void storeUserInfo() {
 
             Map<String, String> params = new HashMap<>();
+            params.put("token", user.getToken());
             params.put("firstname", user.getFirstname());
             params.put("lastname", user.getLastname());
             params.put("email", user.getEmail());
@@ -232,7 +231,7 @@ public class VolleyUserInfo {
 
                     try {
                         int userID = response.getInt("id");
-                        userCallBack.done(new User(userID, user.getFirstname(), user.getLastname(), user.getEmail(),
+                        userCallBack.done(new User(userID, user.getToken(), user.getFirstname(), user.getLastname(), user.getEmail(),
                                 user.getUsername(), user.getTime()));
 
                     } catch (JSONException e) {

@@ -33,11 +33,12 @@ import phoenix.idex.ButtonClickedSingleton;
 import phoenix.idex.Fragments.AboutFragment;
 import phoenix.idex.Fragments.LoginActivityFragment;
 import phoenix.idex.Fragments.PostListFragment;
-import phoenix.idex.GCMRegistrationIntentService;
+import phoenix.idex.GoogleCloudMessaging.GCMRegistrationIntentService;
 import phoenix.idex.R;
 import phoenix.idex.SlidingDrawer.ItemSlideMenu;
 import phoenix.idex.SlidingDrawer.SlidingMenuAdapter;
 import phoenix.idex.UserLocalStore;
+import phoenix.idex.VolleyServerConnections.VolleyGCM;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,15 +54,16 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager;
     public static boolean isMainShown = false;
     private UserLocalStore userLocalStore;
-    private int sizeOfToolBar;
     private ButtonClickedSingleton clickActivity = ButtonClickedSingleton.getInstance();
     private BroadcastReceiver registrationBroadcastReceiver;
+    private VolleyGCM volleyGCM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slidingdrawer);
         userLocalStore = new UserLocalStore(this);
+        volleyGCM = new VolleyGCM(this);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -72,8 +74,6 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.listViewMain);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayoutMain);
         rLayoutMain = (RelativeLayout) findViewById(R.id.rLayoutMain);
-
-        sizeOfToolBar = getThemeAttributeDimensionSize(this, R.attr.actionBarSize);
 
         // If user logged in before, keep them logged in
         if (!userLocalStore.getLoggedInUser().getUsername().equals("")) {
@@ -94,24 +94,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        registrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                // Check the type of intent filter
-
-                if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_SUCCESS)) {
-                    // Registration success
-                    String token = intent.getStringExtra("token");
-                    Toast.makeText(getApplicationContext(), "GCM token " + token, Toast.LENGTH_SHORT).show();
-                } else if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_ERROR)) {
-                    // Registration error
-                    Toast.makeText(getApplicationContext(), "GCM registration error ", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Tobe define
-                }
-            }
-        };
-
         // Check status of google play in the device
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
         if (ConnectionResult.SUCCESS != resultCode) {
@@ -124,11 +106,46 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Device doesn't support google play service ", Toast.LENGTH_SHORT).show();
             }
         } else {
-            // Start service
+            /*
+             * Start service for registering GCM
+             */
             Intent intent = new Intent(this, GCMRegistrationIntentService.class);
             startService(intent);
 
         }
+
+        registrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // Check the type of intent filter
+
+                if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_SUCCESS)) {
+                    // Registration success
+                    String deviceToken = intent.getStringExtra("token");
+
+                    // insert to database
+                    volleyGCM.storeAToken(deviceToken);
+
+                    // If the current logged in device doesn't match user's database token, update it
+                    if ((!deviceToken.equals(userLocalStore.getLoggedInUser().getToken())) && UserLocalStore.isUserLoggedIn) {
+
+                        // Update to the logged in device's token for push notification
+                        volleyGCM.updateGCMToken(userLocalStore.getLoggedInUser().getUserID(), deviceToken);
+                    }
+
+                    // if user is logged in, check to update their token
+
+                    //Toast.makeText(getApplicationContext(), "GCM token " + deviceToken, Toast.LENGTH_SHORT).show();
+                } else if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_ERROR)) {
+                    // Registration error
+                    Toast.makeText(getApplicationContext(), "GCM registration error ", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Tobe define
+                }
+            }
+        };
+
+
     }
 
     @Override
@@ -188,9 +205,10 @@ public class MainActivity extends AppCompatActivity {
     private void setUpDrawerList() {
         itemList = new ArrayList<>();
 
-        itemList.add(new ItemSlideMenu("Log In"));
         itemList.add(new ItemSlideMenu("Roll"));
         itemList.add(new ItemSlideMenu("About"));
+        itemList.add(new ItemSlideMenu("Log In"));
+
 
         adapter = new SlidingMenuAdapter(this, itemList);
         listView.setAdapter(adapter);
@@ -200,9 +218,10 @@ public class MainActivity extends AppCompatActivity {
     private void setUpFragments() {
         fragmentList = new ArrayList<>();
 
-        fragmentList.add(new LoginActivityFragment());
         fragmentList.add(new PostListFragment());
         fragmentList.add(new AboutFragment());
+        fragmentList.add(new LoginActivityFragment());
+
     }
 
     // Add items to the drawer list for navigation drawer
@@ -231,8 +250,6 @@ public class MainActivity extends AppCompatActivity {
     // Start up state
     //Title Idex, with closed navigation drawer and default fragment 1
     private void screenStartUpState() {
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-       // rLayoutMain.setPadding(0,0,0,0);
         isMainShown = true;
         setTitle("");
         FragmentManager fragmentManager = getSupportFragmentManager();

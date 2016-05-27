@@ -1,4 +1,4 @@
-package phoenix.idex;
+package phoenix.idex.GoogleCloudMessaging;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+
+import phoenix.idex.R;
 
 /**
  * Created by Ravinder on 5/24/16.
@@ -45,12 +47,9 @@ public class GCMRegistrationIntentService extends IntentService {
 
         }
 
-        // Send Broadcast
+        // Send Broadcast when registration is done
+        // both case error or non-error
+        // Broadcast is received in MainActivity.java
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
-
-
-
     }
-
-
 }

@@ -88,7 +88,8 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
                 break;
             case Configuration.SCREENLAYOUT_SIZE_NORMAL:
                 System.out.println("NORMAL SCREEN");
-                MainActivity.rLayoutMain.setPadding(0, 310, 0, 0);
+
+               // MainActivity.rLayoutMain.setPadding(0, toolbar.getHeight(), 0, 0);
 
                 break;
             case Configuration.SCREENLAYOUT_SIZE_LARGE:
@@ -212,7 +213,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
 
     }
 
-
     @Override
     public void onClick(View v) {
         switch(v.getId()) {
@@ -278,8 +278,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
         });
     }
 
-
-
     // If user is not logged in, hide the widget. Otherwise, show the widget.
     private void hideWidget() {
         if (!UserLocalStore.isUserLoggedIn) {
@@ -289,7 +287,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
 
     private void notLoggedInMessage() {
         Toast.makeText(getContext(), "You are not logged in", Toast.LENGTH_SHORT).show();
-
     }
 
 
@@ -299,7 +296,6 @@ public class PostListFragment extends Fragment implements  View.OnClickListener,
 
         if (allowRefreshFromBackButton) {
 
-            System.out.println("I'M ON RESUME");
             util.getInternetStatus(getContext(), new NetworkConnectionCallBack() {
                 @Override
                 public void networkConnection(boolean isConnected) {

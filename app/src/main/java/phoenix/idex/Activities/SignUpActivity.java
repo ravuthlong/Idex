@@ -1,5 +1,7 @@
 package phoenix.idex.Activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,23 +14,31 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import phoenix.idex.GoogleCloudMessaging.GCMRegistrationIntentService;
 import phoenix.idex.R;
 import phoenix.idex.ServerRequestCallBacks.GetUserCallBack;
 import phoenix.idex.User;
 import phoenix.idex.UserLocalStore;
+import phoenix.idex.VolleyServerConnections.VolleyGCM;
 import phoenix.idex.VolleyServerConnections.VolleyUserInfo;
 
 
 public class SignUpActivity extends AppCompatActivity {
     private VolleyUserInfo volleyUserInfo;
-    EditText etFirstName, etLastName, etEmail, etUsername, etPassword, etConfirmPass;
+    private EditText etFirstName, etLastName, etEmail, etUsername, etPassword, etConfirmPass;
     private UserLocalStore userLocalStore;
+    private BroadcastReceiver registrationBroadcastReceiver;
+    private String deviceToken;
+    private VolleyGCM volleyGCM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +51,7 @@ public class SignUpActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }        setTitle("Sign Up");
         userLocalStore = new UserLocalStore(this);
+        volleyGCM = new VolleyGCM(this);
 
         etFirstName = (EditText) findViewById(R.id.etFirstName);
         etLastName = (EditText) findViewById(R.id.etLastName);
@@ -126,7 +137,9 @@ public class SignUpActivity extends AppCompatActivity {
         }
         if (errorFields.matches("")) {
             String timeStamp = new SimpleDateFormat("dd/MM/yyyy",  Locale.getDefault()).format(Calendar.getInstance().getTime());
-            User user = new User(firstname, lastname, email, username, password, timeStamp);
+
+            String token = getDeviceToken();
+            User user = new User(token, firstname, lastname, email, username, password, timeStamp);
             registerUser(user);
         }
     }
@@ -178,5 +191,53 @@ public class SignUpActivity extends AppCompatActivity {
             }
         }
         return isValid;
+    }
+
+    private String getDeviceToken() {
+        // Check status of google play in the device
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+        if (ConnectionResult.SUCCESS != resultCode) {
+            // Check the type of error
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                Toast.makeText(getApplicationContext(), "Google play service is not enabled on this device ", Toast.LENGTH_SHORT).show();
+                // So notify
+                GooglePlayServicesUtil.showErrorNotification(resultCode, getApplicationContext());
+            } else {
+                Toast.makeText(getApplicationContext(), "Device doesn't support google play service ", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            /*
+             * Start service for registering GCM
+             */
+            Intent intent = new Intent(this, GCMRegistrationIntentService.class);
+            startService(intent);
+
+        }
+
+        registrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // Check the type of intent filter
+
+                if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_SUCCESS)) {
+                    // Registration success
+                    deviceToken = intent.getStringExtra("token");
+
+                    // insert to database
+                    volleyGCM.storeAToken(deviceToken);
+
+                    // if user is logged in, check to update their token
+
+                    Toast.makeText(getApplicationContext(), "GCM token " + deviceToken, Toast.LENGTH_SHORT).show();
+                } else if (intent.getAction().endsWith(GCMRegistrationIntentService.REGISTRATION_ERROR)) {
+                    // Registration error
+                    Toast.makeText(getApplicationContext(), "GCM registration error ", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Tobe define
+                }
+            }
+        };
+
+        return deviceToken;
     }
 }

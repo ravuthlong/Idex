@@ -27,11 +27,13 @@ import java.util.List;
 
 import phoenix.idex.Activities.CommentActivity;
 import phoenix.idex.Activities.EditProfileActivity;
+import phoenix.idex.Activities.MainActivity;
 import phoenix.idex.Graphing.GraphActivity;
 import phoenix.idex.R;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.data.FeedItem;
 import phoenix.idex.ServerConnections.ServerRequests;
+import phoenix.idex.ServerRequestCallBacks.PostExecutionCallBack;
 import phoenix.idex.SoundPlayer;
 import phoenix.idex.UserLocalStore;
 import phoenix.idex.VolleyServerConnections.VolleyMainPosts;
@@ -48,7 +50,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
     private ServerRequests serverRequests;
     private UserLocalStore userLocalStore;
     private View postView;
-    boolean swipeIsActive = true;
+    private boolean swipeIsActive = true;
     private VolleyMainPosts volleyMainPosts;
     private SoundPlayer fillSound, killSound;
     private AlertDialog.Builder editPostDialog;
@@ -79,10 +81,6 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, int position) {
         serverRequests = new ServerRequests(mContext);
         volleyMainPosts = new VolleyMainPosts(mContext);
-
-        // Initialize fonts
-        //Typeface killFillFont = Typeface.createFromAsset(mContext.getAssets(), "Menufont.ttf");
-        //holder.name.setTypeface(killFillFont);
 
         holder.name.setTextColor(ContextCompat.getColor(mContext, R.color.font));
         holder.txtStatusMsg.setTextColor(ContextCompat.getColor(mContext, R.color.font));
@@ -115,6 +113,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         if (currentPos.getUsername().equals(userLocalStore.getLoggedInUser().getUsername())) {
             holder.tvManagePost.setText("Delete");
             holder.tvEditPost.setVisibility(View.VISIBLE);
+            holder.tvManagePost.setVisibility(View.VISIBLE);
 
         } else {
             holder.bottomWrapper1.setWeightSum(1);
@@ -293,35 +292,28 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                 final EditText edittext = new EditText(mContext);
                 edittext.setText(currentPos.getStatus());
 
-                //editPostDialog.setMessage("Enter Your Message");
                 editPostDialog.setTitle("Edit Post");
                 editPostDialog.setView(edittext);
 
                 editPostDialog.setPositiveButton("Save Changes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        volleyMainPosts.updateAPost(currentPos.getId(), edittext.getText().toString());
+                        volleyMainPosts.updateAPost(currentPos.getId(), edittext.getText().toString(), new PostExecutionCallBack() {
+                            @Override
+                            public void postExecution() {
+                                mContext.startActivity(new Intent(mContext, MainActivity.class));
+                            }
+                        });
                     }
                 });
 
                 editPostDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        // what ever you want to do with No option.
+                        // what ever i want to do with No option.
                     }
                 });
                 editPostDialog.show();
             }
         });
-        /*
-       //  Close the swipeLayout when user click on the post
-        holder.swipeLayout.getSurfaceView().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("333");
-
-                    holder.swipeLayout.close();
-
-            }
-        });*/
 
         holder.tvManagePost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -392,8 +384,7 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
         private ImageButton imgbFill, imgbKill;
         private TextView tvGraph, numFill, numKill, txtStatusMsg, timestamp, name, tvManagePost,
                 tvEditPost;
-        private LinearLayout bottomWrapper1;
-        private LinearLayout postLayout;
+        private LinearLayout bottomWrapper1, postLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -433,15 +424,12 @@ public class FeedListAdapter extends RecyclerSwipeAdapter<FeedListAdapter.ViewHo
                         postInfo.putExtra("clickStatus", currentItem.getFillOrKill());
                         postInfo.putExtra("username", currentItem.getUsername());
                         postInfo.putExtra("fillOrkill", currentItem.getFillOrKill());
-
-
                         mContext.startActivity(postInfo);
                     }
                 }
             });
         }
     }
-
 
     @Override
     public int getSwipeLayoutResourceId(int position) {

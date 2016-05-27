@@ -28,6 +28,7 @@ import phoenix.idex.RecyclerViewFeed.MainRecyclerView.adapter.FeedListAdapter;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.app.AppController;
 import phoenix.idex.RecyclerViewFeed.MainRecyclerView.data.FeedItem;
 import phoenix.idex.ServerRequestCallBacks.GraphInfoCallBack;
+import phoenix.idex.ServerRequestCallBacks.PostExecutionCallBack;
 import phoenix.idex.UserLocalStore;
 
 /**
@@ -45,19 +46,18 @@ public class VolleyMainPosts {
         progressDialog.setMessage("Loading...");
     }
 
-
     public void fetchAGraph(int postID, ProgressDialog progressDialog, GraphInfoCallBack graphInfoCallBack) {
         progressDialog.setMessage("Loading Graph...");
         new FetchGraphInfoVolley(postID, progressDialog, graphInfoCallBack).fetchGraphVolley();
     }
-    public void storeAPostVolley(String post, int userID, String timeStamp) {
+    public void storeAPostVolley(Context context, String post, int userID, String timeStamp) {
         progressDialog.show();
-        new StoreAPostVolley(post, userID, timeStamp).storeAPost();
+        new StoreAPostVolley(context, post, userID, timeStamp).storeAPost();
     }
 
-    public void updateAPost(int postID, String newPost) {
+    public void updateAPost(int postID, String newPost, PostExecutionCallBack postExecutionCallBack) {
         progressDialog.show();
-        new UpdateAPost(postID, newPost).updateAPost();
+        new UpdateAPost(postID, newPost, postExecutionCallBack).updateAPost();
     }
 
     public void deleteAPostVolley(int postID) {
@@ -83,10 +83,12 @@ public class VolleyMainPosts {
     public class UpdateAPost {
         private int postID;
         private String newPost;
+        private PostExecutionCallBack postExecutionCallBack;
 
-        public UpdateAPost(int postID, String newPost) {
+        public UpdateAPost(int postID, String newPost, PostExecutionCallBack postExecutionCallBack) {
             this.postID = postID;
             this.newPost = newPost;
+            this.postExecutionCallBack = postExecutionCallBack;
         }
 
         // Pull JSON directly from the PHP JSON result
@@ -99,7 +101,8 @@ public class VolleyMainPosts {
                 public void onResponse(String response) {
                     progressDialog.dismiss();
                     UserLocalStore.allowRefresh = true;
-                    context.startActivity(new Intent(context, MainActivity.class));
+                    postExecutionCallBack.postExecution();
+                    //context.startActivity(new Intent(context, MainActivity.class));
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -124,11 +127,15 @@ public class VolleyMainPosts {
         private String post;
         private int userID;
         private String timeStamp;
+        private Context context;
+        private VolleyGCM volleyGCM;
 
-        public StoreAPostVolley(String post, int userID, String timeStamp) {
+        public StoreAPostVolley(Context context, String post, int userID, String timeStamp) {
             this.post = post;
             this.userID = userID;
             this.timeStamp = timeStamp;
+            this.context = context;
+            this.volleyGCM = new VolleyGCM(context);
         }
 
         // Pull JSON directly from the PHP JSON result
@@ -140,6 +147,11 @@ public class VolleyMainPosts {
                 @Override
                 public void onResponse(String response) {
                     progressDialog.dismiss();
+
+                    // Send push notification that there's a new post
+                    volleyGCM = new VolleyGCM(context);
+                    volleyGCM.sendNotification("New Idea Posted");
+
                     UserLocalStore.allowRefresh = true;
                     context.startActivity(new Intent(context, MainActivity.class));
                 }
@@ -548,8 +560,4 @@ public class VolleyMainPosts {
             AppController.getInstance().addToRequestQueue(jsonReq);
         }
     }
-
-
-
-
 }

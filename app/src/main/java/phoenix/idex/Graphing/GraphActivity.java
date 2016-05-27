@@ -32,6 +32,7 @@ import java.util.ArrayList;
 
 import phoenix.idex.R;
 import phoenix.idex.ServerRequestCallBacks.GraphInfoCallBack;
+import phoenix.idex.VolleyServerConnections.VolleyGCM;
 import phoenix.idex.VolleyServerConnections.VolleyMainPosts;
 
 /**
@@ -43,8 +44,7 @@ public class GraphActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private TextView tvCurrentValue, tvValueTxt, tvPressedValue, tvPressedPercent;
     private LinearLayout linearGraph3, linearGraph4;
-
-    ArrayList<CandleEntry> yVals1 = new ArrayList<>();
+    private ArrayList<CandleEntry> yVals1 = new ArrayList<>();
 
     class FillKillObject {
         private int fill;
@@ -67,6 +67,7 @@ public class GraphActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_graph);

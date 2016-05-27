@@ -4,15 +4,28 @@ package phoenix.idex;
  * Created by Ravinder on 3/2/16.
  */
 public class User {
-    private String firstname, lastname, email, username, password, time;
+
+    private String token, firstname, lastname, email, username, password, time;
     private int userID;
     // User for signing up
-    public User(String firstname, String lastname, String email, String username, String password, String time) {
+    public User(String token, String firstname, String lastname, String email, String username, String password, String time) {
+        this.token = token;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.username = username;
         this.password = password;
+        this.time = time;
+    }
+
+    // User for current user storage
+    public User(int userID, String token, String firstname, String lastname, String email, String username, String time) {
+        this.userID = userID;
+        this.token = token;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.username = username;
         this.time = time;
     }
 
@@ -26,6 +39,7 @@ public class User {
         this.time = time;
     }
 
+
     // User for current user storage
     public User(int userID, String firstname, String lastname, String email, String username) {
         this.userID = userID;
@@ -34,9 +48,6 @@ public class User {
         this.email = email;
         this.username = username;
     }
-
-
-
 
     // User for logging in
     public User(String username, String password) {
@@ -67,6 +78,7 @@ public class User {
         return userID;
     }
     public String getTime() { return time;}
+    public String getToken() { return token; }
 
 
     public void setFirstName(String firstname) {
@@ -85,6 +97,7 @@ public class User {
     public void serUserID(int userID) {
         this.userID = userID;
     }
+    public void setToken(String token) { this.token = token; }
 
 }
 

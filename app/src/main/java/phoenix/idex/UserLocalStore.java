@@ -26,6 +26,7 @@ public class UserLocalStore {
         spEditor.putString("email", user.getEmail());
         spEditor.putString("username", user.getUsername());
         spEditor.putString("time", user.getTime());
+        spEditor.putString("token", user.getToken());
         spEditor.commit();
     }
 
@@ -36,8 +37,9 @@ public class UserLocalStore {
         String email = userLocalDataStore.getString("email", "");
         String username = userLocalDataStore.getString("username", "");
         String time = userLocalDataStore.getString("time", "");
+        String token = userLocalDataStore.getString("token", "");
 
-        storedUser = new User(userID, firstname, lastname, email, username, time);
+        storedUser = new User(userID, token, firstname, lastname, email, username, time);
         return storedUser;
     }
 

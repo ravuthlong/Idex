@@ -1,8 +1,10 @@
-package phoenix.idex;
+package phoenix.idex.GoogleCloudMessaging;
 
 import android.content.Intent;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
+
+import phoenix.idex.GoogleCloudMessaging.GCMRegistrationIntentService;
 
 /**
  * Created by Ravinder on 5/25/16.

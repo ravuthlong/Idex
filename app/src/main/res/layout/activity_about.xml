@@ -7,11 +7,18 @@
     android:background="#0b0101">
 
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarabout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        />
+
+
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp">
+        android:layout_marginTop="110dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -21,7 +28,7 @@
             android:layout_gravity="center_vertical"
             android:typeface="monospace"
             android:gravity="center"
-            android:id="@+id/tvInfo"
+            android:id="@+id/tvInfoAbout"
             android:singleLine="false"
             />
     </LinearLayout>

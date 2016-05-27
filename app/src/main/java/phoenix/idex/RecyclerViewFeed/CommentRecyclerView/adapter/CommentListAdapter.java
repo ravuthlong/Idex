@@ -134,7 +134,7 @@ public class CommentListAdapter extends RecyclerSwipeAdapter<CommentListAdapter.
                     holder.imgRecommend.setBackgroundResource(android.R.drawable.btn_star_big_on);
 
                     volleyComments.updateRecommend(currentPos.getCommentID());
-                    volleyComments.addToUserCommentList(currentPos.getCommentID(), userLocalStore.getLoggedInUser().getUserID());
+                    volleyComments.addToUserCommentList(currentPos.getCommentID(), currentPos.getPostId(), userLocalStore.getLoggedInUser().getUserID());
                 }
             }
         });
